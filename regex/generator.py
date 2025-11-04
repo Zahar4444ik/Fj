@@ -2,7 +2,7 @@ import random
 from regex.syntax import ALPHABET
 
 MIN_DEPTH = 1
-MAX_DEPTH = 5
+MAX_DEPTH = 3
 
 MAX_UNION_RETRIES = 8
 

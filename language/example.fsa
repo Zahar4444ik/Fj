@@ -1,8 +1,7 @@
 # Example: Thomson construction result for regex {a|b}abb
 
-type: NFA
-alphabet: {a, b}
-states: {q0, q1, q2, q3, q4, q5, q6}
+alphabet: {a, b} # Optional, can be omitted
+states: {q0, q1, q2, q3, q4, q5, q6} # Optional, can be omitted
 start: q0
 accepting: {q6}
 
