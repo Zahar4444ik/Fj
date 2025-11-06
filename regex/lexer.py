@@ -3,29 +3,27 @@ from enum import Enum, auto
 
 class TokenType(Enum):
     SYMBOL = auto()  # Symbol
-    PIPE = auto()  # Operátor '|' (alternácia)
-    LPAREN = auto()  # Ľavá zátvorka '('
-    RPAREN = auto()  # Pravá zátvorka ')'
-    LBRACE = auto()  # Ľavá zložená zátvorka '{'
-    RBRACE = auto()  # Pravá zložená zátvorka '}'
-    LBRACKET = auto()  # Ľavý hranatý zátvor '['
-    RBRACKET = auto()  # Pravý hranatý zátvor ']'
-    EOF = auto()  # Koniec vstupu (End Of File)
+    PIPE = auto()  # '|'
+    LPAREN = auto()  # '('
+    RPAREN = auto()  # ')'
+    LBRACE = auto()  # '{'
+    RBRACE = auto()  # '}'
+    LBRACKET = auto()  # '['
+    RBRACKET = auto()  # ']'
+    EOF = auto()  # (End Of File)
 
 
 class Token:
     def __init__(self, type, value=None):
-        self.type = type  # Typ tokenu (z enum TokenType)
-        self.attribute = value  # Hodnota tokenu
+        self.type = type
+        self.attribute = value
 
     def __repr__(self):
-        # Reťazcová reprezentácia tokenu
         if self.attribute is not None:
             return f"Token({self.type}, {self.attribute})"
         return f"Token({self.type})"
 
 
-# Lexikálny analyzátor - rozpoznáva a extrahuje tokeny zo vstupného reťazca
 class Lexer:
     def __init__(self, input_text):
         self.input_text = input_text
@@ -33,37 +31,37 @@ class Lexer:
         self.current_char = self.input_text[0] if input_text else None
 
     def advance(self):
-        """Posunie pozíciu na ďalší znak a aktualizuje current_char.
-        Ak sa dostane za koniec textu, nastaví current_char na None."""
+        """Moves the position to the next character and updates current_char.
+            If it reaches the end of the text, it sets current_char to None."""
         self.pos += 1
         if self.pos < len(self.input_text):
             self.current_char = self.input_text[self.pos]
         else:
-            self.current_char = None  # Dosiahli sme koniec textu
+            self.current_char = None
 
     def skip_whitespace(self):
-        """Preskočí všetky medzery a nové riadky vo vstupe."""
+        """Skips all spaces and new lines in the input."""
         while self.current_char is not None and self.current_char.isspace():
             self.advance()
 
     def symbol(self):
-        """Vracia token typu SYMBOL."""
+        """Returns a token of type SYMBOL."""
         if self.current_char.isalpha() or self.current_char.isdigit():
             char = self.current_char
             self.advance()
-            return Token(TokenType.SYMBOL, f"<SYMBOL,{char}>")
-        raise ValueError(f"Nerozpoznaný symbol: '{self.current_char}' v pozicií {self.pos}")
+            return Token(TokenType.SYMBOL, char)
+        raise ValueError(f"Unrecognized symbol: '{self.current_char}' in position {self.pos}")
 
     def get_next_token(self):
-        """Hlavná metóda lexikálneho analyzátora.
-        Analyzuje text a vracia ďalší token v poradí."""
+        """The main method of the lexical analyzer.
+        It analyzes the text and returns the next token in order."""
         while self.current_char is not None:
-            # Ignorovanie medzier a formátovanie
+            # Ignoring spaces and formatting
             if self.current_char.isspace():
                 self.skip_whitespace()
                 continue
 
-            # Rozpoznávanie symbolov
+            # Symbol recognition
             if self.current_char.isalpha() or self.current_char.isdigit():
                 return self.symbol()
 
@@ -95,6 +93,6 @@ class Lexer:
                 self.advance()
                 return Token(TokenType.RPAREN)
 
-            raise ValueError(f"Nerozpoznaný znak: '{self.current_char}'")
+            raise ValueError(f"Unrecognized character: '{self.current_char}'")
 
         return Token(TokenType.EOF)

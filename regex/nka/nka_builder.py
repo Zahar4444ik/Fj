@@ -96,33 +96,3 @@ def build_NKA(node):
             return optional_NKA(build_NKA(children[1]))
 
     raise ValueError("Unknown node structure: " + str(node))
-
-
-def export_to_fsa(nka, filename="output.fsa", alphabet=None):
-    visited = set()
-    transitions = []
-
-    def dfs(state):
-        if state in visited:
-            return
-        visited.add(state)
-        for symbol, targets in state.transitions.items():
-            for target in targets:
-                transitions.append((state, symbol or 'ε', target))
-                dfs(target)
-
-    dfs(nka.start)
-    states = {s for (s, _, _) in transitions}
-    states.update([nka.start, nka.accept])
-
-    with open(filename, "w", encoding="utf-8") as f:
-        if alphabet:
-            f.write(f"alphabet: {{{', '.join(sorted(alphabet))}}}\n")
-        f.write(f"states: {{{', '.join(f'q{i}' for i, _ in enumerate(states))}}}\n")
-        f.write(f"start: q0\n")
-        f.write(f"accepting: {{q{len(states) - 1}}}\n\n")
-        f.write("transitions:\n")
-
-        state_ids = {s: f"q{i}" for i, s in enumerate(states)}
-        for s, sym, t in transitions:
-            f.write(f"  {state_ids[s]} -{sym}-> {state_ids[t]}\n")

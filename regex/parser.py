@@ -3,22 +3,22 @@ from regex.lexer import TokenType
 
 class Parser:
     def __init__(self, lexer):
-        self.lexer = lexer  # Lexikálny analyzátor, ktorý dodáva tokeny
-        self.current_token = self.lexer.get_next_token()  # Načítame prvý token
+        self.lexer = lexer
+        self.current_token = self.lexer.get_next_token()
 
     def consume(self, expected_token_type):
         """
-        Kontrolná metóda - kontroluje, či aktuálny token je očakávaného typu.
-        Ak áno, posunie sa na ďalší token. Ak nie, vyhodí chybu.
+        Check method - checks whether the current token is of the expected type.
+        If so, it moves on to the next token. If not, it throws an error.
 
-        Táto metóda implementuje prediktívnu analýzu - očakávame konkrétny token
-        na základe gramatických pravidiel.
+        This method implements predictive analysis - we expect a specific token
+        based on grammatical rules.
         """
         if self.current_token.type == expected_token_type:
-            self.current_token = self.lexer.get_next_token()  # Prejdeme na ďalší token
+            self.current_token = self.lexer.get_next_token()
         else:
-            raise SyntaxError(f"Syntaktická chyba: očakávaný token {expected_token_type}, "
-                              f"získaný {self.current_token.type}")
+            raise SyntaxError(f"Syntax error: expected token {expected_token_type}, "
+                              f"acquired {self.current_token.type}")
 
     def parse_regular(self):
         """

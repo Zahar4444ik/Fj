@@ -1,4 +1,4 @@
-ALPHABET = ['1', '2', 'c', 'd']
+ALPHABET = ['a', 'b', 'c', 'd']
 
 
 OPERATORS = {
@@ -6,7 +6,7 @@ OPERATORS = {
     "concat": "",
     "star": "{}",
     "optional": "[]",
-    "plus": "{a}",
+    "group": "()",
 }
 
 # Define precedence levels (lower number = higher precedence)
