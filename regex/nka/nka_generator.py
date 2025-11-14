@@ -1,4 +1,6 @@
 from textwrap import dedent
+
+from regex.exporter import visualize_nka, get_state_name, get_transitions
 from regex.nka.nka_builder import build_NKA
 
 
@@ -81,94 +83,3 @@ def generate_nka_py_file(syntax_tree):
                 print("\\nExiting...")
                 break
         """))
-
-
-def get_state_name(nka):
-    state_names = {}
-    counter = 0
-    stack = [nka.start]
-    visited = set()
-    while stack:
-        state = stack.pop()
-        if state in visited:
-            continue
-        visited.add(state)
-        state_names[state] = f"q{counter}"
-        counter += 1
-        for next_states in state.transitions.values():
-            stack.extend(next_states - visited)
-    return state_names
-
-
-def get_transitions(nka):
-    state_names = get_state_name(nka)
-    transitions = []
-    visited = set()
-    stack = [(nka.start, [])]
-    while stack:
-        state, path = stack.pop()
-        if state in visited:
-            continue
-        visited.add(state)
-        for symbol, next_states in state.transitions.items():
-            for next_state in next_states:
-                transitions.append((state_names[state], symbol, state_names[next_state]))
-                stack.append((next_state, path + [(state, symbol, next_state)]))
-    return transitions
-
-
-def visualize_nka(nka):
-    # Assign state names (q0, q1, etc.)
-    state_names = {}
-    counter = 0
-    stack = [nka.start]
-    visited = set()
-    while stack:
-        state = stack.pop()
-        if state in visited:
-            continue
-        visited.add(state)
-        state_names[state] = f"q{counter}"
-        counter += 1
-        for next_states in state.transitions.values():
-            stack.extend(next_states - visited)
-
-    print("NFA Structure:")
-    print(f"States: {', '.join(sorted(state_names[state] for state in visited))}")
-    print(f"Start State: {state_names[nka.start]}")
-    print(f"Accept State: {state_names[nka.accept]}")
-
-    # Collect transitions and ε-transitions
-    transitions = []
-    epsilon_transitions = []
-    visited = set()
-    stack = [(nka.start, [])]
-    while stack:
-        state, path = stack.pop()
-        if state in visited:
-            continue
-        visited.add(state)
-        for symbol, next_states in state.transitions.items():
-            for next_state in next_states:
-                if symbol == '':
-                    epsilon_transitions.append((state_names[state], state_names[next_state]))
-                else:
-                    transitions.append((state_names[state], symbol, state_names[next_state]))
-                stack.append((next_state, path + [(state, symbol, next_state)]))
-
-    # Print transitions
-    print("Transitions:")
-    if transitions:
-        for from_state, symbol, to_state in sorted(transitions):
-            symbol = symbol.replace('<SYMBOL_', '').replace('>', '')
-            print(f"  {from_state} --{symbol}--> {to_state}")
-    else:
-        print("  (none)")
-
-    # Print ε-transitions
-    print("Epsilon Transitions:")
-    if epsilon_transitions:
-        for from_state, to_state in sorted(epsilon_transitions):
-            print(f"  {from_state} --eps--> {to_state}")
-    else:
-        print("  (none)")
