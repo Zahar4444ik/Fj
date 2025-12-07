@@ -1,0 +1,5 @@
+regular ::= alternative
+alternative ::= sequence {'|' sequence}
+sequence ::= element {element}
+element ::= symbol | '(' regular ')' | '{' regular '}' | '[' regular ']'
+symbol ::= 'a' | 'b' | ... | 'z' | 'A' | 'B' | ... | 'Z' | '0' | '1' | ... | '9'

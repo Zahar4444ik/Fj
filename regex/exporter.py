@@ -74,11 +74,11 @@ def visualize_nka(nka, pretty=True):
     print("Start State:", state_names[nka.start])
 
     # Accepting may be single state or a collection
-    if isinstance(nka.accept, (set, list, tuple)):
-        accepting_names = sorted({state_names[s] for s in nka.accept})
+    if isinstance(nka.accepts, (set, list, tuple)):
+        accepting_names = sorted({state_names[s] for s in nka.accepts})
         print("Accepting States:", ", ".join(accepting_names))
     else:
-        print("Accept State:", state_names.get(nka.accept, "UNKNOWN"))
+        print("Accept State:", state_names.get(nka.accepts, "UNKNOWN"))
 
     # Collect transitions
     transitions = []
@@ -133,10 +133,10 @@ def export_to_fsa(nka, filename="output.fsa", alphabet=None, pretty=True):
     transitions = get_transitions(nka, pretty=pretty)
 
     # compute accepting set names
-    if isinstance(nka.accept, (set, list, tuple)):
-        accepting = sorted({state_names[s] for s in nka.accept})
+    if isinstance(nka.accepts, (set, list, tuple)):
+        accepting = sorted({state_names[s] for s in nka.accepts})
     else:
-        accepting = [state_names.get(nka.accept)]
+        accepting = [state_names.get(nka.accepts)]
 
     with open(filename, "w", encoding="utf-8") as f:
         # alphabet header

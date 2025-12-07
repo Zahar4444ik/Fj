@@ -53,7 +53,7 @@ def generate_nka_py_file(syntax_tree):
             current_states = epsilon_closure({nka.start})
             for symbol in input_str:
                 current_states = epsilon_closure(move(current_states, symbol))
-            return nka.accept in current_states
+            return nka.accepts in current_states
 
 
         # Build NKA structure
@@ -67,7 +67,7 @@ def generate_nka_py_file(syntax_tree):
         for from_state, symbol, to_state in sorted(transitions):
             f.write(f"{from_state}.add_transition({repr(symbol)}, {to_state})\n")
 
-        f.write(f"\nnka = NKA({state_names[nka.start]}, {state_names[nka.accept]})\n")
+        f.write(f"\nnka = NKA({state_names[nka.start]}, {state_names[nka.accepts]})\n")
 
         f.write(dedent("""
         while True:

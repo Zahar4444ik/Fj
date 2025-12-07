@@ -19,3 +19,5 @@ transitions:
   q8 -b-> q9
   q9 -b-> q10
   q10 -ε-> q6
+
+  {xy|z[x]y}

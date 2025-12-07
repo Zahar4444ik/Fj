@@ -24,6 +24,7 @@ def regex_to_fsa(regex_str):
 
 if __name__ == "__main__":
     regex = generate_valid_regex()
+    regex = '0|1{0|1}'
     print(f"Generated regex: {regex}")
 
     nka = regex_to_fsa(regex)

@@ -14,54 +14,55 @@ class State:
 
 
 class NKA:
-    def __init__(self, start, accept):
+    def __init__(self, start, accepts):
         self.start = start
-        self.accept = accept
+        self.accepts = set(accepts)
 
     def __repr__(self):
-        return f"NKA(start={self.start}, accept={self.accept})"
+        return f"NKA(start={self.start}, accepts={self.accepts})"
 
 
 def symbol_NKA(symbol):
     start = State()
     accept = State()
     start.add_transition(symbol, accept)  # start → symbol → accept
-    return NKA(start, accept)
+    return NKA(start, {accept})
 
 
 def concat_NKA(first, second):
-    first.accept.add_transition('', second.start)  # first.accept → ε → second.start
-    return NKA(first.start, second.accept)
+    for a in first.accepts:
+        a.add_transition('', second.start)  # first.accept → ε → second.start
+    return NKA(first.start, second.accepts)
 
 
 def union_NKA(first, second):
     start = State()
-    accept = State()
+
     start.add_transition('', first.start)  # start → ε → first.start
     start.add_transition('', second.start)  # start → ε → second.start
-    first.accept.add_transition('', accept)  # first.accept ε → accept
-    second.accept.add_transition('', accept)  # second.accept → ε → accept
-    return NKA(start, accept)
+
+    return NKA(start, first.accepts | second.accepts)  # | combines accepts
 
 
 def kleene_star_NKA(nka):
     start = State()
-    accept = State()
+    accepts = {start} | nka.accepts
+
     start.add_transition('', nka.start)  # start → ε → nka.start
-    start.add_transition('', accept)  # start → ε → accept (allows zero occurrences)
-    nka.accept.add_transition('', nka.start)  # nka.accept → ε → nka.start (allows multiple occurrences)
-    nka.accept.add_transition('', accept)  # nka.accept → ε → accept
-    return NKA(start, accept)
+
+    for a in nka.accepts:
+        a.add_transition('', nka.start)  # nka.accepts → ε → nka.start (allows multiple occurrences)
+    return NKA(start, accepts)
 
 
 # The same as union_NKA but with an empty transition to accept state
 def optional_NKA(nka):
     start = State()
-    accept = State()
+
+    accepts = start | nka.acceptss
     start.add_transition('', nka.start)
-    start.add_transition('', accept)
-    nka.accept.add_transition('', accept)
-    return NKA(start, accept)
+
+    return NKA(start, accepts)
 
 
 def build_NKA(node):

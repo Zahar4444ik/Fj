@@ -2,6 +2,22 @@ from collections import defaultdict
 from regex.dka.ast_converter import parser_ast_to_regex_ast
 
 
+class State:
+    def __init__(self):
+        self.transitions = defaultdict(set)
+
+    def add_transition(self, symbol, state):
+        self.transitions[symbol].add(state)
+
+    def __repr__(self):
+        return f"State({id(self)})"
+
+
+class DKA:
+    def __init__(self, start, accepts):
+        self.start = start
+        self.accepts = accepts
+
 def annotate_positions(root):
     """
     Walk the tree and assign unique integer 'position' to every symbol leaf.
@@ -90,23 +106,6 @@ def compute_nullable_first_last(node):
         return
 
     raise ValueError(f"Unknown node type in compute_nullable_first_last: {t}")
-
-class State:
-    def __init__(self):
-        self.transitions = defaultdict(set)
-
-    def add_transition(self, symbol, state):
-        self.transitions[symbol].add(state)
-
-    def __repr__(self):
-        return f"State({id(self)})"
-
-
-class DKA:
-    def __init__(self, start, accept):
-        self.start = start
-        self.accept = accept
-
 
 # -----------------------------------------
 # Compute followpos using standard rules
@@ -244,71 +243,3 @@ def build_DKA(ast):
     dka = build_dka_from_followpos(root, pos_map, followpos)
 
     return dka
-
-
-# ---------------------------
-# Small demo using the regex:
-#   a | b{c|d}
-# (you can replace this with parser_ast_to_regex_ast(parser_tree))
-# ---------------------------
-if __name__ == "__main__":
-    # Build normalized regex AST for: a | b{c|d}
-    # Equivalent normalization:
-    # union( symbol 'a', concat(symbol 'b', star(union(symbol 'c', symbol 'd'))) )
-    regex_ast = {
-        'type': 'regular',
-        'children': [{
-            'type': 'alternative',
-            'children': [
-                {'type': 'sequence', 'children': [
-                    {'type': 'element', 'children': [
-                        {'type': 'symbol', 'value': 'a'}
-                    ]}
-                ]},
-                {'type': 'symbol', 'value': '<PIPE>'},
-                {'type': 'sequence', 'children': [
-                    {'type': 'element', 'children': [
-                        {'type': 'symbol', 'value': 'b'}
-                    ]}
-                ]}
-            ]
-        }]
-    }
-
-    regex_ast = parser_ast_to_regex_ast(regex_ast)  # just to illustrate usage; regex_ast is already in regex AST form
-
-    # Append end marker '#': concat(regex_ast, symbol '#')
-    root = {'type': 'concat', 'left': regex_ast, 'right': {'type': 'symbol', 'value': '#'}}
-
-    # 1) annotate positions (assign integers to every symbol leaf)
-    pos_map = annotate_positions(root)
-    print("Position map:", pos_map)  # e.g. {1:'a', 2:'b', 3:'c', 4:'d', 5:'#'}
-
-    # 2) compute nullable, firstpos, lastpos
-    compute_nullable_first_last(root)
-
-    # Walk tree and print interesting nodes for clarity
-    def dump(node, name='root'):
-        t = node['type']
-        print(f"\nNode {name}: type={t}")
-        if t == 'symbol':
-            print(f"  symbol={node['value']} pos={node['position']}")
-        if 'nullable' in node:
-            print(f"  nullable: {node['nullable']}")
-        if 'firstpos' in node:
-            print(f"  firstpos: {sorted(node['firstpos'])}")
-        if 'lastpos' in node:
-            print(f"  lastpos: {sorted(node['lastpos'])}")
-        if t in ('union','concat'):
-            dump(node['left'], name + '.left')
-            dump(node['right'], name + '.right')
-        elif t in ('star','optional'):
-            dump(node['child'], name + '.child')
-
-    dump(root)
-
-    # 3) compute followpos
-    followpos = compute_followpos(root)
-    print("\nfollowpos:")
-    for p in sorted(followpos.keys()):
-        print(f"  pos {p} -> {sorted(followpos[p])}")

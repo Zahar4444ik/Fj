@@ -1,6 +1,6 @@
 def parser_ast_to_regex_ast(parser_tree):
     """
-    Convert the parser AST dict (from your parser.py) to a normalized regex AST.
+    Convert the parser AST dict to a normalized regex AST.
     Normalized node types: 'symbol', 'concat', 'union', 'star', 'optional'.
     """
 
@@ -102,7 +102,5 @@ if __name__ == "__main__":
     }
 
     regex_ast = parser_ast_to_regex_ast(parser_ast)
-    import pprint
-    pprint.pprint(regex_ast)
 
     print(regex_ast)
