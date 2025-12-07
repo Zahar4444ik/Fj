@@ -59,7 +59,7 @@ def kleene_star_NKA(nka):
 def optional_NKA(nka):
     start = State()
 
-    accepts = start | nka.acceptss
+    accepts = {start} | nka.accepts
     start.add_transition('', nka.start)
 
     return NKA(start, accepts)

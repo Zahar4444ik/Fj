@@ -16,7 +16,8 @@ class State:
 class DKA:
     def __init__(self, start, accepts):
         self.start = start
-        self.accepts = accepts
+        self.accepts = set(accepts)
+
 
 def annotate_positions(root):
     """
@@ -148,50 +149,36 @@ def compute_followpos(root):
 
 
 def build_dka_from_followpos(root, pos_map, followpos):
-    """
-    Convert followpos automaton to your DKA structure.
-    root      – AST root (must have firstpos computed)
-    pos_map   – {pos: symbol}
-    followpos – {pos: set_of_positions}
-    """
 
-    # 1) initial state = firstpos(root)
     start_pos_set = frozenset(root["firstpos"])
 
-    # Mapping: set_of_positions → State()
     dfa_state_map = {}
     dfa_start_state = State()
     dfa_state_map[start_pos_set] = dfa_start_state
 
-    # Queue for BFS
     unprocessed = [start_pos_set]
 
-    # End marker position (#)
+    # find end marker
     end_marker_pos = None
     for pos, sym in pos_map.items():
         if sym == "#":
             end_marker_pos = pos
             break
 
-    # Collect accepting states (State() objects)
     dfa_accept_states = set()
 
     while unprocessed:
         current = unprocessed.pop()
         current_state_obj = dfa_state_map[current]
 
-        # If contains end marker → accepting DFA state
         if end_marker_pos in current:
             dfa_accept_states.add(current_state_obj)
 
-        # Transitions by real alphabet symbols
         symbols = set(pos_map[p] for p in current if pos_map[p] != "#")
 
         for sym in symbols:
-            # All positions in current where symbol = sym
             positions_with_sym = [p for p in current if pos_map[p] == sym]
 
-            # Union of followpos over these positions
             target_set = set()
             for p in positions_with_sym:
                 target_set |= followpos[p]
@@ -199,28 +186,31 @@ def build_dka_from_followpos(root, pos_map, followpos):
             target_set = frozenset(target_set)
 
             if not target_set:
-                continue  # no target
+                continue
 
-            # Create new state if needed
             if target_set not in dfa_state_map:
                 dfa_state_map[target_set] = State()
                 unprocessed.append(target_set)
 
             target_state_obj = dfa_state_map[target_set]
 
-            # Add transition
             current_state_obj.add_transition(sym, target_state_obj)
 
-    # Final result
+    # prepare accept set
     if len(dfa_accept_states) == 1:
         accept = next(iter(dfa_accept_states))
     else:
-        accept = dfa_accept_states  # if multiple
+        accept = dfa_accept_states
 
-    return DKA(dfa_start_state, accept)
+    dka = DKA(dfa_start_state, accept)
+
+    # ✔️ attach the mapping for later
+    dka.state_map = dfa_state_map
+
+    return dka
 
 
-def build_DKA(ast):
+def build_DKA(ast, regex):
     """
     Build DKA from parsed AST
     Returns: DKA object
@@ -242,4 +232,78 @@ def build_DKA(ast):
     # 5) build DKA from followpos
     dka = build_dka_from_followpos(root, pos_map, followpos)
 
-    return dka
+    # 6) creates states visual
+    name_map, visual_map = name_dfa_states(dka, pos_map, regex)
+
+    return dka, name_map, visual_map
+
+
+def visualize_state_positions(regex_str, pos_map, pos_set):
+    """
+    regex_str : original regex string
+    pos_map   : {pos: symbol}
+    pos_set   : active positions in the DFA state
+
+    Returns the regex string with '.' inserted before active symbol positions.
+    """
+
+    # Collect indexes of symbol-characters (non-operators)
+    symbol_indexes = [
+        i for i, ch in enumerate(regex_str)
+        if ch not in "()*+?|{}[]"
+    ]
+
+    # Convert pos_set (positions) → real character indexes in regex_str
+    marked_indexes = []
+    for pos in pos_set:
+        if pos <= len(symbol_indexes):
+            marked_indexes.append(symbol_indexes[pos - 1])
+        else:
+            # Position outside regex_str (shouldn’t normally happen)
+            marked_indexes.append(len(regex_str))
+
+    # Insert '.' before each symbol, process from right to left
+    result = regex_str
+    for idx in sorted(marked_indexes, reverse=True):
+        result = result[:idx] + "." + result[idx:]
+
+    return result
+
+
+def name_dfa_states(dka, pos_map, original_regex):
+    """
+    Assign q0, q1, q2 ... and compute visual token per DFA state.
+    """
+    name_map = {}
+    visual_map = {}
+
+    queue = [dka.start]
+    visited = set([dka.start])
+    counter = 0
+
+    while queue:
+        st = queue.pop(0)
+        name = f"q{counter}"
+        name_map[st] = name
+
+        # find position-set behind this state
+        # invert the mapping from dfa_state_map
+        pos_set = None
+        for k, v in dka.state_map.items():
+            if v is st:
+                pos_set = k
+                break
+
+        visual = visualize_state_positions(original_regex, pos_map, pos_set)
+        visual_map[st] = visual
+
+        counter += 1
+
+        # BFS for next
+        for sym, targets in st.transitions.items():
+            for t in targets:
+                if t not in visited:
+                    visited.add(t)
+                    queue.append(t)
+
+    return name_map, visual_map

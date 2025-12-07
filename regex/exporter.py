@@ -157,3 +157,29 @@ def export_to_fsa(nka, filename="output.fsa", alphabet=None, pretty=True):
             f.write(f"  {frm} -{sym_out}-> {to}\n")
 
     return filename
+
+
+def export_dfa_to_fsa(dka, name_map, visual_map, filename):
+    lines = []
+
+    # states line
+    list_states = [f"{name_map[s]}={visual_map[s]}" for s in name_map]
+    lines.append("states: {" + ", ".join(list_states) + "}")
+
+    # start
+    lines.append(f"start: {name_map[dka.start]}")
+
+    # accepting
+    acc_names = [name_map[a] for a in dka.accepts]
+    lines.append("accepting: {" + ", ".join(acc_names) + "}")
+
+    # transitions
+    lines.append("\ntransitions:")
+    for state in name_map:
+        for sym, targets in state.transitions.items():
+            for t in targets:
+                lines.append(f"  {name_map[state]} -{sym}-> {name_map[t]}")
+
+    result = "\n".join(lines)
+    with open(filename, "w") as f:
+        f.write(result)
