@@ -163,8 +163,8 @@ def export_dfa_to_fsa(dka, name_map, visual_map, filename):
     lines = []
 
     # states line
-    list_states = [f"{name_map[s]}={visual_map[s]}" for s in name_map]
-    lines.append("states: {" + ", ".join(list_states) + "}")
+    list_states = [f'{name_map[s]}="{visual_map[s]}"' for s in name_map]
+    lines.append("states: {\n\t" + ", \n\t".join(list_states) + "\n}")
 
     # start
     lines.append(f"start: {name_map[dka.start]}")
