@@ -28,5 +28,5 @@ if __name__ == "__main__":
 
     regex_to_fsa(regex)
 
-    print(compare("output/fsa/dka.fsa", "output/fsa/test.fsa"))
+    print(compare("dka/dka2.fsa", "dka/dka1.fsa"))
 

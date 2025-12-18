@@ -1,0 +1,9 @@
+states: {s0, s1, s2, s3}
+start: s0
+accepting: {s3}
+
+transitions:
+  s0 -ε-> s2
+  s2 -a-> s3
+  s0 -ε-> s1
+  s1 -a-> s3

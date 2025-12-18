@@ -1,0 +1,7 @@
+states: {s, t, u}
+start: s
+accepting: {u}
+
+transitions:
+  s -ε-> t
+  t -a-> u
