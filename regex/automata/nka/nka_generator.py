@@ -1,7 +1,7 @@
 from textwrap import dedent
 
-from regex.exporter import visualize_nka, get_state_name, get_transitions
-from regex.nka.nka_builder import build_NKA
+from regex.io.exporter import visualize_nka, get_state_name, get_transitions
+from regex.automata.nka.nka_builder import build_NKA
 
 
 def generate_nka_py_file(syntax_tree):
@@ -10,7 +10,7 @@ def generate_nka_py_file(syntax_tree):
     visualize_nka(nka)
 
     # Generate nka.py
-    with open("automata\\nka.py", "w", encoding="utf-8") as f:
+    with open("output/automata/nka.py", "w", encoding="utf-8") as f:
         f.write(dedent("""
         from collections import defaultdict
 

@@ -1,0 +1,7 @@
+states: {q0, q1, q2}
+start: q0
+accepting: {q2}
+
+transitions:
+  q0 -a-> q1
+  q1 -b-> q2

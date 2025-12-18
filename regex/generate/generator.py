@@ -1,5 +1,5 @@
 import random
-from regex.syntax import ALPHABET
+from regex.frontend.syntax import ALPHABET
 
 MIN_DEPTH = 1
 MAX_DEPTH = 3
