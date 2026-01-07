@@ -1,4 +1,4 @@
-ALPHABET = ['a', 'b', 'c', 'd']
+ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
 
 
 OPERATORS = {

@@ -196,13 +196,7 @@ def build_dka_from_followpos(root, pos_map, followpos):
 
             current_state_obj.add_transition(sym, target_state_obj)
 
-    # prepare accept set
-    if len(dfa_accept_states) == 1:
-        accept = next(iter(dfa_accept_states))
-    else:
-        accept = dfa_accept_states
-
-    dka = DKA(dfa_start_state, accept)
+    dka = DKA(dfa_start_state, dfa_accept_states)
 
     # ✔️ attach the mapping for later
     dka.state_map = dfa_state_map
