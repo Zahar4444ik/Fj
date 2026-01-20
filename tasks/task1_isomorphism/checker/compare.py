@@ -1,6 +1,6 @@
-from isomorphism.automata.canonical import canonical_signature
-from isomorphism.automata.normalize import normalize_automaton
-from isomorphism.automata.parser import parse_fsa
+from tasks.task1_isomorphism.generator.automata.canonical import canonical_signature
+from tasks.task1_isomorphism.generator.automata.normalize import normalize_automaton
+from tasks.task1_isomorphism.generator.automata.parser import parse_fsa
 
 
 def structurally_equivalent(a1, a2):

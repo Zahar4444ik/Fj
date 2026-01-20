@@ -1,7 +1,7 @@
 from textwrap import dedent
 
-from regex.io.exporter import visualize_nka, get_state_name, get_transitions
-from regex.automata.nka.nka_builder import build_NKA
+from core.regex.generators.fsa_generator import visualize_nka, get_state_name, get_transitions
+from core.regex.automata.nka.nka_builder import build_NKA
 
 
 def generate_nka_py_file(syntax_tree):

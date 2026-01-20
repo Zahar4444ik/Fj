@@ -232,8 +232,8 @@ def generate_rejected_words(tree: dict, alphabet: List[str], count: int = 10,
 
 # Example usage and testing
 if __name__ == "__main__":
-    from regex.frontend.lexer import Lexer
-    from regex.frontend.parser import Parser
+    from core.regex.frontend.lexer import Lexer
+    from core.regex.frontend.parser import Parser
 
     ALPHABET = ['a', 'b', 'c', 'd']
 

@@ -118,7 +118,7 @@ def visualize_nka(nka, pretty=True):
         print("  (none)")
 
 
-def export_to_fsa(nka, filename="output.fsa", alphabet=None, pretty=True):
+def fsa_from_nka(nka, filename="output.fsa", alphabet=None, pretty=True):
     """
     Write a .fsa file for the given NKA.
     - alphabet: optional iterable of symbols to print in header
@@ -159,7 +159,7 @@ def export_to_fsa(nka, filename="output.fsa", alphabet=None, pretty=True):
     return filename
 
 
-def export_dfa_to_fsa(dka, name_map, visual_map, filename):
+def fsa_from_dka(dka, name_map, visual_map, filename):
     lines = []
 
     # states line

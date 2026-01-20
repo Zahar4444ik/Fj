@@ -1,4 +1,4 @@
-from data.automatons.nka_iterative import student_a, student_b, student_c
+from task2.data.nka_iterative import student_b, student_c, student_a
 import importlib.util
 import sys
 
@@ -12,9 +12,9 @@ def load_module_from_path(module_name, path):
 
 
 def prepare_reference_automaton(pattern, module_name, path):
-    from regex.frontend.lexer import Lexer
-    from regex.frontend.parser import Parser
-    from testing.generate.nka.iterative import generate_iterative_nka
+    from core.regex.frontend.lexer import Lexer
+    from core.regex.frontend.parser import Parser
+    from tasks.task2_behavioral_testing.generator.nka.iterative import generate_iterative_nka
 
     lexer = Lexer(pattern)
     parser = Parser(lexer)
@@ -44,7 +44,7 @@ def test_student_a():
     reference = prepare_reference_automaton(
         "0",
         module_name="reference_a",
-        path="data/automatons/nka_iterative/reference_a.py"
+        path="task2/data/nka_iterative/reference_a.py"
     ).nfa
 
     student = student_a.nfa
@@ -55,7 +55,7 @@ def test_student_b():
     reference = prepare_reference_automaton(
         "{0|1}01",
         module_name="reference_b",
-        path="data/automatons/nka_iterative/reference_b.py"
+        path="task2/data/nka_iterative/reference_b.py"
     ).nfa
 
     student = student_b.nfa
@@ -66,7 +66,7 @@ def test_wrong_student_c():
     reference = prepare_reference_automaton(
         "{0}1",
         module_name="reference_c",
-        path="data/automatons/nka_iterative/reference_c.py"
+        path="task2/data/nka_iterative/reference_c.py"
     ).nfa
 
     student = student_c.nfa

@@ -1,5 +1,5 @@
 from collections import defaultdict
-from regex.automata.dka.ast_converter import parser_ast_to_regex_ast
+from core.regex.automata.dka.ast_converter import parser_ast_to_regex_ast
 
 
 class State:

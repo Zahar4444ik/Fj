@@ -1,4 +1,4 @@
-from regex.frontend.lexer import TokenType
+from core.regex.frontend.lexer import TokenType
 
 
 class Parser:

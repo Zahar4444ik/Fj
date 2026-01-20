@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from isomorphism.automata.compare import compare
+from tasks.task1_isomorphism.checker.compare import compare
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"

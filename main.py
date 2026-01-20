@@ -1,27 +1,27 @@
-from isomorphism.automata.compare import compare
-from regex.automata.dka.dka_builder import build_DKA
-from testing.generate.nka.iterative import generate_iterative_nka
-from testing.generate.random_regex import generate_valid_regex
-from regex.frontend.lexer import Lexer
-from regex.frontend.parser import Parser
-from regex.automata.nka.nka_builder import build_NKA
-from regex.io.exporter import export_to_fsa, export_dfa_to_fsa
+from tasks.task1_isomorphism.checker.compare import compare
+from core.regex.automata.dka.dka_builder import build_DKA
+from tasks.task2_behavioral_testing.generator.nka.iterative import generate_iterative_nka
+from core.regex.generators.random_regex import generate_valid_regex
+from core.regex.frontend.lexer import Lexer
+from core.regex.frontend.parser import Parser
+from core.regex.automata.nka.nka_builder import build_NKA
+from core.regex.generators.fsa_generator import fsa_from_nka, fsa_from_dka
 
 
 def regex_to_fsa(regex_str):
     lexer = Lexer(regex_str)
     parser = Parser(lexer)
     ast = parser.parse()
-    print(ast)
+    # print(ast)
 
     # Generate NKA
     nka = build_NKA(ast)
-    export_to_fsa(nka, filename="output/fsa/nka.fsa")
+    fsa_from_nka(nka, filename="output/fsa/nka.fsa")
     generate_iterative_nka(ast)
 
     # Generate DKA
     dka, name_map, visual_map = build_DKA(ast, regex_str)
-    export_dfa_to_fsa(dka, name_map, visual_map, filename="output/fsa/dka.fsa")
+    fsa_from_dka(dka, name_map, visual_map, filename="output/fsa/dka.fsa")
 
 
 if __name__ == "__main__":
