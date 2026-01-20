@@ -94,9 +94,12 @@ if __name__ == "__main__":
     accepted_states = set()
 
     # TODO: vytvor automat
-    # nfa = NFA(transition_table=transition_table,
-    #           accepted_states=accepted_states,
-    #           init_state=State.q0)
+    nfa = NFA(transition_table=transition_table,
+              accepted_states=accepted_states,
+              init_state=State.q0)
 
-    # TODO: testovanie automatu
-    pass
+    input_string = input("Zadaj vstupný reťazec> ")
+    while input_string != "quit":
+        print(f"Reťazec '{input_string}' "
+              f"{'JE ' if nfa.check(input_string) else 'NIE JE '}akceptovaný!")
+        input_string = input("Zadaj vstupný reťazec> ")

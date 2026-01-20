@@ -1,5 +1,6 @@
 from isomorphism.automata.compare import compare
 from regex.automata.dka.dka_builder import build_DKA
+from testing.generate.nka.iterative import generate_iterative_nka
 from testing.generate.random_regex import generate_valid_regex
 from regex.frontend.lexer import Lexer
 from regex.frontend.parser import Parser
@@ -16,7 +17,7 @@ def regex_to_fsa(regex_str):
     # Generate NKA
     nka = build_NKA(ast)
     export_to_fsa(nka, filename="output/fsa/nka.fsa")
-    # generate_nka_py_file(nka)
+    generate_iterative_nka(ast)
 
     # Generate DKA
     dka, name_map, visual_map = build_DKA(ast, regex_str)
@@ -25,7 +26,7 @@ def regex_to_fsa(regex_str):
 
 if __name__ == "__main__":
     regex = generate_valid_regex()
-    # regex = '0|1{0|1}'
+    regex = '0|1{0|1}'
     print(f"Generated regex: {regex}")
 
     regex_to_fsa(regex)
