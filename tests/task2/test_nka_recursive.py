@@ -1,0 +1,123 @@
+from task2.data.nka_recursive import student_b, student_a, student_infinite_loop, student_wrong, student_random
+import importlib.util
+import sys
+
+from tasks.task2_behavioral_testing.generator.utils.safe_call import safe_call
+from tasks.task2_behavioral_testing.word_generation.testing_words_generator import generate_accepted_words, \
+    generate_rejected_words
+
+
+def load_module_from_path(module_name, path):
+    spec = importlib.util.spec_from_file_location(module_name, path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def prepare_reference_automaton(pattern, module_name, path):
+    from core.regex.frontend.lexer import Lexer
+    from core.regex.frontend.parser import Parser
+    from tasks.task2_behavioral_testing.generator.nka.recursive import generate_recursive_nka
+
+    lexer = Lexer(pattern)
+    parser = Parser(lexer)
+    ast = parser.parse()
+
+    generate_recursive_nka(ast, path=path)
+
+    return load_module_from_path(module_name, path), ast
+
+
+def compare_automata(reference_nfa, student_nfa, alphabet, max_len=5):
+    from itertools import product
+
+    for length in range(max_len + 1):
+        for word in product(alphabet, repeat=length):
+            w = "".join(word)
+            assert reference_nfa.check(w) == student_nfa.check(w), f"Mismatch on '{w}'"
+
+
+def init_module():
+    prepare_reference_automaton("{0}1", "data/automatons/nka_iterative/reference_a.py")
+    prepare_reference_automaton("{0|1}01", "data/automatons/nka_iterative/reference_b.py")
+    prepare_reference_automaton("{0}1", "data/automatons/nka_iterative/reference_c.py")
+
+
+def test_student_a():
+    reference, ast = prepare_reference_automaton(
+        "0",
+        module_name="reference_a",
+        path="task2/data/nka_recursive/reference_a.py"
+    )
+
+    stu = safe_call(student_a.q0, '0')
+    ref = safe_call(reference.q0, '0')
+    assert stu == ref
+
+
+def test_student_b():
+    reference, ast = prepare_reference_automaton(
+        "{0}",
+        module_name="reference_b",
+        path="task2/data/nka_recursive/reference_b.py"
+    )
+
+    stu = safe_call(student_b.q0, '0000')
+    ref = safe_call(reference.q0, '0000')
+    assert stu == ref
+
+
+def test_student_infinite_loop():
+    reference, ast = prepare_reference_automaton(
+        "{0}",
+        module_name="reference_infinite_loop",
+        path="task2/data/nka_recursive/reference_infinite_loop.py"
+    )
+
+    words = ["", "0", "00"]
+
+    for w in words:
+        ref = safe_call(reference.q0, w)
+        stu = safe_call(student_infinite_loop.q0, w)
+
+        assert ref is not None, "Reference must terminate"
+        assert stu is None, f"Student should not terminate on '{w}'"
+
+
+def test_student_wrong():
+    reference, ast = prepare_reference_automaton(
+        "{0|1}01",
+        module_name="reference_wrong",
+        path="task2/data/nka_recursive/reference_wrong.py"
+    )
+
+    counterexamples = ["", "0", "111110011"]
+
+    for w in counterexamples:
+        ref = safe_call(reference.q0, w)
+        stu = safe_call(student_wrong.q0, w)
+
+        assert ref is not None
+        assert stu is not None
+        assert ref != stu, f"Student accepted wrong word '{w}'"
+
+
+def test_student_random():
+    reference, tree = prepare_reference_automaton(
+        "0|1{0|1}",
+        module_name="reference_random",
+        path="task2/data/nka_recursive/reference_random.py"
+    )
+
+    words = generate_accepted_words(tree, ['0', '1'], count=5, max_iterations=3)
+    words.extend(generate_rejected_words(tree, ['0', '1'], count=5, max_iterations=3))
+
+    for w in words:
+        ref = safe_call(reference.q0, w)
+        stu = safe_call(student_random.q0, w)
+
+        assert ref is not None
+        assert stu is not None
+        assert ref == stu, f"Mismatch on word '{w}'"
+

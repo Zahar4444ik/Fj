@@ -25,15 +25,6 @@ def prepare_reference_automaton(pattern, module_name, path):
     return load_module_from_path(module_name, path)
 
 
-def compare_automata(reference_nfa, student_nfa, alphabet, max_len=5):
-    from itertools import product
-
-    for length in range(max_len + 1):
-        for word in product(alphabet, repeat=length):
-            w = "".join(word)
-            assert reference_nfa.check(w) == student_nfa.check(w), f"Mismatch on '{w}'"
-
-
 def init_module():
     prepare_reference_automaton("{0}1", "data/automatons/nka_iterative/reference_a.py")
     prepare_reference_automaton("{0|1}01", "data/automatons/nka_iterative/reference_b.py")

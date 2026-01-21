@@ -11,6 +11,15 @@ def generate_iterative_nka(syntax_tree, path="output/automata/nka_iterative.py")
     # visualize_nka(nka)
 
     with open(path, "w", encoding="utf-8") as f:
+        f.write(dedent('''
+                """
+                ============================================================
+                Rekurzívna implementácia nedeterministického konečného automatu
+                Automat je generovaný automaticky zo syntaxového stromu regexu.
+                ============================================================
+                """
+                '''))
+
         f.write(dedent("""
         from enum import Enum, auto
 

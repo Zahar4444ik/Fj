@@ -6,6 +6,7 @@ from core.regex.frontend.lexer import Lexer
 from core.regex.frontend.parser import Parser
 from core.regex.automata.nka.nka_builder import build_NKA
 from core.regex.generators.fsa_generator import fsa_from_nka, fsa_from_dka
+from tasks.task2_behavioral_testing.generator.nka.recursive import generate_recursive_nka
 
 
 def regex_to_fsa(regex_str):
@@ -18,6 +19,8 @@ def regex_to_fsa(regex_str):
     nka = build_NKA(ast)
     fsa_from_nka(nka, filename="output/fsa/nka.fsa")
     generate_iterative_nka(ast)
+    generate_recursive_nka(ast)
+
 
     # Generate DKA
     dka, name_map, visual_map = build_DKA(ast, regex_str)
