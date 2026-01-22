@@ -1,5 +1,7 @@
 from tasks.task1_isomorphism.checker.compare import compare
 from core.regex.automata.dka.dka_builder import build_DKA
+from tasks.task2_behavioral_testing.generator.dka.iterative import generate_iterative_dka
+from tasks.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
 from tasks.task2_behavioral_testing.generator.nka.iterative import generate_iterative_nka
 from core.regex.generators.random_regex import generate_valid_regex
 from core.regex.frontend.lexer import Lexer
@@ -20,6 +22,8 @@ def regex_to_fsa(regex_str):
     fsa_from_nka(nka, filename="output/fsa/nka.fsa")
     generate_iterative_nka(ast)
     generate_recursive_nka(ast)
+    generate_iterative_dka(ast)
+    generate_recursive_dka(ast)
 
 
     # Generate DKA

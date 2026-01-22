@@ -268,6 +268,9 @@ def name_dfa_states(dka, pos_map, original_regex):
     """
     Assign q0, q1, q2 ... and compute visual token per DFA state.
     """
+    if original_regex is None:
+        return None, None
+
     name_map = {}
     visual_map = {}
 

@@ -1,14 +1,13 @@
 from collections import defaultdict
 from textwrap import dedent
 
-from core.regex.generators.fsa_generator import get_state_name, get_transitions
+from core.regex.automata.utils.automata_operations import get_state_name, get_transitions
 from core.regex.automata.nka.nka_builder import build_NKA
 
 
 def generate_iterative_nka(syntax_tree, path="output/automata/nka_iterative.py"):
     # Build NKA from syntax tree
     nka = build_NKA(syntax_tree)
-    # visualize_nka(nka)
 
     with open(path, "w", encoding="utf-8") as f:
         f.write(dedent('''

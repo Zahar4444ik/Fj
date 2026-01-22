@@ -25,12 +25,6 @@ def prepare_reference_automaton(pattern, module_name, path):
     return load_module_from_path(module_name, path)
 
 
-def init_module():
-    prepare_reference_automaton("{0}1", "data/automatons/nka_iterative/reference_a.py")
-    prepare_reference_automaton("{0|1}01", "data/automatons/nka_iterative/reference_b.py")
-    prepare_reference_automaton("{0}1", "data/automatons/nka_iterative/reference_c.py")
-
-
 def test_student_a():
     reference = prepare_reference_automaton(
         "0",

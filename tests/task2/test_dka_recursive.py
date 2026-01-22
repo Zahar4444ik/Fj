@@ -1,4 +1,4 @@
-from task2.data.nka_recursive import student_b, student_a, student_infinite_loop, student_wrong, student_random
+from task2.data.dka_recursive import student_b, student_a, student_random
 import importlib.util
 import sys
 
@@ -18,13 +18,13 @@ def load_module_from_path(module_name, path):
 def prepare_reference_automaton(pattern, module_name, path):
     from core.regex.frontend.lexer import Lexer
     from core.regex.frontend.parser import Parser
-    from tasks.task2_behavioral_testing.generator.nka.recursive import generate_recursive_nka
+    from tasks.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
 
     lexer = Lexer(pattern)
     parser = Parser(lexer)
     ast = parser.parse()
 
-    generate_recursive_nka(ast, path=path)
+    generate_recursive_dka(ast, path=path)
 
     return load_module_from_path(module_name, path), ast
 
@@ -33,7 +33,7 @@ def test_student_a():
     reference, ast = prepare_reference_automaton(
         "0",
         module_name="reference_a",
-        path="task2/data/nka_recursive/reference_a.py"
+        path="task2/data/dka_recursive/reference_a.py"
     )
 
     stu = safe_call(student_a.q0, '0')
@@ -45,7 +45,7 @@ def test_student_b():
     reference, ast = prepare_reference_automaton(
         "{0}",
         module_name="reference_b",
-        path="task2/data/nka_recursive/reference_b.py"
+        path="task2/data/dka_recursive/reference_b.py"
     )
 
     stu = safe_call(student_b.q0, '0000')
@@ -53,46 +53,11 @@ def test_student_b():
     assert stu == ref
 
 
-def test_student_infinite_loop():
-    reference, ast = prepare_reference_automaton(
-        "{0}",
-        module_name="reference_infinite_loop",
-        path="task2/data/nka_recursive/reference_infinite_loop.py"
-    )
-
-    words = ["", "0", "00"]
-
-    for w in words:
-        ref = safe_call(reference.q0, w)
-        stu = safe_call(student_infinite_loop.q0, w)
-
-        assert ref is not None, "Reference must terminate"
-        assert stu is None, f"Student should not terminate on '{w}'"
-
-
-def test_student_wrong():
-    reference, ast = prepare_reference_automaton(
-        "{0|1}01",
-        module_name="reference_wrong",
-        path="task2/data/nka_recursive/reference_wrong.py"
-    )
-
-    counterexamples = ["", "0", "111110011"]
-
-    for w in counterexamples:
-        ref = safe_call(reference.q0, w)
-        stu = safe_call(student_wrong.q0, w)
-
-        assert ref is not None
-        assert stu is not None
-        assert ref != stu, f"Student accepted wrong word '{w}'"
-
-
 def test_student_random():
     reference, tree = prepare_reference_automaton(
         "0|1{0|1}",
         module_name="reference_random",
-        path="task2/data/nka_recursive/reference_random.py"
+        path="task2/data/dka_recursive/reference_random.py"
     )
 
     words = generate_accepted_words(tree, ['0', '1'], count=5, max_iterations=3)
