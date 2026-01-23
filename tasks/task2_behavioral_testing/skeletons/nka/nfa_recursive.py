@@ -28,17 +28,6 @@ def q0(string: str) -> bool:
     pass
 
 
-# ============================================================
-# TODO:
-# Implementuj jednotlivé stavy automatu (q1, q2, q3, ...)
-#
-# Odporúčanie:
-# - najprv ošetri prípad prázdneho reťazca
-# - potom spracuj prvý znak string[0]
-# - pri prechode odober znak: string[1:]
-# ============================================================
-
-
 if __name__ == "__main__":
     """
     Testovacia časť – študent môže manuálne testovať automat.

@@ -33,6 +33,7 @@ def generate_recursive_dka(syntax_tree, path="output/automata/dka_recursive.py")
         # Generate each state as a function
         for state, state_name in state_names.items():
             f.write(f"\n\ndef {state_name}(string: str) -> bool:\n")
+            f.write(f"    print({repr(state_name)}, string)\n")
 
             # Handle empty string (base case)
             is_accepting = state in dka.accepts

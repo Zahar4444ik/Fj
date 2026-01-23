@@ -1,6 +1,8 @@
 from enum import Enum, auto
 
 
+# Nič nemeniť iba doplniť!!!
+
 # ============================================================
 # TODO:
 # Definuj všetky stavy nedeterministického konečného automatu.
@@ -62,9 +64,9 @@ class NFA:
         Over, či automat akceptuje zadaný vstupný reťazec.
 
         Algoritmus má byť iteratívny a má používať zásobník:
-        1. Inicializuj zásobník počiatočnou konfiguráciou
+        1. Inicializuj zásobník (stack) počiatočnou konfiguráciou
         2. Kým zásobník nie je prázdny:
-           - vyber konfiguráciu
+           - vyber konfiguráciu a vypíš ju v formáte: '(stav, "zvyšok reťazca")'
            - ak je stav akceptačný a reťazec je prázdny → ACCEPT
            - inak rozšír konfiguráciu
         3. Ak sa žiadna akceptačná konfigurácia nenájde → REJECT
@@ -76,29 +78,29 @@ class NFA:
         pass
 
 
+"""
+============================================================
+TODO:
+V tejto časti:
+- definuj tabuľku prechodov
+- definuj množinu akceptačných stavov
+- vytvor inštanciu NFA
+- otestuj automat na rôznych vstupných reťazcoch
+============================================================
+"""
+
+# TODO: definuj transition_table
+transition_table = {}
+
+# TODO: definuj množinu akceptačných stavov
+accepted_states = set()
+
+# TODO: vytvor automat
+nfa = NFA(transition_table=transition_table,
+          accepted_states=accepted_states,
+          init_state=State.q0)
+
 if __name__ == "__main__":
-    """
-    ============================================================
-    TODO:
-    V tejto časti:
-    - definuj tabuľku prechodov
-    - definuj množinu akceptačných stavov
-    - vytvor inštanciu NFA
-    - otestuj automat na rôznych vstupných reťazcoch
-    ============================================================
-    """
-
-    # TODO: definuj transition_table
-    transition_table = {}
-
-    # TODO: definuj množinu akceptačných stavov
-    accepted_states = set()
-
-    # TODO: vytvor automat
-    nfa = NFA(transition_table=transition_table,
-              accepted_states=accepted_states,
-              init_state=State.q0)
-
     input_string = input("Zadaj vstupný reťazec> ")
     while input_string != "quit":
         print(f"Reťazec '{input_string}' "

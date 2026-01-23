@@ -1,16 +1,11 @@
 """
 ============================================================
-Rekurzívna implementácia nedeterministického konečného automatu (NFA)
+Rekurzívna implementácia deterministického konečného automatu (DFA)
 
 Každý stav automatu je reprezentovaný funkciou qX, ktorá:
 - prijíma vstupný reťazec (string)
 - vracia True, ak je reťazec akceptovaný z daného stavu
 - vracia False inak
-
-Nedeterministické vetvenie sa realizuje pomocou logického OR (or).
-
-Epsilon-prechody sú reprezentované volaním inej funkcie
-bez odoberania symbolu zo vstupného reťazca.
 ============================================================
 """
 
@@ -33,18 +28,8 @@ bez odoberania symbolu zo vstupného reťazca.
 # ============================================================
 def q0(string: str) -> bool:
     # TODO: implementuj správanie počiatočného stavu
+    print('(q0, "{string}")') # Toto ma byt na začiatku každej funkcie
     pass
-
-
-# ============================================================
-# TODO:
-# Implementuj jednotlivé stavy automatu (q1, q2, q3, ...)
-#
-# Odporúčanie:
-# - najprv ošetri prípad prázdneho reťazca
-# - potom spracuj prvý znak string[0]
-# - pri prechode odober znak: string[1:]
-# ============================================================
 
 
 if __name__ == "__main__":

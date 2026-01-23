@@ -1,6 +1,19 @@
 EPSILON_SYMBOL = 'ε'
 
 
+def get_ast(regex):
+    """
+    Given a regex string, return its AST using the core.regex frontend.
+    """
+    from core.regex.frontend.lexer import Lexer
+    from core.regex.frontend.parser import Parser
+
+    lexer = Lexer(regex)
+    parser = Parser(lexer)
+    ast = parser.parse()
+    return ast
+
+
 def get_state_name(fsa):
     """
     Traverse reachable states and assign deterministic names q0, q1, ...

@@ -60,6 +60,7 @@ def generate_iterative_nka(syntax_tree, path="output/automata/nka_iterative.py")
             
                 while self.stack:
                     actual_state, string_rest = self.stack.pop()
+                    print(f'{actual_state}, "{string_rest}"')
             
                     if (actual_state, string_rest) in visited:
                         continue

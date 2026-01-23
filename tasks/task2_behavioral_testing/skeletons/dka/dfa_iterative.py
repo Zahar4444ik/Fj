@@ -1,6 +1,8 @@
 from enum import Enum, auto
 
 
+# Nič nemeniť iba doplniť!!!
+
 # ============================================================
 # TODO:
 # Definuj všetky stavy deterministického konečného automatu (DFA).
@@ -47,7 +49,8 @@ class DFA:
         Algoritmus má byť iteratívny:
         1. Nastav aktuálny stav na počiatočný stav
         2. Pre každý symbol vstupného reťazca:
-           - ak existuje prechod (stav, symbol), vykonaj ho
+           - ak existuje prechod (stav, symbol), vykonaj ho a vypis aktuálny stav a zvyšok reťazca v tom formáte:
+                (stav, "zvyšok_reťazca")
            - inak → reťazec nie je akceptovaný
         3. Po spracovaní celého reťazca:
            - ak je aktuálny stav akceptačný → ACCEPT
@@ -60,40 +63,40 @@ class DFA:
         pass
 
 
+"""
+============================================================
+TODO:
+V tejto časti:
+- definuj tabuľku prechodov
+  Príklad formátu:
+    transition_table = {
+        (State.q0, '0'): State.q1,
+        (State.q0, '1'): State.q2,
+        ...
+    }
+- definuj množinu akceptačných stavov
+- vytvor inštanciu DFA
+- otestuj automat na rôznych vstupných reťazcoch
+============================================================
+"""
+
+# TODO: definuj transition_table
+transition_table = {}
+
+# TODO: definuj množinu akceptačných stavov
+accepted_states = set()
+
+# TODO: definuj počiatočný stav
+init_state = None
+
+# TODO: vytvor automat
+dfa = DFA(
+    transition_table=transition_table,
+    accepted_states=accepted_states,
+    init_state=init_state
+)
+
 if __name__ == "__main__":
-    """
-    ============================================================
-    TODO:
-    V tejto časti:
-    - definuj tabuľku prechodov
-      Príklad formátu:
-        transition_table = {
-            (State.q0, '0'): State.q1,
-            (State.q0, '1'): State.q2,
-            ...
-        }
-    - definuj množinu akceptačných stavov
-    - vytvor inštanciu DFA
-    - otestuj automat na rôznych vstupných reťazcoch
-    ============================================================
-    """
-
-    # TODO: definuj transition_table
-    transition_table = {}
-
-    # TODO: definuj množinu akceptačných stavov
-    accepted_states = set()
-
-    # TODO: definuj počiatočný stav
-    init_state = None
-
-    # TODO: vytvor automat
-    dfa = DFA(
-        transition_table=transition_table,
-        accepted_states=accepted_states,
-        init_state=init_state
-    )
-
     input_string = input("Zadaj vstupný reťazec> ")
     while input_string != "quit":
         print(
