@@ -6,7 +6,7 @@ from core.regex.generators.fsa_generator import get_state_name
 
 
 def generate_iterative_dka(syntax_tree, path="output/automata/dka_iterative.py"):
-    dka, name_map, visual_map = build_DKA(syntax_tree, None)
+    dka = build_DKA(syntax_tree, None)
 
     with open(path, "w", encoding="utf-8") as f:
         f.write(dedent('''

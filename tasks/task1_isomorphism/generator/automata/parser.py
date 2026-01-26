@@ -10,7 +10,13 @@ class FSABuilder(FSAListener):
         self.automaton = Automaton()
 
     def exitStateEntry(self, ctx):
-        self.automaton.states.add(ctx.ID().getText())
+        state = ctx.ID().getText()
+        self.automaton.states.add(state)
+
+        if ctx.STRING() is not None:
+            # Remove surrounding quotes
+            annotation = ctx.STRING().getText()[1:-1]
+            self.automaton.annotations[state] = annotation
 
     def exitStart(self, ctx):
         self.automaton.start = ctx.ID().getText()

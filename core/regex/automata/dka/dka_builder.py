@@ -17,6 +17,8 @@ class DKA:
     def __init__(self, start, accepts):
         self.start = start
         self.accepts = set(accepts)
+        self.name_map = {}
+        self.visual_map = {}
 
 
 def annotate_positions(root):
@@ -108,6 +110,7 @@ def compute_nullable_first_last(node):
 
     raise ValueError(f"Unknown node type in compute_nullable_first_last: {t}")
 
+
 # -----------------------------------------
 # Compute followpos using standard rules
 # -----------------------------------------
@@ -122,7 +125,8 @@ def compute_followpos(root):
         t = node['type']
         if t == 'concat':
             # for every i in lastpos(left): add firstpos(right) to followpos[i]
-            left = node['left']; right = node['right']
+            left = node['left'];
+            right = node['right']
             for i in left['lastpos']:
                 followpos[i] |= set(right['firstpos'])
             # recurse
@@ -149,7 +153,6 @@ def compute_followpos(root):
 
 
 def build_dka_from_followpos(root, pos_map, followpos):
-
     start_pos_set = frozenset(root["firstpos"])
 
     dfa_state_map = {}
@@ -227,9 +230,9 @@ def build_DKA(ast, regex):
     dka = build_dka_from_followpos(root, pos_map, followpos)
 
     # 6) creates states visual
-    name_map, visual_map = name_dfa_states(dka, pos_map, regex)
+    name_dfa_states(dka, pos_map, regex)
 
-    return dka, name_map, visual_map
+    return dka
 
 
 def visualize_state_positions(regex_str, pos_map, pos_set):
@@ -269,10 +272,7 @@ def name_dfa_states(dka, pos_map, original_regex):
     Assign q0, q1, q2 ... and compute visual token per DFA state.
     """
     if original_regex is None:
-        return None, None
-
-    name_map = {}
-    visual_map = {}
+        return
 
     queue = [dka.start]
     visited = set([dka.start])
@@ -281,7 +281,7 @@ def name_dfa_states(dka, pos_map, original_regex):
     while queue:
         st = queue.pop(0)
         name = f"q{counter}"
-        name_map[st] = name
+        dka.name_map[st] = name
 
         # find position-set behind this state
         # invert the mapping from dfa_state_map
@@ -292,7 +292,7 @@ def name_dfa_states(dka, pos_map, original_regex):
                 break
 
         visual = visualize_state_positions(original_regex, pos_map, pos_set)
-        visual_map[st] = visual
+        dka.visual_map[st] = visual
 
         counter += 1
 
@@ -302,5 +302,3 @@ def name_dfa_states(dka, pos_map, original_regex):
                 if t not in visited:
                     visited.add(t)
                     queue.append(t)
-
-    return name_map, visual_map

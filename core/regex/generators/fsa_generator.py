@@ -44,26 +44,26 @@ def fsa_from_nka(nka, filename="output.fsa", alphabet=None, pretty=True):
     return filename
 
 
-def fsa_from_dka(dka, name_map, visual_map, filename):
+def fsa_from_dka(dka, filename):
     lines = []
 
     # states line
-    list_states = [f'{name_map[s]}="{visual_map[s]}"' for s in name_map]
+    list_states = [f'{dka.name_map[s]}="{dka.visual_map[s]}"' for s in dka.name_map]
     lines.append("states: {\n\t" + ", \n\t".join(list_states) + "\n}")
 
     # start
-    lines.append(f"start: {name_map[dka.start]}")
+    lines.append(f"start: {dka.name_map[dka.start]}")
 
     # accepting
-    acc_names = [name_map[a] for a in dka.accepts]
+    acc_names = [dka.name_map[a] for a in dka.accepts]
     lines.append("accepting: {" + ", ".join(acc_names) + "}")
 
     # transitions
     lines.append("\ntransitions:")
-    for state in name_map:
+    for state in dka.name_map:
         for sym, targets in state.transitions.items():
             for t in targets:
-                lines.append(f"  {name_map[state]} -{sym}-> {name_map[t]}")
+                lines.append(f"  {dka.name_map[state]} -{sym}-> {dka.name_map[t]}")
 
     result = "\n".join(lines)
     with open(filename, "w") as f:

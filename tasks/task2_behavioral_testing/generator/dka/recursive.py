@@ -6,7 +6,7 @@ from core.regex.generators.fsa_generator import get_state_name
 
 
 def generate_recursive_dka(syntax_tree, path="output/automata/dka_recursive.py"):
-    dka, name_map, visual_map = build_DKA(syntax_tree, None)
+    dka = build_DKA(syntax_tree, None)
 
     # Assign names q0, q1, ...
     state_names = {state: f"q{i}" for i, state in enumerate(get_state_name(dka))}

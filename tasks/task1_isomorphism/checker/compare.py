@@ -9,11 +9,15 @@ def structurally_equivalent(a1, a2):
     return canonical_signature(a1) == canonical_signature(a2)
 
 
-def compare(file1, file2):
-    a1 = parse_fsa(file1)
-    a2 = parse_fsa(file2)
+def check_isomorphism(reference, student):
+    return structurally_equivalent(reference, student)
 
-    normalize_automaton(a1)
-    normalize_automaton(a2)
 
-    return structurally_equivalent(a1, a2)
+def check_annotations(reference, student):
+    return reference.annotations == student.annotations
+
+
+def prepare_automaton_for_fsa_test(file):
+    a = parse_fsa(file)
+    normalize_automaton(a)
+    return a
