@@ -1,11 +1,4 @@
 
-"""
-============================================================
-Rekurzívna implementácia nedeterministického konečného automatu
-Automat je generovaný automaticky zo syntaxového stromu regexu.
-============================================================
-"""
-
 from enum import Enum, auto
 
 

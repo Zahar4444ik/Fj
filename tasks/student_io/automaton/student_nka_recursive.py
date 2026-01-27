@@ -1,12 +1,3 @@
-
-"""
-============================================================
-Rekurzívna implementácia nedeterministického konečného automatu
-Automat je generovaný automaticky zo syntaxového stromu regexu.
-============================================================
-"""
-
-
 def q0(string: str) -> bool:
     return q1(string) or q9(string)
 

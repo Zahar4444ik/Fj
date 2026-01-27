@@ -1,5 +1,6 @@
 from core.assignment.utils import load_module_from_path
 from core.regex.frontend.syntax import ALPHABET
+from tasks.task2_behavioral_testing.checker.utils import check_no_iteration
 from tasks.task2_behavioral_testing.generator.dka.iterative import generate_iterative_dka
 from tasks.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
 from tasks.task2_behavioral_testing.generator.nka.iterative import generate_iterative_nka
@@ -38,6 +39,16 @@ def evaluate_iterative(ast, automaton_type):
 
 def evaluate_recursive(ast, automaton_type):
     score = 0
+
+    errors = check_no_iteration("tasks/student_io/automaton/student_dka_recursive.py")
+
+    if errors:
+        print("❌ Iteration rule violated:")
+        for e in errors:
+            print("  -", e)
+        return score
+    else:
+        print("✅ No forbidden iteration detected")
 
     if automaton_type == "DKA":
         generate_recursive_dka(ast)

@@ -1,12 +1,3 @@
-
-"""
-============================================================
-Rekurzívna implementácia deterministického konečného automatu
-Automat je generovaný automaticky zo syntaxového stromu regexu.
-============================================================
-"""
-
-
 def q0(string: str) -> bool:
     print('q0', string)
     if len(string) == 0:

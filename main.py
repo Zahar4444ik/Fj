@@ -1,18 +1,12 @@
 from core.assignment.assignment_description import get_assignment_description
 from core.assignment.assignment_variables import generate_assignment_variables
-from core.assignment.utils import load_module_from_path
-from core.regex.frontend.syntax import ALPHABET
 from evaluation.fsa_evaluation import evaluate_fsa
 from evaluation.implementation_evaluation import evaluate_iterative, evaluate_recursive
 from core.regex.automata.dka.dka_builder import build_DKA
-from tasks.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
 from core.regex.generators.random_regex import generate_valid_regex
 from core.regex.frontend.lexer import Lexer
 from core.regex.frontend.parser import Parser
 from core.regex.automata.nka.nka_builder import build_NKA
-from tasks.task2_behavioral_testing.generator.nka.recursive import generate_recursive_nka
-from tasks.task2_behavioral_testing.word_generation.testing_words_generator import generate_accepted_words, \
-    generate_rejected_words
 
 
 def get_ast_from_regex(regex_str=None):

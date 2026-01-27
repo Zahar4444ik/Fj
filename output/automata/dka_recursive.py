@@ -10,12 +10,12 @@ Automat je generovaný automaticky zo syntaxového stromu regexu.
 def q0(string: str) -> bool:
     print('q0', string)
     if len(string) == 0:
-        return True
+        return False
     else:
         match string[0]:
-            case 'a':
+            case '0':
                 return q1(string[1:])
-            case 'e':
+            case '1':
                 return q2(string[1:])
             case _:
                 return False
@@ -27,12 +27,6 @@ def q1(string: str) -> bool:
         return True
     else:
         match string[0]:
-            case 'a':
-                return q2(string[1:])
-            case 'c':
-                return q2(string[1:])
-            case 'e':
-                return q2(string[1:])
             case _:
                 return False
 
@@ -43,9 +37,9 @@ def q2(string: str) -> bool:
         return True
     else:
         match string[0]:
-            case 'a':
+            case '0':
                 return q2(string[1:])
-            case 'e':
+            case '1':
                 return q2(string[1:])
             case _:
                 return False
