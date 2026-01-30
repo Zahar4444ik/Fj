@@ -1,40 +1,66 @@
+from core.regex.automata.dka.dka_builder import DKA
+from core.regex.automata.nka.nka_builder import NKA
 from core.regex.generators.fsa_generator import fsa_from_dka, fsa_from_nka
+from evaluation.report import AssignmentReport
 from tasks.task1_isomorphism.checker.compare import prepare_automaton_for_fsa_test, check_isomorphism, check_annotations
 
 
-def evaluate_fsa(automaton, automaton_type):
+def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport) -> int:
     score = 0
+    report.section("1. FSA Specification Verification")
 
     if automaton_type == "DKA":
-
         fsa_from_dka(automaton, filename="output/fsa/dka.fsa")
 
         reference = prepare_automaton_for_fsa_test("output/fsa/dka.fsa")
         student = prepare_automaton_for_fsa_test("tasks/student_io/fsa/student_dka.fsa")
-        if check_isomorphism(reference, student):
-            print("DKA isomorphism test PASSED\n\t +8 points\n")
+
+        # ------------------------------------------------------------------
+        # 1.1 Structural equivalence
+        # ------------------------------------------------------------------
+        iso = check_isomorphism(reference, student)
+
+        report.section("1.1 Structural Equivalence Verification")
+
+        report.add_result("Structural equivalence", iso, points=8)
+        if iso:
             score += 8
-        else:
-            print("DKA isomorphism test FAILED\n")
-        if check_annotations(reference, student):
-            print("DKA annotations test PASSED\n\t +2 points\n")
+
+        # ------------------------------------------------------------------
+        # 1.2 Annotation verification
+        # ------------------------------------------------------------------
+        ann = check_annotations(reference, student)
+
+        report.add_info("\n[ 1.2 State Annotation Verification ]")
+        report.add_info("Verified properties:")
+        report.add_info("  - Correct annotation of states")
+        report.add_info("  - Consistency with reference automaton")
+
+        report.add_result("State annotations", ann, points=2)
+        if ann:
             score += 2
         else:
-            print("DKA annotations test FAILED!")
-            print("Expected:")
-            print(reference.annotations_as_string())
-            print("Received:")
-            print(student.annotations_as_string())
-    else:
+            report.add_info("")
+            report.add_info("Annotation mismatches detected:")
+            report.add_info("")
+            report.add_info("Expected annotations:")
+            report.add_info(reference.annotations_as_string())
+            report.add_info("Received annotations:")
+            report.add_info(student.annotations_as_string())
 
-        fsa_from_nka(automaton, filename="output/fsa/dka.fsa")
+    else:
+        # NKA version (simpler)
+        fsa_from_nka(automaton, filename="output/fsa/nka.fsa")
 
         reference = prepare_automaton_for_fsa_test("output/fsa/nka.fsa")
         student = prepare_automaton_for_fsa_test("tasks/student_io/fsa/student_nka.fsa")
-        if check_isomorphism(reference, student):
-            print("NKA isomorphism test PASSED\n\t +10 points\n")
+
+        report.section("1.1 Structural Equivalence Verification")
+
+        iso = check_isomorphism(reference, student)
+        report.add_result("Structural equivalence (NKA)", iso, points=10)
+
+        if iso:
             score += 10
-        else:
-            print("DKA isomorphism test FAILED\n")
 
     return score

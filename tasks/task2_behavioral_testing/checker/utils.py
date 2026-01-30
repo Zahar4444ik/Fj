@@ -1,7 +1,7 @@
 import ast
 from pathlib import Path
 
-from tasks.task2_behavioral_testing.checker.IterationChecker import IterationChecker
+from tasks.task2_behavioral_testing.checker.iteration_checker import IterationChecker
 
 
 def check_no_iteration(path: str | Path) -> list[str]:

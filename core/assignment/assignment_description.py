@@ -2,7 +2,7 @@ def get_assignment_description(assignment):
     regex = assignment["regex"]
     automaton_type = assignment["automaton_type"]
     implementation = assignment["implementation"]
-    print(f"""
+    return f"""
         Vašou úlohou je navrhnúť konečnostavový automat a naprogramovať jeho implementáciu
         pre akceptáciu slov jazyka špecifikovaného nasledujúcim regulárnym výrazom:
         
@@ -23,4 +23,4 @@ def get_assignment_description(assignment):
         
         Nie je povolené používať externé knižnice ani meniť štruktúru riešenia.
 
-    """)
+    """

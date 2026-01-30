@@ -4,7 +4,7 @@ states: {
 	q2="0|1{0|1}."
 }
 start: q0
-accepting: {q2, q1}
+accepting: {q1, q2}
 
 transitions:
   q0 -1-> q1

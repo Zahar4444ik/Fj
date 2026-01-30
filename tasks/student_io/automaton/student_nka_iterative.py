@@ -1,4 +1,11 @@
 
+"""
+============================================================
+Rekurzívna implementácia nedeterministického konečného automatu
+Automat je generovaný automaticky zo syntaxového stromu regexu.
+============================================================
+"""
+
 from enum import Enum, auto
 
 
@@ -43,7 +50,7 @@ class NFA:
 
         while self.stack:
             actual_state, string_rest = self.stack.pop()
-            print(f'{actual_state}, "{string_rest}"')
+            print(f'({actual_state}, "{string_rest}")')
 
             if (actual_state, string_rest) in visited:
                 continue
@@ -68,9 +75,9 @@ transition_table = {
     (State.q4, ''): {State.q5},
     (State.q5, ''): {State.q6},
     (State.q6, ''): {State.q7, State.q9},
-    (State.q7, '0'): {State.q8},
+    (State.q7, '1'): {State.q8},
     (State.q8, ''): {State.q6},
-    (State.q9, '1'): {State.q10},
+    (State.q9, '0'): {State.q10},
 
 }
 
@@ -80,9 +87,9 @@ transition_table = {
 # ============================================================
 accepted_states = {
     State.q5,
-    State.q10,
     State.q8,
     State.q2,
+    State.q10,
 }
 
 init_state = State.q0
