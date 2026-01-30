@@ -68,15 +68,15 @@ class NFA:
 # Transition table
 # ============================================================
 transition_table = {
-    (State.q0, ''): {State.q1, State.q3},
-    (State.q1, '0'): {State.q2},
-    (State.q10, ''): {State.q6},
-    (State.q3, '1'): {State.q4},
-    (State.q4, ''): {State.q5},
-    (State.q5, ''): {State.q6},
-    (State.q6, ''): {State.q7, State.q9},
-    (State.q7, '1'): {State.q8},
-    (State.q8, ''): {State.q6},
+    (State.q0, ''): {State.q1, State.q9},
+    (State.q1, '1'): {State.q2},
+    (State.q2, ''): {State.q3},
+    (State.q3, ''): {State.q4},
+    (State.q4, ''): {State.q5, State.q7},
+    (State.q5, '1'): {State.q6},
+    (State.q6, ''): {State.q4},
+    (State.q7, '0'): {State.q8},
+    (State.q8, ''): {State.q4},
     (State.q9, '0'): {State.q10},
 
 }
@@ -87,9 +87,9 @@ transition_table = {
 # ============================================================
 accepted_states = {
     State.q10,
-    State.q5,
     State.q8,
-    State.q2,
+    State.q3,
+    State.q6,
 }
 
 init_state = State.q0

@@ -1,0 +1,57 @@
+============================================================
+Automata Assignment – Evaluation Report
+Generated: 2026-01-30 16:17:36.899402
+============================================================
+
+[ Configuration ]
+------------------------------------------------------------
+Regex: 0|1{0|1}
+Automaton type: DKA
+Implementation: recursive
+
+[ 1. FSA Specification Verification ] [ 40% ]
+------------------------------------------------------------
+
+[ 1.1 Structural Equivalence Verification ]
+------------------------------------------------------------
+Structural equivalence verification: PASSED
+[ 30% / 40% ]
+
+[ 1.2 State Annotation Verification ]
+------------------------------------------------------------
+State annotation verification: PASSED
+[ 40% / 40% ]
+
+CURRENT SCORE: 40% / 100%
+
+[ 2. Automaton Implementation Testing ]
+------------------------------------------------------------
+[ 2.1 Static Code Analysis ]: PASSED
+[ 40% / 0% ]
+
+[ [ 2.2 Behavioral Testing ] ]
+------------------------------------------------------------
+Word '111': PASSED
+[ 41% / 0% ]
+Word '1000': PASSED
+[ 42% / 0% ]
+Word '1100': PASSED
+[ 43% / 0% ]
+Word '101': PASSED
+[ 44% / 0% ]
+Word '100': PASSED
+[ 45% / 0% ]
+Word '1': PASSED
+[ 46% / 0% ]
+Word '1c1': PASSED
+[ 47% / 0% ]
+Word 'ecgacdcbgd': PASSED
+[ 48% / 0% ]
+Word 'ccaef': PASSED
+[ 49% / 0% ]
+Word 'dcfgbdad': PASSED
+[ 50% / 0% ]
+
+============================================================
+FINAL SCORE: 50
+============================================================

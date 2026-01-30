@@ -19,7 +19,7 @@ class NKA:
         self.accepts = set(accepts)
 
     def __repr__(self):
-        return f"NKA(start={self.start}, accepts={self.accepts})"
+        return "NKA"
 
 
 def symbol_NKA(symbol):

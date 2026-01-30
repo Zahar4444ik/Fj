@@ -20,6 +20,9 @@ class DKA:
         self.name_map = {}
         self.visual_map = {}
 
+    def __repr__(self):
+        return "DKA"
+
 
 def annotate_positions(root):
     """

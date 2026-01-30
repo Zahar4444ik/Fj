@@ -1,8 +1,9 @@
 import random
 from core.regex.frontend.syntax import ALPHABET
+from evaluation.evaluation_profile import EVALUATION_PROFILE
 
-MIN_DEPTH = 1
-MAX_DEPTH = 3
+MIN_DEPTH = EVALUATION_PROFILE["global"]["regex_complexity"]["min_depth"]
+MAX_DEPTH = EVALUATION_PROFILE["global"]["regex_complexity"]["max_depth"]
 
 MAX_UNION_RETRIES = 8
 
