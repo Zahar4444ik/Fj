@@ -2,8 +2,20 @@ from collections import deque
 
 
 def canonical_signature(automaton):
+    """
+    BFS from start state, assigns canonical ids (0, 1, 2, ...).
+    Caches result on the automaton instance so repeated calls are free.
+
+    Returns:
+        signature: structure for equivalence check
+        annotations: annotations mapped to canonical ids
+    """
+    if hasattr(automaton, '_canonical_cache'):
+        return automaton._canonical_cache
+
     queue = deque([automaton.start])
     state_id = {automaton.start: 0}
+    id_to_state = {0: automaton.start}
     signature = []
 
     while queue:
@@ -25,6 +37,7 @@ def canonical_signature(automaton):
             for t in sorted(targets):
                 if t not in state_id:
                     state_id[t] = len(state_id)
+                    id_to_state[state_id[t]] = t
                     queue.append(t)
                 ids.append(state_id[t])
 
@@ -32,4 +45,10 @@ def canonical_signature(automaton):
 
         signature[cid] = sig
 
-    return signature
+    annotations = {
+        cid: automaton.annotations.get(state)
+        for cid, state in id_to_state.items()
+    }
+
+    automaton._canonical_cache = (signature, annotations, id_to_state)
+    return signature, annotations, id_to_state

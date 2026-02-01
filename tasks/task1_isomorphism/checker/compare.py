@@ -3,18 +3,18 @@ from tasks.task1_isomorphism.generator.automata.normalize import normalize_autom
 from tasks.task1_isomorphism.generator.automata.parser import parse_fsa
 
 
-def structurally_equivalent(a1, a2):
-    if a1.is_dfa != a2.is_dfa:
-        return False
-    return canonical_signature(a1) == canonical_signature(a2)
-
-
 def check_isomorphism(reference, student):
-    return structurally_equivalent(reference, student)
+    if reference.is_dfa != student.is_dfa:
+        return False
+    ref_sig, _, _ = canonical_signature(reference)
+    stu_sig, _, _ = canonical_signature(student)
+    return ref_sig == stu_sig
 
 
 def check_annotations(reference, student):
-    return reference.annotations == student.annotations
+    _, ref_ann, _ = canonical_signature(reference)
+    _, stu_ann, _ = canonical_signature(student)
+    return ref_ann == stu_ann
 
 
 def prepare_automaton_for_fsa_test(file):

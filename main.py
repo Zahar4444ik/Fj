@@ -43,7 +43,8 @@ if __name__ == "__main__":
 
     # regex = assignment_variables["regex"]
     regex = "0|1{0|1}"
-    automaton_type = assignment_variables["automaton_type"]
+    # automaton_type = assignment_variables["automaton_type"]
+    automaton_type = "DKA"
 
     implementation = assignment_variables["implementation"]
     # implementation = "recursive"

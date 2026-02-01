@@ -1,6 +1,6 @@
 ============================================================
 Automata Assignment – Evaluation Report
-Generated: 2026-01-30 16:17:36.899402
+Generated: 2026-02-01 15:53:02.131753
 ============================================================
 
 [ Configuration ]
@@ -31,25 +31,25 @@ CURRENT SCORE: 40% / 100%
 
 [ [ 2.2 Behavioral Testing ] ]
 ------------------------------------------------------------
-Word '111': PASSED
+Word '1010': PASSED
 [ 41% / 0% ]
-Word '1000': PASSED
+Word '10': PASSED
 [ 42% / 0% ]
-Word '1100': PASSED
+Word '0': PASSED
 [ 43% / 0% ]
-Word '101': PASSED
+Word '11': PASSED
 [ 44% / 0% ]
-Word '100': PASSED
+Word '1001': PASSED
 [ 45% / 0% ]
-Word '1': PASSED
+Word '00': PASSED
 [ 46% / 0% ]
-Word '1c1': PASSED
+Word '0a': PASSED
 [ 47% / 0% ]
-Word 'ecgacdcbgd': PASSED
+Word 'a': PASSED
 [ 48% / 0% ]
-Word 'ccaef': PASSED
+Word 'gbaf': PASSED
 [ 49% / 0% ]
-Word 'dcfgbdad': PASSED
+Word 'gadac': PASSED
 [ 50% / 0% ]
 
 ============================================================

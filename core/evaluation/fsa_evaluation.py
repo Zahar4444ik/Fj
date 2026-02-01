@@ -1,9 +1,14 @@
+from core.evaluation.utils.difference_print import format_annotation_diff
 from core.regex.automata.dka.dka_builder import DKA
 from core.regex.automata.nka.nka_builder import NKA
 from core.regex.generators.fsa_generator import fsa_from_dka, fsa_from_nka
 from core.evaluation.report import AssignmentReport
 from evaluation.evaluation_profile import EVALUATION_PROFILE
-from tasks.task1_isomorphism.checker.compare import prepare_automaton_for_fsa_test, check_isomorphism, check_annotations
+from tasks.task1_isomorphism.checker.compare import (
+    prepare_automaton_for_fsa_test,
+    check_isomorphism,
+    check_annotations,
+)
 
 
 def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport) -> int:
@@ -21,7 +26,7 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         # 1.1 Isomorphism
         report.section("1.1 Structural Equivalence Verification")
 
-        iso, iso_map = check_isomorphism(reference, student)
+        iso = check_isomorphism(reference, student)  # computes and caches
         report.add_result(
             "Structural equivalence verification",
             iso,
@@ -35,7 +40,7 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         # 1.2 Annotations
         report.section("1.2 State Annotation Verification")
 
-        ann = check_annotations(reference, student, iso_map)
+        ann = check_annotations(reference, student)  # uses cache, no recomputation
         report.add_result(
             "State annotation verification",
             ann,
@@ -49,9 +54,7 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
             report.add_info("")
             report.add_info("Annotation mismatches detected:")
             report.add_info("")
-            report.add_info(
-                reference.format_annotation_diff(student)
-            )
+            report.add_info(format_annotation_diff(reference, student))  # uses cache
 
     else:
         fsa_from_nka(automaton, filename="output/fsa/nka.fsa")
@@ -62,7 +65,7 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         # 1.1 Isomorphism
         report.section("1.1 Structural Equivalence Verification")
 
-        iso = check_isomorphism(reference, student)
+        iso = check_isomorphism(reference, student)  # computes and caches
         report.add_result(
             "Structural equivalence verification",
             iso,
