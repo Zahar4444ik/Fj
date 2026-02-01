@@ -1,6 +1,6 @@
 ============================================================
 Automata Assignment – Evaluation Report
-Generated: 2026-02-01 15:53:02.131753
+Generated: 2026-02-01 16:38:56.985975
 ============================================================
 
 [ Configuration ]
@@ -24,34 +24,12 @@ State annotation verification: PASSED
 
 CURRENT SCORE: 40% / 100%
 
-[ 2. Automaton Implementation Testing ]
+[ 2. Automaton Implementation Testing ] [ 60% ]
 ------------------------------------------------------------
-[ 2.1 Static Code Analysis ]: PASSED
-[ 40% / 0% ]
-
-[ [ 2.2 Behavioral Testing ] ]
-------------------------------------------------------------
-Word '1010': PASSED
-[ 41% / 0% ]
-Word '10': PASSED
-[ 42% / 0% ]
-Word '0': PASSED
-[ 43% / 0% ]
-Word '11': PASSED
-[ 44% / 0% ]
-Word '1001': PASSED
-[ 45% / 0% ]
-Word '00': PASSED
-[ 46% / 0% ]
-Word '0a': PASSED
-[ 47% / 0% ]
-Word 'a': PASSED
-[ 48% / 0% ]
-Word 'gbaf': PASSED
-[ 49% / 0% ]
-Word 'gadac': PASSED
-[ 50% / 0% ]
+Skipping behavioral testing due to use of iteration.
+Forbidden iteration construct While at line 17
+[ 0% / 60% ]
 
 ============================================================
-FINAL SCORE: 50
+FINAL SCORE: 40% / 100%
 ============================================================

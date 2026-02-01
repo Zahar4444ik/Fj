@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from tasks.task1_isomorphism.checker.compare import check_isomorphism
+from tasks.task1_isomorphism.checker.compare import check_isomorphism, prepare_automaton_for_fsa_test
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
@@ -11,7 +11,9 @@ def fsa(path):
 
 
 def check(f1, f2, expected):
-    assert check_isomorphism(fsa(f1), fsa(f2)) is expected
+    a1 = prepare_automaton_for_fsa_test(fsa(f1))
+    a2 = prepare_automaton_for_fsa_test(fsa(f2))
+    assert check_isomorphism(a1, a2) is expected
 
 
 def test_dka_simple_equivalent():

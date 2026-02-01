@@ -44,7 +44,7 @@ class AssignmentReport:
     def footer(self):
         self.lines.append("")
         self.lines.append("=" * 60)
-        self.lines.append(f"FINAL SCORE: {self.current_score}")
+        self.lines.append(f"FINAL SCORE: {self.current_score}% / {self.total_score}%")
         self.lines.append("=" * 60)
 
     def save(self):

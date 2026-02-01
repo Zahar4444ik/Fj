@@ -5,12 +5,7 @@ EVALUATION_PROFILE = {
 
         "test_words": {
             "count": 20,
-            # 0–3 → difficulty / aggressiveness
             "bad_word_ratio_level": 2
-            # 0 = 0%
-            # 1 = 10%
-            # 2 = 20%
-            # 3 = 30%
         },
 
         "regex_complexity": {
@@ -26,9 +21,7 @@ EVALUATION_PROFILE = {
             "annotations": 10,
         },
         "implementation": {
-            "total": 60,
-            "iterative": 60,
-            "recursive": 60
+            "total": 60
         }
     },
 
@@ -38,9 +31,7 @@ EVALUATION_PROFILE = {
             "isomorphism": 30
         },
         "implementation": {
-            "total": 70,
-            "iterative": 70,
-            "recursive": 70
+            "total": 70
         }
     }
 }
