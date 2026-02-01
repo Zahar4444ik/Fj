@@ -11,35 +11,52 @@ from tasks.task1_isomorphism.checker.compare import (
 )
 
 
+FSA_CONFIG = {
+    "DKA": {
+        "generate": fsa_from_dka,
+        "reference_path": "output/fsa/dka.fsa",
+        "student_path": "tasks/student_io/fsa/student_dka.fsa",
+        "check_annotations": True,
+    },
+    "NKA": {
+        "generate": fsa_from_nka,
+        "reference_path": "output/fsa/nka.fsa",
+        "student_path": "tasks/student_io/fsa/student_nka.fsa",
+        "check_annotations": False,
+    },
+}
+
+
 def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport) -> float:
     fsa_cfg = EVALUATION_PROFILE[automaton_type]["fsa"]
+    type_cfg = FSA_CONFIG[automaton_type]
     score = 0.0
 
     report.section("1. FSA Specification Verification", fsa_cfg["total"])
 
-    if automaton_type == "DKA":
-        fsa_from_dka(automaton, filename="output/fsa/dka.fsa")
+    # Generate and load
+    type_cfg["generate"](automaton, filename=type_cfg["reference_path"])
+    reference = prepare_automaton_for_fsa_test(type_cfg["reference_path"])
+    student = prepare_automaton_for_fsa_test(type_cfg["student_path"])
 
-        reference = prepare_automaton_for_fsa_test("output/fsa/dka.fsa")
-        student = prepare_automaton_for_fsa_test("tasks/student_io/fsa/student_dka.fsa")
+    # 1.1 Isomorphism
+    report.section("1.1 Structural Equivalence Verification")
 
-        # 1.1 Isomorphism
-        report.section("1.1 Structural Equivalence Verification")
+    iso = check_isomorphism(reference, student)
+    report.add_result(
+        "Structural equivalence verification",
+        iso,
+        points=float(fsa_cfg["isomorphism"]),
+    )
 
-        iso = check_isomorphism(reference, student)  # computes and caches
-        report.add_result(
-            "Structural equivalence verification",
-            iso,
-            points=float(fsa_cfg["isomorphism"]),
-        )
+    if iso:
+        score += fsa_cfg["isomorphism"]
 
-        if iso:
-            score += fsa_cfg["isomorphism"]
-
-        # 1.2 Annotations
+    # 1.2 Annotations (DKA only)
+    if type_cfg["check_annotations"]:
         report.section("1.2 State Annotation Verification")
 
-        ann = check_annotations(reference, student)  # uses cache, no recomputation
+        ann = check_annotations(reference, student)
         report.add_result(
             "State annotation verification",
             ann,
@@ -52,26 +69,6 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
             report.add_info("")
             report.add_info("Annotation mismatches detected:")
             report.add_info("")
-            report.add_info(format_annotation_diff(reference, student))  # uses cache
+            report.add_info(format_annotation_diff(reference, student))
 
-    else:
-        fsa_from_nka(automaton, filename="output/fsa/nka.fsa")
-
-        reference = prepare_automaton_for_fsa_test("output/fsa/nka.fsa")
-        student = prepare_automaton_for_fsa_test("tasks/student_io/fsa/student_nka.fsa")
-
-        # 1.1 Isomorphism
-        report.section("1.1 Structural Equivalence Verification")
-
-        iso = check_isomorphism(reference, student)  # computes and caches
-        report.add_result(
-            "Structural equivalence verification",
-            iso,
-            points=float(fsa_cfg["isomorphism"]),
-        )
-
-        if iso:
-            score += fsa_cfg["isomorphism"]
-
-    report.current_score_report()
     return score

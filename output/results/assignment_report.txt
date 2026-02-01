@@ -1,73 +1,64 @@
 ============================================================
 Automata Assignment – Evaluation Report
-Generated: 2026-02-01 17:55:25.251620
+Generated: 2026-02-01 18:20:09.551813
 ============================================================
 
 [ Configuration ]
 ------------------------------------------------------------
 Regex: 0|1{0|1}
-Automaton type: DKA
+Automaton type: NKA
 Implementation: iterative
 
-[ 1. FSA Specification Verification ] [ 40% ]
+[ 1. FSA Specification Verification ] [ 30% ]
 ------------------------------------------------------------
 
 [ 1.1 Structural Equivalence Verification ]
 ------------------------------------------------------------
-Structural equivalence verification: PASSED
-[ 30.0% / 100% ]
+Structural equivalence verification: FAILED
+[ 0.0% / 100% ]
 
-[ 1.2 State Annotation Verification ]
-------------------------------------------------------------
-State annotation verification: PASSED
-[ 40.0% / 100% ]
-
-CURRENT SCORE: 40.0% / 100%
-
-[ 2. Automaton Implementation Testing ] [ 60% ]
+[ 2. Automaton Implementation Testing ] [ 70% ]
 ------------------------------------------------------------
 
 [ 2.1 Behavioral Testing (iterative) ]
 ------------------------------------------------------------
-Word '10': PASSED
-[ 43.0% / 100% ]
-Word '11': PASSED
-[ 46.0% / 100% ]
-Word '100': FAILED
-[ 46.0% / 100% ]
-Word '101': FAILED
-[ 46.0% / 100% ]
-Word '1000': FAILED
-[ 46.0% / 100% ]
-Word '110': PASSED
-[ 49.0% / 100% ]
+Word '101': PASSED
+[ 3.68% / 100% ]
+Word '1001': PASSED
+[ 7.37% / 100% ]
+Word '1011': PASSED
+[ 11.05% / 100% ]
 Word '1110': PASSED
-[ 52.0% / 100% ]
-Word '1010': FAILED
-[ 52.0% / 100% ]
-Word '1100': FAILED
-[ 52.0% / 100% ]
-Word '1001': FAILED
-[ 52.0% / 100% ]
-Word '111': PASSED
-[ 55.0% / 100% ]
-Word '1111': PASSED
-[ 58.0% / 100% ]
+[ 14.74% / 100% ]
+Word '10': PASSED
+[ 18.42% / 100% ]
+Word '1101': PASSED
+[ 22.11% / 100% ]
+Word '1100': PASSED
+[ 25.79% / 100% ]
+Word '110': PASSED
+[ 29.47% / 100% ]
+Word '1010': PASSED
+[ 33.16% / 100% ]
+Word '11': PASSED
+[ 36.84% / 100% ]
+Word '1000': PASSED
+[ 40.53% / 100% ]
+Word '100': PASSED
+[ 44.21% / 100% ]
+Word '1': PASSED
+[ 47.89% / 100% ]
 Word '0': PASSED
-[ 61.0% / 100% ]
-Word '1101': FAILED
-[ 61.0% / 100% ]
-Word '1011': FAILED
-[ 61.0% / 100% ]
-Word '1': PASSED
-[ 64.0% / 100% ]
-Word '1': PASSED
-[ 67.0% / 100% ]
-Word '110001000': FAILED
-[ 67.0% / 100% ]
-Word '0001101': PASSED
-[ 70.0% / 100% ]
-Word '10000': FAILED
+[ 51.58% / 100% ]
+Word '111': PASSED
+[ 55.26% / 100% ]
+Word '1110': PASSED
+[ 58.95% / 100% ]
+Word '1010001': PASSED
+[ 62.63% / 100% ]
+Word '1111': PASSED
+[ 66.32% / 100% ]
+Word '01101': PASSED
 [ 70.0% / 100% ]
 
 ============================================================

@@ -14,6 +14,98 @@ from tasks.task2_behavioral_testing.word_generation.testing_words_generator impo
 )
 
 
+IMPLEMENTATION_CONFIG = {
+    ("DKA", "iterative"): {
+        "student_path": "tasks/student_io/automaton/student_dka_iterative.py",
+        "reference_path": "output/automata/dka_iterative.py",
+        "module_name": "dka_iterative",
+        "student_module_name": "student_dka_iterative",
+        "static_check": check_no_recursion,
+        "static_error_reason": "use of recursion",
+        "generate": generate_iterative_dka,
+        "get_check_fn": lambda mod: mod.dfa.check,
+    },
+    ("DKA", "recursive"): {
+        "student_path": "tasks/student_io/automaton/student_dka_recursive.py",
+        "reference_path": "output/automata/dka_recursive.py",
+        "module_name": "dka_recursive",
+        "student_module_name": "student_dka_recursive",
+        "static_check": check_no_iteration,
+        "static_error_reason": "use of iteration",
+        "generate": generate_recursive_dka,
+        "get_check_fn": lambda mod: mod.q0,
+    },
+    ("NKA", "iterative"): {
+        "student_path": "tasks/student_io/automaton/student_nka_iterative.py",
+        "reference_path": "output/automata/nka_iterative.py",
+        "module_name": "nka_iterative",
+        "student_module_name": "student_nka_iterative",
+        "static_check": check_no_recursion,
+        "static_error_reason": "use of recursion",
+        "generate": generate_iterative_nka,
+        "get_check_fn": lambda mod: mod.nfa.check,
+    },
+    ("NKA", "recursive"): {
+        "student_path": "tasks/student_io/automaton/student_nka_recursive.py",
+        "reference_path": "output/automata/nka_recursive.py",
+        "module_name": "nka_recursive",
+        "student_module_name": "student_nka_recursive",
+        "static_check": check_no_iteration,
+        "static_error_reason": "use of iteration",
+        "generate": generate_recursive_nka,
+        "get_check_fn": lambda mod: mod.q0,
+    },
+}
+
+
+def evaluate_implementation(ast: dict, automaton_type: str, variant: str, report: AssignmentReport) -> int:
+    """
+    Unified evaluation for both iterative and recursive implementations.
+
+    :param ast: Syntax tree of the regex
+    :param automaton_type: "DKA" or "NKA"
+    :param variant: "iterative" or "recursive"
+    :param report: Assignment report
+    :return: Score earned
+    """
+    cfg = IMPLEMENTATION_CONFIG[(automaton_type, variant)]
+    implementation_total = EVALUATION_PROFILE[automaton_type]["implementation"]["total"]
+
+    report.section("2. Automaton Implementation Testing", implementation_total)
+
+    # Static analysis
+    errors = cfg["static_check"](cfg["student_path"])
+
+    if errors:
+        report.add_info(f"Skipping behavioral testing due to {cfg['static_error_reason']}.")
+        for err in errors:
+            report.add_info(err)
+        report.add_info(f'[ 0% / {implementation_total}% ]')
+        return 0
+
+    # Generate reference and load both modules
+    cfg["generate"](ast)
+
+    reference = load_module_from_path(cfg["module_name"], cfg["reference_path"])
+    student = load_module_from_path(cfg["student_module_name"], cfg["student_path"])
+
+    reference_fn = cfg["get_check_fn"](reference)
+    student_fn = cfg["get_check_fn"](student)
+
+    words = generate_test_words(ast)
+
+    # 2.1 Behavioral testing
+    report.section(f"2.1 Behavioral Testing ({variant})")
+
+    return behavioral_test(
+        words,
+        reference_fn,
+        student_fn,
+        report,
+        implementation_total,
+    )
+
+
 def generate_test_words(ast):
     cfg = EVALUATION_PROFILE["global"]["test_words"]
 
@@ -72,118 +164,3 @@ def behavioral_test(
             score += points_per_word
 
     return round(score)
-
-
-def evaluate_iterative(ast: dict, automaton_type: str, report: AssignmentReport) -> int:
-    implementation_total = EVALUATION_PROFILE[automaton_type]["implementation"]["total"]
-
-    report.section("2. Automaton Implementation Testing", implementation_total)
-
-    student_path = (
-        "tasks/student_io/automaton/student_dka_iterative.py"
-        if automaton_type == "DKA"
-        else "tasks/student_io/automaton/student_nka_iterative.py"
-    )
-
-    # Static analysis
-    errors = check_no_recursion(student_path)
-
-    if errors:
-        report.add_info(f"Skipping behavioral testing due to use of recursion.")
-        for err in errors:
-            report.add_info(err)
-        report.add_info(f'[ 0% / {implementation_total}% ]')
-        return 0
-
-    # Generate reference automaton
-    if automaton_type == "DKA":
-        generate_iterative_dka(ast)
-
-        reference = load_module_from_path(
-            "dka_iterative", "output/automata/dka_iterative.py"
-        ).dfa
-        student = load_module_from_path(
-            "student_dka_iterative", student_path
-        ).dfa
-
-    else:
-        generate_iterative_nka(ast)
-
-        reference = load_module_from_path(
-            "nka_iterative", "output/automata/nka_iterative.py"
-        ).nfa
-        student = load_module_from_path(
-            "student_nka_iterative", student_path
-        ).nfa
-
-    reference_fn = reference.check
-    student_fn = student.check
-
-    words = generate_test_words(ast)
-
-    # 2.1 Behavioral testing
-    report.section("2.1 Behavioral Testing (iterative)")
-
-    return behavioral_test(
-        words,
-        reference_fn,
-        student_fn,
-        report,
-        implementation_total
-    )
-
-
-def evaluate_recursive(ast: dict, automaton_type: str, report: AssignmentReport) -> int:
-    implementation_total = EVALUATION_PROFILE[automaton_type]["implementation"]["total"]
-
-    report.section("2. Automaton Implementation Testing", implementation_total)
-
-    student_path = (
-        "tasks/student_io/automaton/student_dka_recursive.py"
-        if automaton_type == "DKA"
-        else "tasks/student_io/automaton/student_nka_recursive.py"
-    )
-
-    # Static analysis
-    errors = check_no_iteration(student_path)
-
-    if errors:
-        report.add_info(f"Skipping behavioral testing due to use of iteration.")
-        for err in errors:
-            report.add_info(err)
-        report.add_info(f'[ 0% / {implementation_total}% ]')
-        return 0
-
-    # Generate reference automaton
-    if automaton_type == "DKA":
-        generate_recursive_dka(ast)
-
-        reference = load_module_from_path(
-            "dka_recursive", "output/automata/dka_recursive.py"
-        )
-        student = load_module_from_path(
-            "student_dka_recursive", student_path
-        )
-
-    else:
-        generate_recursive_nka(ast)
-
-        reference = load_module_from_path(
-            "nka_recursive", "output/automata/nka_recursive.py"
-        )
-        student = load_module_from_path(
-            "student_nka_recursive", student_path
-        )
-
-    words = generate_test_words(ast)
-
-    # 2.1 Behavioral testing
-    report.section("2.1 Behavioral Testing (recursive)")
-
-    return behavioral_test(
-        words,
-        reference.q0,
-        student.q0,
-        report,
-        implementation_total,
-    )
