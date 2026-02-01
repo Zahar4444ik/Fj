@@ -47,7 +47,7 @@ if __name__ == "__main__":
     automaton_type = "DKA"
 
     # implementation = assignment_variables["implementation"]
-    implementation = "recursive"
+    implementation = "iterative"
 
     report.section("Configuration")
     report.add_info(f"Regex: {regex}")
@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     ast = get_ast_from_regex(regex)
 
-    score = 0
+    score = 0.0
 
     if automaton_type == "NKA":
         nka = build_NKA(ast)
@@ -76,5 +76,5 @@ if __name__ == "__main__":
         else:
             score += evaluate_recursive(ast, automaton_type, report)
 
-    report.footer()
+    report.footer(score)
     report.save()

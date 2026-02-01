@@ -9,7 +9,7 @@ class AssignmentReport:
         self.path = Path(path)
         self.lines = []
         self.total_score = EVALUATION_PROFILE["global"]["total_score"]
-        self.current_score = 0
+        self.current_score = 0.0
 
     def header(self, title: str):
         self.lines.append("=" * 60)
@@ -23,13 +23,13 @@ class AssignmentReport:
         self.lines.append(f"[ {title} ] [ {max_score}% ]" if max_score > 0 else f"[ {title} ]")
         self.lines.append("-" * 60)
 
-    def add_result(self, description: str, passed: bool, points: int = 0, max_points: int = 0):
+    def add_result(self, description: str, passed: bool, points: float = 0.0):
         description = str(description)
         status = "PASSED" if passed else "FAILED"
         self.lines.append(f"{description}: {status}")
         if passed and points > 0:
             self.current_score += points
-        self.lines.append(f"[ {self.current_score}% / {max_points}% ]")
+        self.lines.append(f"[ {round(self.current_score, 2)}% / {self.total_score}% ]")
 
     def add_info(self, text):
         if text is None:
@@ -41,10 +41,10 @@ class AssignmentReport:
         self.lines.append("")
         self.lines.append(f"CURRENT SCORE: {self.current_score}% / {self.total_score}%")
 
-    def footer(self):
+    def footer(self, score):
         self.lines.append("")
         self.lines.append("=" * 60)
-        self.lines.append(f"FINAL SCORE: {self.current_score}% / {self.total_score}%")
+        self.lines.append(f"FINAL SCORE: {score}% / {self.total_score}%")
         self.lines.append("=" * 60)
 
     def save(self):

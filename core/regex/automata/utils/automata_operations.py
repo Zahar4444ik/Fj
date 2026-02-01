@@ -1,3 +1,5 @@
+from typing import Any
+
 EPSILON_SYMBOL = 'ε'
 
 
@@ -129,3 +131,22 @@ def visualize_nka(nka, pretty=True):
             print(f"  {frm} --eps--> {to}")
     else:
         print("  (none)")
+
+
+def get_regex_alphabet(ast: dict) -> list[Any]:
+    """
+    Extract the alphabet (set of symbols) used in the regex AST.
+    """
+    alphabet = set()
+
+    def traverse(node):
+        if node.get("type") == "symbol":
+            value = node.get("value")
+            if value and not value.startswith("<"):
+                alphabet.add(value)
+
+        for child in node.get("children", []):
+            traverse(child)
+
+    traverse(ast)
+    return list(alphabet)

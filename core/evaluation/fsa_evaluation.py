@@ -11,9 +11,9 @@ from tasks.task1_isomorphism.checker.compare import (
 )
 
 
-def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport) -> int:
+def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport) -> float:
     fsa_cfg = EVALUATION_PROFILE[automaton_type]["fsa"]
-    score = 0
+    score = 0.0
 
     report.section("1. FSA Specification Verification", fsa_cfg["total"])
 
@@ -30,8 +30,7 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         report.add_result(
             "Structural equivalence verification",
             iso,
-            points=fsa_cfg["isomorphism"],
-            max_points=fsa_cfg["total"]
+            points=float(fsa_cfg["isomorphism"]),
         )
 
         if iso:
@@ -44,8 +43,7 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         report.add_result(
             "State annotation verification",
             ann,
-            points=fsa_cfg["annotations"],
-            max_points=fsa_cfg["total"]
+            points=float(fsa_cfg["annotations"]),
         )
 
         if ann:
@@ -69,8 +67,7 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         report.add_result(
             "Structural equivalence verification",
             iso,
-            points=fsa_cfg["isomorphism"],
-            max_points=fsa_cfg["total"]
+            points=float(fsa_cfg["isomorphism"]),
         )
 
         if iso:

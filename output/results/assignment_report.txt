@@ -1,13 +1,13 @@
 ============================================================
 Automata Assignment – Evaluation Report
-Generated: 2026-02-01 16:38:56.985975
+Generated: 2026-02-01 17:55:25.251620
 ============================================================
 
 [ Configuration ]
 ------------------------------------------------------------
 Regex: 0|1{0|1}
 Automaton type: DKA
-Implementation: recursive
+Implementation: iterative
 
 [ 1. FSA Specification Verification ] [ 40% ]
 ------------------------------------------------------------
@@ -15,21 +15,61 @@ Implementation: recursive
 [ 1.1 Structural Equivalence Verification ]
 ------------------------------------------------------------
 Structural equivalence verification: PASSED
-[ 30% / 40% ]
+[ 30.0% / 100% ]
 
 [ 1.2 State Annotation Verification ]
 ------------------------------------------------------------
 State annotation verification: PASSED
-[ 40% / 40% ]
+[ 40.0% / 100% ]
 
-CURRENT SCORE: 40% / 100%
+CURRENT SCORE: 40.0% / 100%
 
 [ 2. Automaton Implementation Testing ] [ 60% ]
 ------------------------------------------------------------
-Skipping behavioral testing due to use of iteration.
-Forbidden iteration construct While at line 17
-[ 0% / 60% ]
+
+[ 2.1 Behavioral Testing (iterative) ]
+------------------------------------------------------------
+Word '10': PASSED
+[ 43.0% / 100% ]
+Word '11': PASSED
+[ 46.0% / 100% ]
+Word '100': FAILED
+[ 46.0% / 100% ]
+Word '101': FAILED
+[ 46.0% / 100% ]
+Word '1000': FAILED
+[ 46.0% / 100% ]
+Word '110': PASSED
+[ 49.0% / 100% ]
+Word '1110': PASSED
+[ 52.0% / 100% ]
+Word '1010': FAILED
+[ 52.0% / 100% ]
+Word '1100': FAILED
+[ 52.0% / 100% ]
+Word '1001': FAILED
+[ 52.0% / 100% ]
+Word '111': PASSED
+[ 55.0% / 100% ]
+Word '1111': PASSED
+[ 58.0% / 100% ]
+Word '0': PASSED
+[ 61.0% / 100% ]
+Word '1101': FAILED
+[ 61.0% / 100% ]
+Word '1011': FAILED
+[ 61.0% / 100% ]
+Word '1': PASSED
+[ 64.0% / 100% ]
+Word '1': PASSED
+[ 67.0% / 100% ]
+Word '110001000': FAILED
+[ 67.0% / 100% ]
+Word '0001101': PASSED
+[ 70.0% / 100% ]
+Word '10000': FAILED
+[ 70.0% / 100% ]
 
 ============================================================
-FINAL SCORE: 40% / 100%
+FINAL SCORE: 70.0% / 100%
 ============================================================
