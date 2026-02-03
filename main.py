@@ -39,8 +39,10 @@ if __name__ == "__main__":
 
     # regex = assignment_variables["regex"]
     regex = "0|1{0|1}"  # Hardcoded for testing purposes
-    automaton_type = assignment_variables["automaton_type"]
+    # automaton_type = assignment_variables["automaton_type"]
+    automaton_type = "NKA"  # Hardcoded for testing purposes
     implementation = assignment_variables["implementation"]
+    # implementation = "iterative"  # Hardcoded for testing purposes
 
     report.section("Configuration")
     report.add_info(f"Regex: {regex}")

@@ -1,5 +1,4 @@
 def q0(string: str) -> bool:
-    print('q0', string)
     if len(string) == 0:
         return False
     else:
@@ -13,7 +12,6 @@ def q0(string: str) -> bool:
 
 
 def q1(string: str) -> bool:
-    print('q1', string)
     if len(string) == 0:
         return True
     else:
@@ -27,7 +25,6 @@ def q1(string: str) -> bool:
 
 
 def q2(string: str) -> bool:
-    print('q2', string)
     if len(string) == 0:
         return True
     else:

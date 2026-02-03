@@ -23,7 +23,6 @@ class DFA:
         for idx, symbol in enumerate(string):
             if (self.actual_state, symbol) not in self.transition_table:
                 return False
-            print(f'({self.actual_state}, "{string[idx:]}")')
             self.actual_state = self.transition_table[(self.actual_state, symbol)]
 
         return self.actual_state in self.accepted_states

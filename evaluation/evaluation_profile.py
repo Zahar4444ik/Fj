@@ -7,6 +7,9 @@ EVALUATION_PROFILE = {
             "count": 20,
             "bad_word_ratio_level": 2
         },
+        "group_testing": {
+            "group_size": 5,
+        },
 
         "regex_complexity": {
             "min_depth": 1,

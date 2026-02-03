@@ -1,6 +1,9 @@
+import random
+
 from core.assignment.utils import load_module_from_path
 from core.evaluation.report import AssignmentReport
-from core.evaluation.utils.helpers import bad_word_ratio
+from core.evaluation.utils.difference_print import format_acceptance_diff
+from core.evaluation.utils.helpers import bad_word_ratio, split_into_groups
 from core.regex.automata.utils.automata_operations import get_regex_alphabet
 from evaluation.evaluation_profile import EVALUATION_PROFILE
 from tasks.task2_behavioral_testing.checker.utils import check_no_iteration, check_no_recursion
@@ -94,10 +97,12 @@ def evaluate_implementation(ast: dict, automaton_type: str, variant: str, report
 
     words = generate_test_words(ast)
 
+    random.shuffle(words)
+
     # 2.1 Behavioral testing
     report.section(f"2.1 Behavioral Testing ({variant})")
 
-    return behavioral_test(
+    return behavioral_group_test(
         words,
         reference_fn,
         student_fn,
@@ -163,4 +168,51 @@ def behavioral_test(
         if passed:
             score += points_per_word
 
-    return round(score)
+    return round(score, 2)
+
+
+def behavioral_group_test(
+    words,
+    reference_fn,
+    student_fn,
+    report,
+    max_points,
+):
+    group_cfg = EVALUATION_PROFILE["global"]["group_testing"]
+    group_size = group_cfg["group_size"]
+
+    groups = split_into_groups(words, group_size)
+    points_per_group = max_points / len(groups)
+
+    score = 0.0
+
+    for idx, group in enumerate(groups, start=1):
+        group_passed = True
+        mismatches = []
+
+        for word in group:
+            ref = reference_fn(word)
+            stu = student_fn(word)
+
+            if ref != stu:
+                group_passed = False
+                mismatches.append({
+                    "word": word,
+                    "expected": ref,
+                    "got": stu,
+                })
+
+        report.add_behavioral_group_result(
+            group_index=idx,
+            words=group,
+            passed=group_passed,
+            points=points_per_group if group_passed else 0,
+        )
+
+        if group_passed:
+            score += points_per_group
+        else:
+            report.add_info(format_acceptance_diff(mismatches))
+
+    return round(score, 2)
+

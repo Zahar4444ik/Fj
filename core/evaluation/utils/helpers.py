@@ -12,3 +12,10 @@ def bad_word_ratio(level: int) -> float:
         2: 0.2,
         3: 0.3,
     }[level]
+
+
+def split_into_groups(words, group_size):
+    return [
+        words[i:i + group_size]
+        for i in range(0, len(words), group_size)
+    ]

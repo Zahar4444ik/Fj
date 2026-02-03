@@ -7,7 +7,7 @@ def format_annotation_diff(reference, student) -> str:
 
     lines = [
         "State          Expected                    Received",
-        "-" * 65
+        "-" * 60
     ]
 
     has_diff = False
@@ -17,10 +17,43 @@ def format_annotation_diff(reference, student) -> str:
         if exp != got:
             ref_name = ref_id_to_state.get(cid, "?")
             stu_name = stu_id_to_state.get(cid, "?")
-            lines.append(f"{ref_name}/{stu_name:<7} {exp:<27} {got}")
+            lines.append(f"{ref_name}/{stu_name:<11} {exp:<27} {got}")
             has_diff = True
 
     if not has_diff:
         lines.append("No mismatches found.")
 
     return "\n".join(lines)
+
+
+def format_acceptance_diff(mismatches: list[dict]) -> str:
+    """
+    mismatches: list of dicts with keys:
+        - word
+        - expected (bool)
+        - got (bool)
+    """
+
+    def fmt(val: bool) -> str:
+        return "ACCEPTED" if val else "REJECTED"
+
+    lines = [
+        "Acceptance mismatches detected:",
+        "",
+        f"{'Word':<15} {'Expected':<15} {'Received'}",
+        "-" * 60,
+    ]
+
+    if not mismatches:
+        lines.append("No mismatches found.")
+        return "\n".join(lines)
+
+    for m in mismatches:
+        lines.append(
+            f"{m['word']:<15} "
+            f"{fmt(m['expected']):<15} "
+            f"{fmt(m['got'])}"
+        )
+
+    return "\n".join(lines)
+
