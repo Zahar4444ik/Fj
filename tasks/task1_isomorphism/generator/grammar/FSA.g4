@@ -59,6 +59,8 @@ ID
 
 EPSILON
     : 'ε'
+    | 'eps'
+    | 'epsilon'
     ;
 
 STRING
