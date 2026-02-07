@@ -1,30 +1,25 @@
 ============================================================
 FSA Credit Test A – Evaluation Report
 Student: zakhar.fesiuk@student.tuke.sk
-Generated: 2026-02-07 21:40:52.373883
+Generated: 2026-02-07 22:56:11.046017
 ============================================================
 Configuration
 ------------------------------------------------------------
 Regex: 0|1{0|1}
-Automaton type: DKA
+Automaton type: NKA
 Implementation: iterative
 
 ------------------------------------------------------------
-1. FSA Specification Verification        [ 40 pts / 40 pts ]
+1. FSA Specification Verification        [ 0 pts / 40 pts ]
 ------------------------------------------------------------
 
 1.1 Structural Equivalence Verification
 
-Structural equivalence verification: PASSED
-[ 30 pts / 30 pts ]
-
-1.2 State Annotation Verification
-
-State annotation verification: PASSED
-[ 10 pts / 10 pts ]
+Structural equivalence verification: FAILED
+[ 0 pts / 30 pts ]
 
 ------------------------------------------------------------
-2. FSA Implementation Testing            [ 60 pts / 60 pts ]
+2. FSA Implementation Testing            [ 70 pts / 70 pts ]
 ------------------------------------------------------------
 
 2.1 Static Analysis: PASSED
@@ -32,22 +27,25 @@ State annotation verification: PASSED
 2.2 Functional Testing (iterative):
 
 Group 1: PASSED
-Words: 1010, 1000, 10, 1110, 0111010
-[ 15 pts / 15 pts ]
+Words: 1011, 111, 111, 1001
+[ 14.0 pts / 14.0 pts ]
 
 Group 2: PASSED
-Words: 1001, 1000111110, 111, 00, 1100
-[ 15 pts / 15 pts ]
+Words: 1110, 11, 1000, 11
+[ 14.0 pts / 14.0 pts ]
 
 Group 3: PASSED
-Words: 100, 101, 11, 1101, 0
-[ 15 pts / 15 pts ]
+Words: 110, 10, 0010010, 1010
+[ 14.0 pts / 14.0 pts ]
 
 Group 4: PASSED
-Words: 0, 110, 1011, 1
-[ 15 pts / 15 pts ]
+Words: 1111, 1, 0, 100
+[ 14.0 pts / 14.0 pts ]
 
+Group 5: PASSED
+Words: 1101, 101, 00111
+[ 14.0 pts / 14.0 pts ]
 
 ============================================================
-FINAL SCORE:                            [ 100 pts / 100 pts ]
+FINAL SCORE:                            [ 70 pts / 100 pts ]
 ============================================================

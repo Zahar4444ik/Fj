@@ -1,9 +1,9 @@
+from core.config.scoring import DKA_FSA_ISOMORPHISM, DKA_FSA_ANNOTATIONS, DKA_FSA_TOTAL, NKA_FSA_ISOMORPHISM
 from core.evaluation.utils.difference_print import format_annotation_diff
 from core.regex.automata.dka.dka_builder import DKA
 from core.regex.automata.nka.nka_builder import NKA
 from core.regex.generators.fsa_generator import fsa_from_dka, fsa_from_nka
 from core.evaluation.report import AssignmentReport
-from evaluation.evaluation_profile import EVALUATION_PROFILE
 from tasks.task1_isomorphism.checker.compare import (
     prepare_automaton_for_fsa_test,
     check_isomorphism,
@@ -27,7 +27,6 @@ FSA_CONFIG = {
 
 
 def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport) -> float:
-    fsa_cfg = EVALUATION_PROFILE[automaton_type]["fsa"]
     type_cfg = FSA_CONFIG[automaton_type]
 
     # ============================================================
@@ -41,11 +40,13 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
     # 2. Run all checks
     # ============================================================
     iso_passed = check_isomorphism(reference, student)
+    iso_points = DKA_FSA_ISOMORPHISM if automaton_type == "DKA" else NKA_FSA_ISOMORPHISM
     ann_passed = None
     ann_diff = None
 
     if type_cfg["check_annotations"]:
         ann_passed = check_annotations(reference, student)
+        ann_points = DKA_FSA_ANNOTATIONS
         if not ann_passed:
             ann_diff = format_annotation_diff(reference, student)
 
@@ -55,23 +56,23 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
     score = 0.0
 
     if iso_passed:
-        score += fsa_cfg["isomorphism"]
-        report.increase_score(fsa_cfg["isomorphism"])
+        score += iso_points
+        report.increase_score(iso_points)
 
     if ann_passed:
-        score += fsa_cfg["annotations"]
-        report.increase_score(fsa_cfg["annotations"])
+        score += ann_points
+        report.increase_score(ann_points)
 
     # ============================================================
     # 4. Add to report
     # ============================================================
-    report.section("1. FSA Specification Verification", max_points=fsa_cfg["total"])
+    report.section("1. FSA Specification Verification", DKA_FSA_TOTAL)
 
     report.subsection("1.1 Structural Equivalence Verification")
     report.add_result(
         "Structural equivalence verification",
         iso_passed,
-        points=fsa_cfg["isomorphism"],
+        points=iso_points,
     )
 
     if type_cfg["check_annotations"]:
@@ -79,7 +80,7 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         report.add_result(
             "State annotation verification",
             ann_passed,
-            points=fsa_cfg["annotations"],
+            points=ann_points,
         )
 
         if not ann_passed:

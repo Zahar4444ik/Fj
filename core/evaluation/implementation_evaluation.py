@@ -1,11 +1,12 @@
 import random
 
 from core.assignment.utils import load_module_from_path
+from core.config.scoring import DKA_IMPLEMENTATION, NKA_IMPLEMENTATION, TEST_WORDS_COUNT, BAD_WORD_RATIO_LEVEL, \
+    GROUP_SIZE
 from core.evaluation.report import AssignmentReport
 from core.evaluation.utils.difference_print import format_acceptance_diff
-from core.evaluation.utils.helpers import bad_word_ratio, split_into_groups
+from core.evaluation.utils.helpers import split_into_groups
 from core.regex.automata.utils.automata_operations import get_regex_alphabet
-from evaluation.evaluation_profile import EVALUATION_PROFILE
 from tasks.task2_behavioral_testing.checker.utils import check_no_iteration, check_no_recursion
 from tasks.task2_behavioral_testing.generator.dka.iterative import generate_iterative_dka
 from tasks.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
@@ -77,7 +78,7 @@ def evaluate_implementation(
     """
     report.set_current_score(0)
     cfg = IMPLEMENTATION_CONFIG[(automaton_type, variant)]
-    impl_cfg = EVALUATION_PROFILE[automaton_type]["implementation"]
+    impl_point = DKA_IMPLEMENTATION if automaton_type == "DKA" else NKA_IMPLEMENTATION
 
     # ============================================================
     # 1. Static analysis
@@ -105,14 +106,14 @@ def evaluate_implementation(
         random.shuffle(words)
 
         # Run group testing
-        group_results, score = run_group_tests(words, reference_fn, student_fn)
+        group_results, score = run_group_tests(words, reference_fn, student_fn, impl_point)
 
         report.increase_score(score)
 
     # ============================================================
     # 3. Add to report
     # ============================================================
-    report.section("2. FSA Implementation Testing", max_points=impl_cfg["total"])
+    report.section("2. FSA Implementation Testing", max_points=impl_point)
     report.subsection(f"2.1 Static Analysis: {'PASSED' if static_passed else 'FAILED'}")
 
     if not static_passed:
@@ -140,12 +141,12 @@ def evaluate_implementation(
 
 def generate_test_words(ast: dict) -> list[str]:
     """Generate test words based on configuration."""
-    cfg = EVALUATION_PROFILE["global"]["test_words"]
 
-    total = cfg["count"]
-    ratio = bad_word_ratio(cfg["bad_word_ratio_level"])
+    total = TEST_WORDS_COUNT
+    ratio = BAD_WORD_RATIO_LEVEL
 
     rejected_count = int(total * ratio)
+
     accepted_count = total - rejected_count
 
     alphabet = get_regex_alphabet(ast)
@@ -161,18 +162,17 @@ def generate_test_words(ast: dict) -> list[str]:
     return words
 
 
-def run_group_tests(words: list[str], reference_fn, student_fn) -> tuple[list[dict], float]:
+def run_group_tests(words: list[str], reference_fn, student_fn, impl_points: int) -> tuple[list[dict], float]:
     """
     Run behavioral testing on groups of words.
 
     Returns:
         (group_results, total_score)
     """
-    group_cfg = EVALUATION_PROFILE["global"]["group_testing"]
-    group_size = group_cfg["group_size"]
+    group_size = GROUP_SIZE
 
     groups = split_into_groups(words, group_size)
-    points_per_group = EVALUATION_PROFILE["DKA"]["implementation"]["total"] / len(groups)
+    points_per_group = float(impl_points / len(groups))
 
     results = []
     score = 0.0

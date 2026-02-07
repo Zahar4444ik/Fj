@@ -1,21 +1,19 @@
 from datetime import datetime
 from pathlib import Path
 
-from evaluation.evaluation_profile import EVALUATION_PROFILE
-
 
 class AssignmentReport:
     def __init__(self, path: str):
         self.path = Path(path)
         self.lines = []
-        self.total_score = EVALUATION_PROFILE["global"]["total_score"]
+        self.total_score = 100
         self._current_score = 0.0
 
     def header(self, title: str, student_email: str):
         """Add report header with title and metadata."""
         self.lines.extend([
             "=" * 60,
-            title,
+            f"{title} – Evaluation Report",
             f"Student: {student_email}",
             f"Generated: {datetime.now()}",
             "=" * 60,
@@ -75,7 +73,7 @@ class AssignmentReport:
         self.lines.append(f"Group {group_index}: {status}")
         self.lines.append(f"Words: {', '.join(words)}")
 
-        self.lines.append(f"[ {int(points) if passed else 0} pts / {int(points)} pts ]\n")
+        self.lines.append(f"[ {points if passed else 0} pts / {points} pts ]\n")
 
     def increase_score(self, points: float):
         """Manually increase score (for partial credit)."""
@@ -84,7 +82,6 @@ class AssignmentReport:
     def footer(self, score):
         """Add final score footer."""
         self.lines.extend([
-            "",
             "=" * 60,
             f"FINAL SCORE:{' ' * 27} [ {int(score)} pts / {self.total_score} pts ]",
             "=" * 60,

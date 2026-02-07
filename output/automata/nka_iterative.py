@@ -85,9 +85,9 @@ transition_table = {
 # Accepting states
 # ============================================================
 accepted_states = {
-    State.q3,
     State.q6,
     State.q8,
+    State.q3,
     State.q10,
 }
 
