@@ -50,7 +50,6 @@ class NFA:
 
         while self.stack:
             actual_state, string_rest = self.stack.pop()
-            print(f'({actual_state}, "{string_rest}")')
 
             if (actual_state, string_rest) in visited:
                 continue

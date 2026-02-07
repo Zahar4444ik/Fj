@@ -16,7 +16,6 @@ from tasks.task2_behavioral_testing.word_generation.testing_words_generator impo
     generate_rejected_words,
 )
 
-
 IMPLEMENTATION_CONFIG = {
     ("DKA", "iterative"): {
         "student_path": "tasks/student_io/automaton/student_dka_iterative.py",
@@ -61,7 +60,12 @@ IMPLEMENTATION_CONFIG = {
 }
 
 
-def evaluate_implementation(ast: dict, automaton_type: str, variant: str, report: AssignmentReport) -> int:
+def evaluate_implementation(
+        ast: dict,
+        automaton_type: str,
+        variant: str,
+        report: AssignmentReport
+) -> float:
     """
     Unified evaluation for both iterative and recursive implementations.
 
@@ -71,47 +75,71 @@ def evaluate_implementation(ast: dict, automaton_type: str, variant: str, report
     :param report: Assignment report
     :return: Score earned
     """
+    report.set_current_score(0)
     cfg = IMPLEMENTATION_CONFIG[(automaton_type, variant)]
-    implementation_total = EVALUATION_PROFILE[automaton_type]["implementation"]["total"]
+    impl_cfg = EVALUATION_PROFILE[automaton_type]["implementation"]
 
-    report.section("2. Automaton Implementation Testing", implementation_total)
+    # ============================================================
+    # 1. Static analysis
+    # ============================================================
+    static_errors = cfg["static_check"](cfg["student_path"])
+    static_passed = not static_errors
 
-    # Static analysis
-    errors = cfg["static_check"](cfg["student_path"])
+    # ============================================================
+    # 2. Behavioral testing (only if static passed)
+    # ============================================================
+    group_results = []
+    score = 0.0
 
-    if errors:
+    if static_passed:
+        # Generate reference and load modules
+        cfg["generate"](ast)
+        reference = load_module_from_path(cfg["module_name"], cfg["reference_path"])
+        student = load_module_from_path(cfg["student_module_name"], cfg["student_path"])
+
+        reference_fn = cfg["get_check_fn"](reference)
+        student_fn = cfg["get_check_fn"](student)
+
+        # Generate and shuffle test words
+        words = generate_test_words(ast)
+        random.shuffle(words)
+
+        # Run group testing
+        group_results, score = run_group_tests(words, reference_fn, student_fn)
+
+        report.increase_score(score)
+
+    # ============================================================
+    # 3. Add to report
+    # ============================================================
+    report.section("2. FSA Implementation Testing", max_points=impl_cfg["total"])
+    report.subsection(f"2.1 Static Analysis: {'PASSED' if static_passed else 'FAILED'}")
+
+    if not static_passed:
         report.add_info(f"Skipping behavioral testing due to {cfg['static_error_reason']}.")
-        for err in errors:
+        for err in static_errors:
             report.add_info(err)
-        report.add_info(f'[ 0% / {implementation_total}% ]')
-        return 0
+        return 0.0
 
-    # Generate reference and load both modules
-    cfg["generate"](ast)
+    report.subsection(f"2.2 Functional Testing ({variant}):")
+    report.add_info("")
 
-    reference = load_module_from_path(cfg["module_name"], cfg["reference_path"])
-    student = load_module_from_path(cfg["student_module_name"], cfg["student_path"])
+    for result in group_results:
+        report.add_group_result(
+            group_index=result["index"],
+            words=result["words"],
+            passed=result["passed"],
+            points=result["points"],
+        )
 
-    reference_fn = cfg["get_check_fn"](reference)
-    student_fn = cfg["get_check_fn"](student)
+        if not result["passed"]:
+            report.add_info(format_acceptance_diff(result["mismatches"]))
 
-    words = generate_test_words(ast)
-
-    random.shuffle(words)
-
-    # 2.1 Behavioral testing
-    report.section(f"2.1 Behavioral Testing ({variant})")
-
-    return behavioral_group_test(
-        words,
-        reference_fn,
-        student_fn,
-        report,
-        implementation_total,
-    )
+    return score
 
 
-def generate_test_words(ast):
+def generate_test_words(ast: dict) -> list[str]:
+    """Generate test words based on configuration."""
     cfg = EVALUATION_PROFILE["global"]["test_words"]
 
     total = cfg["count"]
@@ -123,71 +151,33 @@ def generate_test_words(ast):
     alphabet = get_regex_alphabet(ast)
 
     words = []
-
     words.extend(
-        generate_accepted_words(
-            ast,
-            alphabet,
-            count=accepted_count,
-            max_iterations=3,
-        )
+        generate_accepted_words(ast, alphabet, count=accepted_count, max_iterations=3)
     )
-
     words.extend(
-        generate_rejected_words(
-            ast,
-            alphabet,
-            count=rejected_count,
-            max_iterations=3,
-        )
+        generate_rejected_words(ast, alphabet, count=rejected_count, max_iterations=3)
     )
 
     return words
 
 
-def behavioral_test(
-    words,
-    reference_fn,
-    student_fn,
-    report,
-    max_points,
-):
+def run_group_tests(words: list[str], reference_fn, student_fn) -> tuple[list[dict], float]:
+    """
+    Run behavioral testing on groups of words.
 
-    points_per_word = max_points / len(words)
-    score = 0.0
-
-    for word in words:
-        passed = reference_fn(word) == student_fn(word)
-
-        report.add_result(
-            f"Word '{word}'",
-            passed,
-            points=points_per_word if passed else 0,
-        )
-
-        if passed:
-            score += points_per_word
-
-    return round(score, 2)
-
-
-def behavioral_group_test(
-    words,
-    reference_fn,
-    student_fn,
-    report,
-    max_points,
-):
+    Returns:
+        (group_results, total_score)
+    """
     group_cfg = EVALUATION_PROFILE["global"]["group_testing"]
     group_size = group_cfg["group_size"]
 
     groups = split_into_groups(words, group_size)
-    points_per_group = max_points / len(groups)
+    points_per_group = EVALUATION_PROFILE["DKA"]["implementation"]["total"] / len(groups)
 
+    results = []
     score = 0.0
 
     for idx, group in enumerate(groups, start=1):
-        group_passed = True
         mismatches = []
 
         for word in group:
@@ -195,24 +185,23 @@ def behavioral_group_test(
             stu = student_fn(word)
 
             if ref != stu:
-                group_passed = False
                 mismatches.append({
                     "word": word,
                     "expected": ref,
                     "got": stu,
                 })
 
-        report.add_behavioral_group_result(
-            group_index=idx,
-            words=group,
-            passed=group_passed,
-            points=points_per_group if group_passed else 0,
-        )
+        group_passed = len(mismatches) == 0
+
+        results.append({
+            "index": idx,
+            "words": group,
+            "passed": group_passed,
+            "points": points_per_group,
+            "mismatches": mismatches,
+        })
 
         if group_passed:
             score += points_per_group
-        else:
-            report.add_info(format_acceptance_diff(mismatches))
 
-    return round(score, 2)
-
+    return results, round(score, 2)

@@ -32,19 +32,22 @@ if __name__ == "__main__":
     validate_evaluation_profile(EVALUATION_PROFILE)
 
     report = AssignmentReport(RESULT_PATH)
-    report.header("Automata Assignment – Evaluation Report")
+    report.header(TITLE, "zakhar.fesiuk@student.tuke.sk")
 
     assignment_variables = generate_assignment_variables()
     assignment_description = get_assignment_description(assignment_variables)
 
     # regex = assignment_variables["regex"]
     regex = "0|1{0|1}"  # Hardcoded for testing purposes
-    # automaton_type = assignment_variables["automaton_type"]
-    automaton_type = "NKA"  # Hardcoded for testing purposes
-    implementation = assignment_variables["implementation"]
-    # implementation = "iterative"  # Hardcoded for testing purposes
 
-    report.section("Configuration")
+    # automaton_type = assignment_variables["automaton_type"]
+    automaton_type = "DKA"  # Hardcoded for testing purposes
+
+    # implementation = assignment_variables["implementation"]
+    implementation = "iterative"  # Hardcoded for testing purposes
+
+    report.add_info("Configuration")
+    report.add_info("-" * 60)
     report.add_info(f"Regex: {regex}")
     report.add_info(f"Automaton type: {automaton_type}")
     report.add_info(f"Implementation: {implementation}")

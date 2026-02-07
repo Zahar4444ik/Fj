@@ -34,7 +34,7 @@ class DFA:
 transition_table = {
     (State.q0, '0'): State.q2,
     (State.q0, '1'): State.q1,
-    (State.q1, '0'): State.q2, # corrected transition is q1 -0-> q1
+    (State.q1, '0'): State.q1, # corrected transition is q1 -0-> q1
     (State.q1, '1'): State.q1,
 
 }

@@ -50,7 +50,6 @@ class NFA:
 
         while self.stack:
             actual_state, string_rest = self.stack.pop()
-            print(f'{actual_state}, "{string_rest}"')
 
             if (actual_state, string_rest) in visited:
                 continue
@@ -73,9 +72,9 @@ transition_table = {
     (State.q2, ''): {State.q3},
     (State.q3, ''): {State.q4},
     (State.q4, ''): {State.q5, State.q7},
-    (State.q5, '1'): {State.q6},
+    (State.q5, '0'): {State.q6},
     (State.q6, ''): {State.q4},
-    (State.q7, '0'): {State.q8},
+    (State.q7, '1'): {State.q8},
     (State.q8, ''): {State.q4},
     (State.q9, '0'): {State.q10},
 
@@ -86,10 +85,10 @@ transition_table = {
 # Accepting states
 # ============================================================
 accepted_states = {
-    State.q8,
-    State.q10,
     State.q3,
     State.q6,
+    State.q8,
+    State.q10,
 }
 
 init_state = State.q0

@@ -32,7 +32,7 @@ def q4(string: str) -> bool:
 
 
 def q5(string: str) -> bool:
-    return (len(string) > 0 and string[0] == '1' and q6(string[1:]))
+    return (len(string) > 0 and string[0] == '0' and q6(string[1:]))
 
 
 def q6(string: str) -> bool:
@@ -40,7 +40,7 @@ def q6(string: str) -> bool:
 
 
 def q7(string: str) -> bool:
-    return (len(string) > 0 and string[0] == '0' and q8(string[1:]))
+    return (len(string) > 0 and string[0] == '1' and q8(string[1:]))
 
 
 def q8(string: str) -> bool:

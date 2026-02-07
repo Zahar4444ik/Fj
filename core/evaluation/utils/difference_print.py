@@ -55,5 +55,5 @@ def format_acceptance_diff(mismatches: list[dict]) -> str:
             f"{fmt(m['got'])}"
         )
 
-    return "\n".join(lines)
+    return "\n".join(lines) + '\n'
 

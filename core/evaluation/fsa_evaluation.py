@@ -10,7 +10,6 @@ from tasks.task1_isomorphism.checker.compare import (
     check_annotations,
 )
 
-
 FSA_CONFIG = {
     "DKA": {
         "generate": fsa_from_dka,
@@ -30,45 +29,63 @@ FSA_CONFIG = {
 def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport) -> float:
     fsa_cfg = EVALUATION_PROFILE[automaton_type]["fsa"]
     type_cfg = FSA_CONFIG[automaton_type]
-    score = 0.0
 
-    report.section("1. FSA Specification Verification", fsa_cfg["total"])
-
-    # Generate and load
+    # ============================================================
+    # 1. Generate and load automatons
+    # ============================================================
     type_cfg["generate"](automaton, filename=type_cfg["reference_path"])
     reference = prepare_automaton_for_fsa_test(type_cfg["reference_path"])
     student = prepare_automaton_for_fsa_test(type_cfg["student_path"])
 
-    # 1.1 Isomorphism
-    report.section("1.1 Structural Equivalence Verification")
+    # ============================================================
+    # 2. Run all checks
+    # ============================================================
+    iso_passed = check_isomorphism(reference, student)
+    ann_passed = None
+    ann_diff = None
 
-    iso = check_isomorphism(reference, student)
+    if type_cfg["check_annotations"]:
+        ann_passed = check_annotations(reference, student)
+        if not ann_passed:
+            ann_diff = format_annotation_diff(reference, student)
+
+    # ============================================================
+    # 3. Calculate score
+    # ============================================================
+    score = 0.0
+
+    if iso_passed:
+        score += fsa_cfg["isomorphism"]
+        report.increase_score(fsa_cfg["isomorphism"])
+
+    if ann_passed:
+        score += fsa_cfg["annotations"]
+        report.increase_score(fsa_cfg["annotations"])
+
+    # ============================================================
+    # 4. Add to report
+    # ============================================================
+    report.section("1. FSA Specification Verification", max_points=fsa_cfg["total"])
+
+    report.subsection("1.1 Structural Equivalence Verification")
     report.add_result(
         "Structural equivalence verification",
-        iso,
-        points=float(fsa_cfg["isomorphism"]),
+        iso_passed,
+        points=fsa_cfg["isomorphism"],
     )
 
-    if iso:
-        score += fsa_cfg["isomorphism"]
-
-    # 1.2 Annotations (DKA only)
     if type_cfg["check_annotations"]:
-        report.section("1.2 State Annotation Verification")
-
-        ann = check_annotations(reference, student)
+        report.subsection("1.2 State Annotation Verification")
         report.add_result(
             "State annotation verification",
-            ann,
-            points=float(fsa_cfg["annotations"]),
+            ann_passed,
+            points=fsa_cfg["annotations"],
         )
 
-        if ann:
-            score += fsa_cfg["annotations"]
-        else:
+        if not ann_passed:
             report.add_info("")
             report.add_info("Annotation mismatches detected:")
             report.add_info("")
-            report.add_info(format_annotation_diff(reference, student))
+            report.add_info(ann_diff)
 
     return score

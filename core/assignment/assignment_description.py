@@ -15,10 +15,6 @@ def get_assignment_description(assignment):
         ktorý rozpoznáva jazyk definovaný regulárnym výrazom R, a zapíšte ho
         do súboru vo formáte .fsa.
         
-        Následne doplňte kostru programu tak, aby metóda:
-        
-            check(word: str) -> bool
-        
         správne určovala, či dané slovo patrí do daného jazyka.
         
         Nie je povolené používať externé knižnice ani meniť štruktúru riešenia.
