@@ -1,6 +1,6 @@
 import random
 
-from core.regex.generators.random_regex import generate_regex
+from core.regex.generators.random_regex import generate_valid_regex
 
 
 def generate_assignment_variables(seed=None):
@@ -9,7 +9,7 @@ def generate_assignment_variables(seed=None):
     automaton_type = random.choice(["NKA", "DKA"])
     implementation = random.choice(["iterative", "recursive"])
 
-    regex = generate_regex()
+    regex = generate_valid_regex()
 
     assignment = {
         "regex": regex,
