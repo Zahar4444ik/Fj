@@ -1,7 +1,9 @@
+alphabet: {a}
 states: {q0, q1, q2}
 start: q0
 accepting: {q2}
 
-transitions:
-  q0 -ε-> q1
+transitions:{
+  q0 -ε-> q1,
   q1 -a-> q2
+}

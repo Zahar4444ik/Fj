@@ -1,9 +1,11 @@
+alphabet: {a}
 states: {q0, q1, q2, q3}
 start: q0
 accepting: {q3}
 
-transitions:
-  q0 -ε-> q1
-  q0 -ε-> q2
-  q1 -a-> q3
+transitions:{
+  q0 -ε-> q1,
+  q0 -ε-> q2,
+  q1 -a-> q3,
   q2 -a-> q3
+}

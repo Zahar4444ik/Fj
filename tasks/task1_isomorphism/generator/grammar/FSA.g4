@@ -1,11 +1,15 @@
 grammar FSA;
 
 file
-    : states start accepting transitions EOF
+    : alphabet states start accepting transitions EOF
+    ;
+
+alphabet
+    : ALPHABET COLON LBRACE symbol (COMMA symbol)* COMMA? RBRACE
     ;
 
 states
-    : STATES COLON LBRACE stateEntry (COMMA stateEntry)* RBRACE
+    : STATES COLON LBRACE stateEntry (COMMA stateEntry)* COMMA? RBRACE
     ;
 
 stateEntry
@@ -17,11 +21,11 @@ start
     ;
 
 accepting
-    : ACCEPTING COLON LBRACE ID (COMMA ID)* RBRACE
+    : ACCEPTING COLON LBRACE ID (COMMA ID)* COMMA? RBRACE
     ;
 
 transitions
-    : TRANSITIONS COLON transition+
+    : TRANSITIONS COLON LBRACE transition (COMMA transition)* COMMA? RBRACE
     ;
 
 transition
@@ -36,6 +40,7 @@ symbol
 
 /* ---------- Lexer ---------- */
 
+ALPHABET    : 'alphabet' ;
 STATES      : 'states' ;
 START       : 'start' ;
 ACCEPTING   : 'accepting' ;

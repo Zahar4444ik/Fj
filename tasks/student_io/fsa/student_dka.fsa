@@ -1,3 +1,4 @@
+alphabet: {0, 1}
 states: {
 	s0=".0|.1{0|1}",
 	s1="0|1{.0|.1}.",
@@ -6,8 +7,9 @@ states: {
 start: s0
 accepting: {s2, s1}
 
-transitions:
-  s0 -1-> s1
-  s0 -0-> s2
-  s1 -1-> s1
+transitions:{
+  s0 -1-> s1,
+  s0 -0-> s2,
+  s1 -1-> s1,
   s1 -0-> s1
+}

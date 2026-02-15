@@ -1,17 +1,33 @@
-states: {q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10}
+alphabet: {0, 1}
+
+states: {
+    q0,
+    q1,
+    q2,
+    q3,
+    q4,
+    q5,
+    q6,
+    q7,
+    q8,
+    q9,
+    q10
+}
+
 start: q0
 accepting: {q10, q2, q5, q8}
 
-transitions:
-  q0 -ε-> q1
-  q0 -ε-> q3
-  q1 -0-> q2
-  q3 -1-> q4
-  q4 -ε-> q5
-  q5 -ε-> q6
-  q6 -ε-> q7
-  q6 -ε-> q9
-  q7 -0-> q8
-  q8 -ε-> q6
-  q9 -1-> q10
-  q10 -ε-> q6
+transitions: {
+    q0 -ε-> q1,
+    q0 -ε-> q3,
+    q1 -0-> q2,
+    q3 -1-> q4,
+    q4 -ε-> q5,
+    q5 -ε-> q6,
+    q6 -ε-> q7,
+    q6 -ε-> q9,
+    q7 -0-> q8,
+    q8 -ε-> q6,
+    q9 -1-> q10,
+    q10 -ε-> q6
+}

@@ -3,6 +3,10 @@ from tasks.task1_isomorphism.generator.automata.normalize import normalize_autom
 from tasks.task1_isomorphism.generator.automata.parser import parse_fsa
 
 
+def check_alphabet(reference, student):
+    return reference.alphabet == student.alphabet
+
+
 def check_isomorphism(reference, student):
     if reference.is_dfa != student.is_dfa:
         return False

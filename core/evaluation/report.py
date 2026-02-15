@@ -73,7 +73,7 @@ class AssignmentReport:
         self.lines.append(f"Group {group_index}: {status}")
         self.lines.append(f"Words: {', '.join(words)}")
 
-        self.lines.append(f"[ {points if passed else 0} pts / {points} pts ]\n")
+        self.lines.append(f"[ {round(points, 2) if passed else 0} pts / {round(points, 2)} pts ]\n")
 
     def increase_score(self, points: float):
         """Manually increase score (for partial credit)."""

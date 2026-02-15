@@ -7,7 +7,7 @@ from core.evaluation.report import AssignmentReport
 from tasks.task1_isomorphism.checker.compare import (
     prepare_automaton_for_fsa_test,
     check_isomorphism,
-    check_annotations,
+    check_annotations, check_alphabet,
 )
 
 FSA_CONFIG = {
@@ -39,8 +39,10 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
     # ============================================================
     # 2. Run all checks
     # ============================================================
+    alphabet_passed = check_alphabet(reference, student)
     iso_passed = check_isomorphism(reference, student)
     iso_points = DKA_FSA_ISOMORPHISM if automaton_type == "DKA" else NKA_FSA_ISOMORPHISM
+    ann_points = 0
     ann_passed = None
     ann_diff = None
 
@@ -66,9 +68,11 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
     # ============================================================
     # 4. Add to report
     # ============================================================
-    report.section("1. FSA Specification Verification", DKA_FSA_TOTAL)
+    report.section("1. FSA Specification Verification", (iso_points + ann_points))
 
-    report.subsection("1.1 Structural Equivalence Verification")
+    report.subsection(f"1.1 Alphabet correctness: {'PASSED' if alphabet_passed else 'FAILED'}")
+
+    report.subsection("1.2 Structural Equivalence Verification")
     report.add_result(
         "Structural equivalence verification",
         iso_passed,
@@ -76,7 +80,7 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
     )
 
     if type_cfg["check_annotations"]:
-        report.subsection("1.2 State Annotation Verification")
+        report.subsection("1.3 State Annotation Verification")
         report.add_result(
             "State annotation verification",
             ann_passed,
