@@ -1,4 +1,4 @@
-from core.config.scoring import DKA_FSA_ISOMORPHISM, DKA_FSA_ANNOTATIONS, DKA_FSA_TOTAL, NKA_FSA_ISOMORPHISM
+from core.config.settings_parse import DKA_FSA_ISOMORPHISM, DKA_FSA_ANNOTATIONS, DKA_FSA_TOTAL, NKA_FSA_ISOMORPHISM
 from core.evaluation.utils.difference_print import format_annotation_diff
 from core.regex.automata.dka.dka_builder import DKA
 from core.regex.automata.nka.nka_builder import NKA

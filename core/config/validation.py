@@ -1,4 +1,4 @@
-from .scoring import *
+from .settings_parse import *
 
 
 def validate_scoring_profile():

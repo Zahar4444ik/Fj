@@ -1,6 +1,6 @@
 import random
 
-from core.config.scoring import REGEX_MIN_DEPTH, REGEX_MAX_DEPTH
+from core.config.settings_parse import REGEX_MIN_DEPTH, REGEX_MAX_DEPTH
 from core.regex.frontend.syntax import ALPHABET
 
 MIN_DEPTH = REGEX_MIN_DEPTH

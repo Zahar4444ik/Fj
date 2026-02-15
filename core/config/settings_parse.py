@@ -7,6 +7,7 @@ load_dotenv()
 # -----------------------------
 # Global
 # -----------------------------
+CATEGORY = os.getenv("CATEGORY", "default")
 TITLE = os.getenv("TITLE", "Unnamed Test")
 
 TEST_WORDS_COUNT = int(os.getenv("TEST_WORDS_COUNT", 0))

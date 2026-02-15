@@ -1,7 +1,7 @@
 import random
 
 from core.assignment.utils import load_module_from_path
-from core.config.scoring import DKA_IMPLEMENTATION, NKA_IMPLEMENTATION, TEST_WORDS_COUNT, BAD_WORD_RATIO_LEVEL, \
+from core.config.settings_parse import DKA_IMPLEMENTATION, NKA_IMPLEMENTATION, TEST_WORDS_COUNT, BAD_WORD_RATIO_LEVEL, \
     GROUP_SIZE
 from core.evaluation.report import AssignmentReport
 from core.evaluation.utils.difference_print import format_acceptance_diff
@@ -155,9 +155,12 @@ def generate_test_words(ast: dict) -> list[str]:
     words.extend(
         generate_accepted_words(ast, alphabet, count=accepted_count, max_iterations=3)
     )
+    print(len(words))
+    print(len(set(words)))
     words.extend(
         generate_rejected_words(ast, alphabet, count=rejected_count, max_iterations=3)
     )
+    print(len(words))
 
     return words
 

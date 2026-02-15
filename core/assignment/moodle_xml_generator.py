@@ -3,6 +3,7 @@ import copy
 import re
 import xml.etree.ElementTree as ET
 
+from core.config.settings_parse import CATEGORY
 from core.regex.generators.random_regex import generate_valid_regex
 
 
@@ -85,7 +86,7 @@ def generate_moodle_xml(count: int, template_path: str, output_path: str):
     category = ET.SubElement(quiz, "question", type="category")
     cat_node = ET.SubElement(category, "category")
     text = ET.SubElement(cat_node, "text")
-    text.text = "$course$/top/generated_assignments"
+    text.text = f"$course$/top/{CATEGORY}"
 
     for i in range(count):
         assignment = generate_assignment_variables()

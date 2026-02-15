@@ -1,19 +1,21 @@
 ============================================================
 FSA Credit Test A – Evaluation Report
 Student: zakhar.fesiuk@student.tuke.sk
-Generated: 2026-02-07 22:56:11.046017
+Generated: 2026-02-15 17:42:24.642534
 ============================================================
 Configuration
 ------------------------------------------------------------
 Regex: 0|1{0|1}
 Automaton type: NKA
-Implementation: iterative
+Implementation: recursive
 
 ------------------------------------------------------------
-1. FSA Specification Verification        [ 0 pts / 40 pts ]
+1. FSA Specification Verification        [ 0 pts / 30 pts ]
 ------------------------------------------------------------
 
-1.1 Structural Equivalence Verification
+1.1 Alphabet correctness: PASSED
+
+1.2 Structural Equivalence Verification
 
 Structural equivalence verification: FAILED
 [ 0 pts / 30 pts ]
@@ -24,27 +26,31 @@ Structural equivalence verification: FAILED
 
 2.1 Static Analysis: PASSED
 
-2.2 Functional Testing (iterative):
+2.2 Functional Testing (recursive):
 
 Group 1: PASSED
-Words: 1011, 111, 111, 1001
-[ 14.0 pts / 14.0 pts ]
+Words: 11, 101, 0101010, , 1
+[ 11.67 pts / 11.67 pts ]
 
 Group 2: PASSED
-Words: 1110, 11, 1000, 11
-[ 14.0 pts / 14.0 pts ]
+Words: 1111, 100, 1110, 1, 0
+[ 11.67 pts / 11.67 pts ]
 
 Group 3: PASSED
-Words: 110, 10, 0010010, 1010
-[ 14.0 pts / 14.0 pts ]
+Words: 0, 100, 110110, 1100, 0
+[ 11.67 pts / 11.67 pts ]
 
 Group 4: PASSED
-Words: 1111, 1, 0, 100
-[ 14.0 pts / 14.0 pts ]
+Words: 1, 1100, 0, 0, 0
+[ 11.67 pts / 11.67 pts ]
 
 Group 5: PASSED
-Words: 1101, 101, 00111
-[ 14.0 pts / 14.0 pts ]
+Words: 1, 100011, 0, 0, 1
+[ 11.67 pts / 11.67 pts ]
+
+Group 6: PASSED
+Words: 0, 0, 0, 0, 0
+[ 11.67 pts / 11.67 pts ]
 
 ============================================================
 FINAL SCORE:                            [ 70 pts / 100 pts ]

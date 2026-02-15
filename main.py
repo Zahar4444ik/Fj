@@ -1,7 +1,7 @@
 from core.assignment.assignment_description import get_assignment_description
 from core.assignment.assignment_variables import generate_assignment_variables
 from core.assignment.moodle_xml_generator import generate_moodle_xml
-from core.config.scoring import TITLE
+from core.config.settings_parse import TITLE
 from core.config.validation import validate_scoring_profile
 from core.regex.generators.random_regex import generate_regex
 from core.evaluation.fsa_evaluation import evaluate_fsa
@@ -31,7 +31,7 @@ def get_ast_from_regex(regex_str=None):
 
 if __name__ == "__main__":
     generate_moodle_xml(
-        5,
+        3,
         "output/templates.xml",
         "output/quiz.xml"
     )
@@ -47,11 +47,11 @@ if __name__ == "__main__":
     print(assignment_variables["regex"])
     regex = "0|1{0|1}"  # Hardcoded for testing purposes
 
-    # automaton_type = assignment_variables["automaton_type"]
-    automaton_type = "NKA"  # Hardcoded for testing purposes
+    automaton_type = assignment_variables["automaton_type"]
+    # automaton_type = "NKA"  # Hardcoded for testing purposes
 
-    # implementation = assignment_variables["implementation"]
-    implementation = "iterative"  # Hardcoded for testing purposes
+    implementation = assignment_variables["implementation"]
+    # implementation = "iterative"  # Hardcoded for testing purposes
 
     report.add_info("Configuration")
     report.add_info("-" * 60)
