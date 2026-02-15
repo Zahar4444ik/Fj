@@ -1,4 +1,11 @@
-ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+import string
+
+ALPHABET = (
+    list(string.ascii_lowercase) +
+    list(string.ascii_uppercase) +
+    list(string.digits) +
+    list("!@$%^&*-_+=<>?~")
+)
 
 
 OPERATORS = {
