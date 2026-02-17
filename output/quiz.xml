@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='utf-8'?>
+<quiz><question type="category"><category><text>$course$/top/test_generated_assignments</text></category></question><question type="essay">
+    <name>
+      <text>nfa_recursive_template</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p dir="ltr" style="text-align: left;"&gt;&lt;/p&gt;
+
+&lt;p&gt;
+&lt;/p&gt;
+&lt;p data-start="430" data-end="623"&gt;&lt;/p&gt;
+&lt;p dir="ltr"&gt;Navrhnite nedeterministický konečnostavový automat (NFA) pre jazyk špecifikovaný&amp;nbsp;nasledujúcim regulárnym výrazom&amp;nbsp;&lt;strong&gt;vy&lt;/strong&gt;&lt;strong&gt;užitím metódy prezentovanej na cvičeniach&amp;nbsp;&lt;/strong&gt;a naprogramujte jeho&lt;strong&gt;&amp;nbsp;rekurzívnu&amp;nbsp;&lt;/strong&gt;implementáciu&lt;span&gt;&amp;nbsp;&lt;/span&gt;$$\{(&gt;n|p3)\}$$&lt;/p&gt;Pri riešení zadania sa riaďte nasledujúcimi technickými pokynmi k jeho vypracovaniu a odovzdaniu. Stiahnite si&amp;nbsp;&lt;a href="@@PLUGINFILE@@/skeleton_nfa_rec.zip" title="kostru riešenia"&gt;kostru riešenia&lt;/a&gt;, ktorá má nasledujúcu štruktúru:&lt;br&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;ul&gt;
+    &lt;li&gt;&lt;span data-start="704" data-end="715"&gt;specification.fsa&lt;/span&gt; – súbor s&amp;nbsp;&lt;strong data-start="752" data-end="822"&gt;formálnou špecifikáciou výsledného DFA&lt;/strong&gt;. Súbor musí obsahovať &lt;span data-start="185" data-end="206"&gt;abecedu&lt;/span&gt;&lt;strong&gt;&amp;nbsp;&lt;/strong&gt;automatu,&amp;nbsp;stavy, prechody, počiatočný stav a akceptačné stavy zapísané v &lt;span&gt;&lt;span data-start="927" data-end="985" style=""&gt;doménovo-špecifickom jazyku predstavenom na cvičeniach&lt;/span&gt;. &lt;em&gt;Samotný postup návrhu automatu je nutné taktiež &lt;span&gt;písomne zdokumentovať&lt;/span&gt;&lt;strong&gt; &lt;/strong&gt;na priloženom pomocnom hárku papiera.&lt;/em&gt;&lt;/span&gt;&lt;/li&gt;&lt;li&gt;automaton.py&amp;nbsp;– skript s &lt;strong&gt;rekurzívnou implementáciou výsledného NFA&lt;/strong&gt;. Každý stav NFA musí byť implementovaný ako samostatná funkcia s parametrom reprezentujúcim&amp;nbsp;ešte nespracovanú časť vstupného reťazca a návratovou (pravdivostnou) hodnotou určujúcou, či daný reťazec patrí alebo nepatrí do jazyka špecifikovaného daným regulárnym výrazom. &lt;span&gt;&lt;em&gt;Názvy funkcií reprezentujúcich jednotlivé stavy musia byť zhodné s názvami stavov uvedenými vo formálnej špecifikácii&lt;span&gt;&lt;em&gt;&amp;nbsp;&lt;/em&gt;&lt;/span&gt;&lt;em&gt;a v tomto skripte nie je povolené využívať žiadne iteratívne konštrukcie.&lt;/em&gt;&lt;/em&gt;&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;main.py&amp;nbsp;– skript na manuálne testovanie implementácie.&amp;nbsp;Skript je možné spustiť v adresári so súbormi riešenia príkazom &lt;pre&gt;py main.py&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;/p&gt;Pri riešení nie je povolené využívať žiadne externé knižnice, meniť názvy jednotlivých súborov, tried alebo metód ani štruktúru riešenia. Po doplnení&amp;nbsp;formálnej špecifikácie automatu a požadovanej funkcionality jeho implementácie zabaľte vaše riešenie (príslušnú trojicu súborov specification.fsa, automaton.py a main.py) do zip archívu&amp;nbsp;&lt;strong&gt;bez akýchkoľvek podadresárov&lt;/strong&gt;&amp;nbsp;a nahrajte ho ako odpoveď. Na pomenovaní archívu nezáleží.&lt;br&gt;&lt;br&gt;&lt;br&gt;
+&lt;ul&gt;
+&lt;/ul&gt;</text>
+<file name="skeleton_nfa_rec.zip" path="/" encoding="base64">UEsDBBQACAAIABIbTFwAAAAAAAAAAAAAAAAMACAAYXV0b21hdG9uLnB5dXgLAAEEAAAAAAQAAAAAVVQNAAflOY1p5TmNaXIjjWldUr1qHDEQ7gN5hwE3CThHXAXcBe6CHcytMSZFKo9v5zidTj/WSoLdN3DhLi+wRQoX9wIGXyPrvTzaXWNwJ2aG71dHcF3Nq1O4Ihlcl/ZREwhld6RI+7D1BBGVAI3RbXTw6RmWv35+/nQE30BiPtQ8aDzGMgUVmrSH2zb/f4cwETXfoDTQoDJ863XqYR20XAmEEWme/l0s8vP5dbo/BV53sZ0uGI9R+XBA/XtWzZfpHprxqAgr5CZCiFQTE/EkGlgbp1K/07SF3FtaibWQqV8JAQgRvFGe1UgnLNtbni/g9wIuqz/VxaKAxzbkAweBTJgPAuuSiCeHfkxHGp177wKro0m/Qh0GPvDUDJZ55QTlnjRr3xIokw86PUJjQ+MFI1uX9hI7o+DGtgwg9My2N6wOa0dN6h1bY5Hp6Za9iHewY+AHy7aO6hGNbe8Vhwsx9yghCCbwdMzaidPh/iYUemOBLyczDuLHjFGxNvIrt7txWIudKL0Z50tMZje4GGsguPs+7VjxtC20b+vO1NZwB7hNTyuOvcOXB4HevDywaxWGmsKHX/G4MeXbvAJQSwcITOiR26oBAACCAgAAUEsDBBQACAAIAI0TTFwAAAAAAAAAAAAAAAAHACAAbWFpbi5weXV4CwABBAAAAAAEAAAAAFVUDQAHuyyNaeYsjWm3K41prZC/TsMwEMb3SnmHqxmSbp2RgsRQJBg6MLJYR3KhTuM/Sewgpeoj9DE6MPACSJ3SvhcOaUSZEBI32eff9935yyotAZ3VEq1WIKTRlYVyDlfjOXNqnQjqezmB0baiZ9W9gcJVhak47c+g9xnRVqdGN5Ri3n0klEOLx53w/sedF0oHtcXG9bKCJCmrG/T9lYbl3W0wCSYiA84VSuIc4hgY5xKF4pxdBxPwJZRxlte2EuoF4uEasSf086CprTOqO0BFpz22lNwAmw2y15Uo6Kd46t1LJ+zo3JfxLzbK2OPZAMLNpWYbAvuGh8rYJnxYQAh+83IeXeIzoKImCJf3C+iRLa4TMsOXD1M28zk3ukDlU/s96C+ye/+noMft/xznJ1BLBwhrivC0HgEAADQCAABQSwMEFAAIAAgAChNMXAAAAAAAAAAAAAAAABEAIABzcGVjaWZpY2F0aW9uLmZzYXV4CwABBAAAAAAEAAAAAFVUDQAHxCuNacQrjWnEK41pAwBQSwcIAAAAAAIAAAAAAAAAUEsBAhQDFAAIAAgAEhtMXEzokduqAQAAggIAAAwAGAAAAAAAAAAAALaBAAAAAGF1dG9tYXRvbi5weXV4CwABBAAAAAAEAAAAAFVUBQAB5TmNaVBLAQIUAxQACAAIAI0TTFxrivC0HgEAADQCAAAHABgAAAAAAAAAAAC2gQQCAABtYWluLnB5dXgLAAEEAAAAAAQAAAAAVVQFAAG7LI1pUEsBAhQDFAAIAAgAChNMXAAAAAACAAAAAAAAABEAGAAAAAAAAAAAALaBdwMAAHNwZWNpZmljYXRpb24uZnNhdXgLAAEEAAAAAAQAAAAAVVQFAAHEK41pUEsFBgAAAAADAAMA9gAAANgDAAAAAA==</file>
+    </questiontext>
+    <generalfeedback format="html">
+      <text />
+    </generalfeedback>
+    <defaultgrade>10.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber>0</idnumber>
+    <responseformat>noinline</responseformat>
+    <responserequired>1</responserequired>
+    <responsefieldlines>10</responsefieldlines>
+    <minwordlimit />
+    <maxwordlimit />
+    <attachments>1</attachments>
+    <attachmentsrequired>1</attachmentsrequired>
+    <maxbytes>0</maxbytes>
+    <filetypeslist>.zip</filetypeslist>
+    <graderinfo format="html">
+      <text />
+    </graderinfo>
+    <responsetemplate format="html">
+      <text />
+    </responsetemplate>
+  </question>
+
+<question type="essay">
+    <name>
+      <text>dfa_recursive_template</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p dir="ltr" style="text-align: left;"&gt;&lt;/p&gt;
+
+&lt;p&gt;
+&lt;/p&gt;
+&lt;p data-start="430" data-end="623"&gt;&lt;/p&gt;
+&lt;p dir="ltr"&gt;Navrhnite deterministický konečnostavový automat (DFA) pre jazyk špecifikovaný nasledujúcim regulárnym výrazom &lt;strong&gt;&lt;/strong&gt;&lt;strong&gt;vy&lt;/strong&gt;&lt;strong&gt;užitím metódy tokenov&lt;/strong&gt;&lt;strong&gt;&amp;nbsp;&lt;/strong&gt;a naprogramujte jeho&lt;strong&gt;&amp;nbsp;rekurzívnu&amp;nbsp;&lt;/strong&gt;implementáciu&lt;span&gt;&amp;nbsp;&lt;/span&gt;$$\{[_]w|[z][w]\}$$&lt;/p&gt;Pri riešení zadania sa riaďte nasledujúcimi technickými pokynmi k jeho vypracovaniu a odovzdaniu. Stiahnite si&amp;nbsp;&lt;a href="@@PLUGINFILE@@/skeleton_dfa_rec.zip" title="kostru riešenia"&gt;kostru riešenia&lt;/a&gt;, ktorá má nasledujúcu štruktúru:&lt;br&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;ul&gt;
+    &lt;li&gt;&lt;span data-start="704" data-end="715"&gt;specification.fsa&lt;/span&gt; – súbor s&amp;nbsp;&lt;strong data-start="752" data-end="822"&gt;formálnou špecifikáciou výsledného DFA&lt;/strong&gt;. Súbor musí obsahovať&amp;nbsp;&lt;span data-start="185" data-end="206"&gt;abecedu&lt;/span&gt;&lt;strong&gt;&amp;nbsp;&lt;/strong&gt;automatu, stavy vrátane ich anotácií, prechody, počiatočný stav a akceptačné stavy zapísané v &lt;span&gt;&lt;span data-start="927" data-end="985" style=""&gt;doménovo-špecifickom jazyku predstavenom na cvičeniach&lt;/span&gt;. &lt;em&gt;Samotný postup návrhu automatu je nutné taktiež &lt;span&gt;písomne zdokumentovať&lt;/span&gt;&lt;strong&gt; &lt;/strong&gt;na priloženom pomocnom hárku papiera.&lt;/em&gt;&lt;/span&gt;&lt;/li&gt;&lt;li&gt;automaton.py&amp;nbsp;– skript s &lt;strong&gt;rekurzívnou implementáciou výsledného DFA&lt;/strong&gt;. Každý stav DFA musí byť implementovaný ako samostatná funkcia s parametrom reprezentujúcim ešte nespracovanú časť vstupného reťazca a návratovou (pravdivostnou) hodnotou určujúcou, či daný reťazec patrí alebo nepatrí do jazyka špecifikovaného daným regulárnym výrazom. &lt;span&gt;&lt;em&gt;Názvy funkcií reprezentujúcich jednotlivé stavy musia byť zhodné s názvami stavov uvedenými vo formálnej špecifikácii&amp;nbsp;&lt;/em&gt;&lt;/span&gt;&lt;em&gt;a v tomto skripte nie je povolené využívať žiadne iteratívne konštrukcie.&lt;/em&gt;&lt;/li&gt;
+    &lt;li&gt;main.py&amp;nbsp;– skript na manuálne testovanie implementácie.&amp;nbsp;Skript je možné spustiť v adresári so súbormi riešenia príkazom &lt;pre&gt;py main.py&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;/p&gt;Pri riešení nie je povolené využívať žiadne externé knižnice, meniť názvy jednotlivých súborov, tried alebo metód ani štruktúru riešenia. Po doplnení&amp;nbsp;formálnej špecifikácie automatu a požadovanej funkcionality jeho implementácie zabaľte vaše riešenie (príslušnú trojicu súborov specification.fsa, automaton.py a main.py) do zip archívu&amp;nbsp;&lt;strong&gt;bez akýchkoľvek podadresárov&lt;/strong&gt;&amp;nbsp;a nahrajte ho ako odpoveď. Na pomenovaní archívu nezáleží.&lt;br&gt;&lt;br&gt;&lt;br&gt;
+&lt;ul&gt;
+&lt;/ul&gt;</text>
+<file name="skeleton_dfa_rec.zip" path="/" encoding="base64">UEsDBBQACAAIAOsaTFwAAAAAAAAAAAAAAAAMACAAYXV0b21hdG9uLnB5dXgLAAEEAAAAAAQAAAAAVVQNAAebOY1pST+NaTcjjWldUr1qHDEQ7gN5hwE3CThHUgXcBe5CHIw3BJMilce3c5xuT9JGKwl238CFu7zAFilc3AsYfI2s9/K3P8aQTswM369O6KpYFmf0U6rgunSIRkjpei9ajA87LxRZKzIc3dYEnx5p+fXL2zcn9IEqzscSg8ZzHKakQ5MOdNPmf68QNrLBDVeWGtYWt96knjbBVGvFNCEt09+LVX48v0q3Z4R1F9v5AnhAxeGI+vtbsbxMt9RMR4OwgdxGClFKAREm0dLGOp36vZEd5b6WtdqoKvVrpYgpkrfaQ03lVA17l+cr+r6iH8Wv4mI1gMc25COCYBDmo+JySMSLYz+lU1mTe+8C1MmsX7MJIx95aUbLWDkluRcD7TshbfPRpHtq6tB4BeTapUPFndV0XbcAUGZRt9dQx6WTJvUO1iAyPdzAi3oFOyU8ILt2Uk5osH3QCJdi7rmioEDg5RTaBemgvxlFXljo3acFgvi8ACqXtnqPdreOS7VXQ2/W+SEmux9dTDUI/fk476B43g60L+vOlrVFB7xLD2vE3vHTnWJvn+7gWoexpvDfr7jf2uHbPANQSwcIqIeYpqoBAACCAgAAUEsDBBQACAAIAJYRTFwAAAAAAAAAAAAAAAAHACAAbWFpbi5weXV4CwABBAAAAAAEAAAAAFVUDQAHDCmNaYQsjWmqI41prZC/TsMwEMb3Sn2HqxmSbJ2RgoREkWBgYGSxjuRCnMZ/mthBStVH6GN0YOAFkDqlfS8c0ogyISRuss+/77vzl1VaAjqrJVqtQEijKwurOVyM58ypZSKo7xUERtuKnlX3BgrzClNx3J1A7zOirU6NbijFovtIqIAWD1vh/Q9bL5QOaouN62UlSVJWN+j7uYab2+vpZDoRGXCuUBLnEMfAOJcoFOfscjoBX0IZZ3ltK6FeIB6uIXtCPw+a2jqjuj1UdNxhS8kVsGiQveaipJ/imXdfOWFH576Mf7Fhxh5PBhCszzWbABh800NlbB3cLyAAv/pqHp7zEVBZEwQPdwvokQ0uEzLDn/czFvmgG12i8rH9nvQX2b3/U9Lj9n/O8xNQSwcIHLJDcR8BAAA1AgAAUEsDBBQACAAIAFsSTFwAAAAAAAAAAAAAAAARACAAc3BlY2lmaWNhdGlvbi5mc2F1eAsAAQQAAAAABAAAAABVVA0AB34qjWl+Ko1pbySNaQMAUEsHCAAAAAACAAAAAAAAAFBLAQIUAxQACAAIAOsaTFyoh5imqgEAAIICAAAMABgAAAAAAAAAAAC2gQAAAABhdXRvbWF0b24ucHl1eAsAAQQAAAAABAAAAABVVAUAAZs5jWlQSwECFAMUAAgACACWEUxcHLJDcR8BAAA1AgAABwAYAAAAAAAAAAAAtoEEAgAAbWFpbi5weXV4CwABBAAAAAAEAAAAAFVUBQABDCmNaVBLAQIUAxQACAAIAFsSTFwAAAAAAgAAAAAAAAARABgAAAAAAAAAAAC2gXgDAABzcGVjaWZpY2F0aW9uLmZzYXV4CwABBAAAAAAEAAAAAFVUBQABfiqNaVBLBQYAAAAAAwADAPYAAADZAwAAAAA=</file>
+    </questiontext>
+    <generalfeedback format="html">
+      <text />
+    </generalfeedback>
+    <defaultgrade>10.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber>1</idnumber>
+    <responseformat>noinline</responseformat>
+    <responserequired>1</responserequired>
+    <responsefieldlines>10</responsefieldlines>
+    <minwordlimit />
+    <maxwordlimit />
+    <attachments>1</attachments>
+    <attachmentsrequired>1</attachmentsrequired>
+    <maxbytes>0</maxbytes>
+    <filetypeslist>.zip</filetypeslist>
+    <graderinfo format="html">
+      <text />
+    </graderinfo>
+    <responsetemplate format="html">
+      <text />
+    </responsetemplate>
+  </question>
+
+
+  <question type="essay">
+    <name>
+      <text>dfa_iterative_template</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p dir="ltr" style="text-align: left;"&gt;&lt;/p&gt;
+
+&lt;p&gt;
+&lt;/p&gt;
+&lt;p data-start="430" data-end="623"&gt;&lt;/p&gt;
+&lt;p dir="ltr"&gt;Navrhnite deterministický konečnostavový automat (DFA) pre jazyk špecifikovaný nasledujúcim regulárnym výrazom &lt;strong&gt;vy&lt;/strong&gt;&lt;strong&gt;užitím metódy tokenov&amp;nbsp;&lt;/strong&gt;a naprogramujte jeho&lt;strong&gt;&amp;nbsp;iteratívnu&amp;nbsp;&lt;/strong&gt;implementáciu&lt;span&gt;&amp;nbsp;&lt;/span&gt;$$\{%Y|\{o\}B\}$$&lt;/p&gt;Pri riešení zadania sa riaďte nasledujúcimi technickými pokynmi k jeho vypracovaniu a odovzdaniu. Stiahnite si&amp;nbsp;&lt;a href="@@PLUGINFILE@@/skeleton_dfa_iter.zip" title="kostru riešenia"&gt;kostru riešenia&lt;/a&gt;, ktorá má nasledujúcu štruktúru:&lt;br&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;ul&gt;
+    &lt;li&gt;&lt;span data-start="704" data-end="715"&gt;specification.fsa – súbor s&lt;strong&gt; formálnou špecifikáciou výsledného DFA&lt;/strong&gt;. Súbor musí obsahovať&lt;span&gt; &lt;span data-start="185" data-end="206" style=""&gt;abecedu&lt;/span&gt;&lt;strong&gt;&amp;nbsp;&lt;/strong&gt;&lt;/span&gt;automatu, stavy vrátane ich anotácií, prechody, počiatočný stav a akceptačné stavy zapísané v doménovo-špecifickom jazyku predstavenom na cvičeniach. &lt;em&gt;Samotný postup návrhu automatu je nutné taktiež písomne zdokumentovať na priloženom pomocnom hárku papiera.&lt;/em&gt;&lt;/span&gt;&lt;/li&gt;&lt;li&gt;automaton.py&amp;nbsp;– skript s definíciou triedy DFA, ktorú&lt;strong&gt;&amp;nbsp;je potrebné implementovať&lt;/strong&gt;. Táto trieda musí obsahovať verejnú&amp;nbsp;&lt;strong&gt;metódu check&lt;/strong&gt; s parametrom reprezentujúcim vstupný reťazec a návratovou (pravdivostnou) hodnotou určujúcou, či daný reťazec patrí alebo nepatrí do jazyka špecifikovaného zadaným regulárnym výrazom.&amp;nbsp;&lt;em&gt;V tomto skripte nie je povolené využívať žiadnu rekurziu.&lt;/em&gt;&lt;/li&gt;
+    &lt;li&gt;main.py&amp;nbsp;– skript na manuálne testovanie implementácie.&amp;nbsp;Skript je možné spustiť v adresári so súbormi riešenia príkazom &lt;pre&gt;py main.py&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;/p&gt;Pri riešení nie je povolené využívať žiadne externé knižnice, meniť názvy jednotlivých súborov, tried alebo metód ani štruktúru riešenia. Po doplnení&amp;nbsp;formálnej špecifikácie automatu a požadovanej funkcionality jeho implementácie zabaľte vaše riešenie (príslušnú trojicu súborov specification.fsa, automaton.py a main.py) do zip archívu&amp;nbsp;&lt;strong&gt;bez akýchkoľvek podadresárov&lt;/strong&gt;&amp;nbsp;a nahrajte ho ako odpoveď. Na pomenovaní archívu nezáleží.&lt;br&gt;&lt;br&gt;&lt;br&gt;
+&lt;ul&gt;
+&lt;/ul&gt;</text>
+<file name="skeleton_dfa_iter.zip" path="/" encoding="base64">UEsDBBQACAAIADobTFwAAAAAAAAAAAAAAAAMACAAYXV0b21hdG9uLnB5dXgLAAEEAAAAAAQAAAAAVVQNAAcwOo1pMDqNaS8jjWldUr1u2zAQ3g34HQ7IkgBOH8BDgQJxARdB3CHo6pykc01LIgnyKEB6gwzd+gIaMmTw1E4B4oXRe+UoOR3KhZCO9933cxdwv7nZLGFd24pq0hwOTNBgrUBj4/Y6cHyFm69fAEsD7BQVYT67gGsojR56dqFk46ZCC5qso4xc7GE4KSw0gUWHNbEjqEiD0ipXWKkuHAhQurL4wu25fSk3aq9YGb1lzCpaAOY5WaZi6xmZ/CIh8PQBKFUOWJ0/rSneTghDbylXO1XGPlc0Ur9kA50WGjr2C2FGUOJwKoSlShpQCydgOrD5EJKFQgAdFQLdmAaHJ9gFXb790vEF1IdXaUIANnsDynN8llvGXU3+jEgIdfDxCCbzuJ9wGnJ0SDDiSvxTBMj3lJcLSD4mRkwOOR4b3dbgbfzrTWZq6JQfnpJp1sWjr8LQa+MTmudg9Tja0fCEXY5QGDhg15Y4EREZUNBO6XhMdCdFUJvhpI2YFiQpASIdapmcFL4CtxZW8mMCuIm/b1fD6/o+Pi6hEb21GOVLpyQYuFuv4NsKvm9+bG5Xd/ERmlYQhX/SOi1BEGplcJ06b06NOsS+kuWQRFlc0ZKTuDX0pCUIETmSi8+iP3hO7JLqEjsx4sG2AqD0J9s+CBksHPnYOwVeOMWXzDhZ3X9g89l8tnPSluSl4IzjUZlsVmCTynmF3qfclvMZyBGrYLsd12x76anaXZ0L6Vh5m5o+Ho7Zja8WYqxT+ucy3Vdw/RkyY6r/Wt8BUEsHCLln6vI4AgAAbgMAAFBLAwQUAAgACACsFExcAAAAAAAAAAAAAAAABwAgAG1haW4ucHl1eAsAAQQAAAAABAAAAABVVA0AB9QujWn3MY1pOC2NaZVPO07DQBDtLfkOL9us3XAAJCMhkUhQpKCkGY2cXbIk+4k9DhJRjsMxqBD3Yk2CTEpeNZ/3mbFd9OBBomeJAc6n2AnuFrdlURbOgiiwN0RoGigizy4QqeuyQMbKMpqRXNWngQtpEOqlc+E5b35aVOqJV/yCfS9DCp8f6MzXO7+Z9gbqrHtdu625VM9y3m5w8ps1IuWNVFY9ng2gD5eio4bCxD/BqoN+mEMjv5MvvmrXpt1Uf3U1zLY30Mv7OUbmkTetSRL3nM+dqcmwnsr/v/oNUEsHCC/1UMPRAAAAawEAAFBLAwQUAAgACADlE0xcAAAAAAAAAAAAAAAAEQAgAHNwZWNpZmljYXRpb24uZnNhdXgLAAEEAAAAAAQAAAAAVVQNAAdfLY1pXy2NaV8tjWkDAFBLBwgAAAAAAgAAAAAAAABQSwECFAMUAAgACAA6G0xcuWfq8jgCAABuAwAADAAYAAAAAAAAAAAAtoEAAAAAYXV0b21hdG9uLnB5dXgLAAEEAAAAAAQAAAAAVVQFAAEwOo1pUEsBAhQDFAAIAAgArBRMXC/1UMPRAAAAawEAAAcAGAAAAAAAAAAAALaBkgIAAG1haW4ucHl1eAsAAQQAAAAABAAAAABVVAUAAdQujWlQSwECFAMUAAgACADlE0xcAAAAAAIAAAAAAAAAEQAYAAAAAAAAAAAAtoG4AwAAc3BlY2lmaWNhdGlvbi5mc2F1eAsAAQQAAAAABAAAAABVVAUAAV8tjWlQSwUGAAAAAAMAAwD2AAAAGQQAAAAA</file>
+    </questiontext>
+    <generalfeedback format="html">
+      <text />
+    </generalfeedback>
+    <defaultgrade>10.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber>2</idnumber>
+    <responseformat>noinline</responseformat>
+    <responserequired>1</responserequired>
+    <responsefieldlines>10</responsefieldlines>
+    <minwordlimit />
+    <maxwordlimit />
+    <attachments>1</attachments>
+    <attachmentsrequired>1</attachmentsrequired>
+    <maxbytes>0</maxbytes>
+    <filetypeslist>.zip</filetypeslist>
+    <graderinfo format="html">
+      <text />
+    </graderinfo>
+    <responsetemplate format="html">
+      <text />
+    </responsetemplate>
+  </question>
+
+
+  </quiz>
