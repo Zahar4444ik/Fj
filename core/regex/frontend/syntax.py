@@ -4,7 +4,7 @@ ALPHABET = (
     list(string.ascii_lowercase) +
     list(string.ascii_uppercase) +
     list(string.digits) +
-    list("!@$%^&*-+=<>?~")
+    list("!@$%^&*-_+=<>?~")
 )
 
 
