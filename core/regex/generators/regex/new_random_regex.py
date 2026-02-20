@@ -6,6 +6,8 @@ from core.regex.generators.regex.ast_nodes import (
     Symbol, Star, Union, Concat, Optional,
     is_atomic, count_stars, count_unions, count_nodes,
 )
+from core.regex.frontend.helper import get_ast_from_regex
+from core.regex.automata.dka.dka_builder import build_DKA
 
 MIN_DEPTH = REGEX_MIN_DEPTH
 MAX_DEPTH = REGEX_MAX_DEPTH
@@ -57,7 +59,8 @@ def generate_ast(depth=0):
         # At least one side must be non-atomic — safe because can_nest is True
         # Also forbid Union as child of Union to cap branches at 2
         while (is_atomic(left) and is_atomic(right)) \
-                or isinstance(left, Union) or isinstance(right, Union):
+                or isinstance(left, Union) or isinstance(right, Union) \
+                or left == right:
             left = generate_ast(depth + 1)
             right = generate_ast(depth + 1)
         return Union(left, right)
@@ -134,6 +137,43 @@ def generate_valid_regex() -> str:
     return to_regex(ast)
 
 
+def generate_regex_with_state_count(min_states: int, max_states: int) -> str:
+    """
+    Generate a valid regex whose DFA has a state count in [min_states, max_states].
+    """
+    while True:
+        regex = generate_valid_regex()
+        try:
+            ast = get_ast_from_regex(regex)
+            automaton = build_DKA(ast, regex)
+            state_count = len(automaton.name_map)
+            if min_states <= state_count <= max_states:
+                return regex
+        except Exception:
+            # Malformed regex or DFA build failure — just retry
+            continue
+
+
+def generate_assignment_regexes(
+    count: int,
+    min_states: int,
+    max_states: int,
+) -> list[str]:
+    """
+    Generate `count` valid regexes each with DFA state count in [min_states, max_states].
+    """
+    return [generate_regex_with_state_count(min_states, max_states) for _ in range(count)]
+
+
 if __name__ == "__main__":
-    for _ in range(10):
+    # Basic generation
+    for _ in range(5):
         print(generate_valid_regex())
+
+    print("---")
+
+    # DFA state count controlled generation (e.g. medium difficulty: 4–7 states)
+    for regex in generate_assignment_regexes(count=15, min_states=4, max_states=4):
+        ast = get_ast_from_regex(regex)
+        automaton = build_DKA(ast, regex)
+        print(f"{regex}  →  {len(automaton.name_map)} states")

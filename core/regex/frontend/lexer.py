@@ -1,5 +1,7 @@
 from enum import Enum, auto
 
+from core.regex.frontend.syntax import ALPHABET
+
 
 class TokenType(Enum):
     SYMBOL = auto()  # Symbol
@@ -46,7 +48,7 @@ class Lexer:
 
     def symbol(self):
         """Returns a token of type SYMBOL."""
-        if self.current_char.isalpha() or self.current_char.isdigit():
+        if self.current_char in ALPHABET:
             char = self.current_char
             self.advance()
             return Token(TokenType.SYMBOL, char)
@@ -62,7 +64,7 @@ class Lexer:
                 continue
 
             # Symbol recognition
-            if self.current_char.isalpha() or self.current_char.isdigit():
+            if self.current_char in ALPHABET:
                 return self.symbol()
 
             if self.current_char == '|':
