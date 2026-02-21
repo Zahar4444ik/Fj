@@ -1,8 +1,8 @@
-from core.config.settings_parse import DKA_FSA_ISOMORPHISM, DKA_FSA_ANNOTATIONS, DKA_FSA_TOTAL, NKA_FSA_ISOMORPHISM
+from core.config.settings_parse import DKA_FSA_ISOMORPHISM, DKA_FSA_ANNOTATIONS, NKA_FSA_ISOMORPHISM
 from core.evaluation.utils.difference_print import format_annotation_diff
 from core.regex.automata.dka.dka_builder import DKA
 from core.regex.automata.nka.nka_builder import NKA
-from core.regex.generators.fsa_generator import fsa_from_dka, fsa_from_nka
+from core.regex.generators.fsa.fsa_generator import fsa_from_dka, fsa_from_nka
 from core.evaluation.report import AssignmentReport
 from tasks.task1_isomorphism.checker.compare import (
     prepare_automaton_for_fsa_test,

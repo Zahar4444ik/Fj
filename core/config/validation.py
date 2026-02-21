@@ -16,11 +16,11 @@ def validate_scoring_profile():
     if GROUP_SIZE <= 0:
         errors.append("GROUP_SIZE must be > 0")
 
-    if REGEX_MIN_DEPTH < 1:
-        errors.append("REGEX_MIN_DEPTH must be >= 1")
+    if REGEX_MIN_STATES_COUNT < 1:
+        errors.append("REGEX_MIN_STATES_COUNT must be >= 1")
 
-    if REGEX_MIN_DEPTH > REGEX_MAX_DEPTH:
-        errors.append("REGEX_MIN_DEPTH must be <= REGEX_MAX_DEPTH")
+    if REGEX_MIN_STATES_COUNT > REGEX_MAX_STATES_COUNT:
+        errors.append("REGEX_MIN_STATES_COUNT must be <= REGEX_MAX_STATES_COUNT")
 
     # -----------------------------
     # DKA scoring validation

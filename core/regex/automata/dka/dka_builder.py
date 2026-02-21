@@ -204,7 +204,6 @@ def build_dka_from_followpos(root, pos_map, followpos):
 
     dka = DKA(dfa_start_state, dfa_accept_states)
 
-    # ✔️ attach the mapping for later
     dka.state_map = dfa_state_map
 
     return dka

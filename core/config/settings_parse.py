@@ -14,8 +14,8 @@ TEST_WORDS_COUNT = int(os.getenv("TEST_WORDS_COUNT", 0))
 BAD_WORD_RATIO_LEVEL = float(os.getenv("BAD_WORD_RATIO_LEVEL", 0))
 GROUP_SIZE = int(os.getenv("GROUP_SIZE", 0))
 
-REGEX_MIN_DEPTH = int(os.getenv("REGEX_MIN_DEPTH", 0))
-REGEX_MAX_DEPTH = int(os.getenv("REGEX_MAX_DEPTH", 0))
+REGEX_MIN_STATES_COUNT = int(os.getenv("REGEX_MIN_STATES_COUNT", 0))
+REGEX_MAX_STATES_COUNT = int(os.getenv("REGEX_MAX_STATES_COUNT", 0))
 
 TOTAL_SCORE = 100  # fixed system invariant
 

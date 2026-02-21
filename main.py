@@ -1,15 +1,12 @@
 from core.assignment.assignment_description import get_assignment_description
 from core.assignment.assignment_variables import generate_assignment_variables
-from core.assignment.moodle_xml_generator import generate_moodle_xml
 from core.config.settings_parse import TITLE
 from core.config.validation import validate_scoring_profile
-from core.regex.generators.random_regex import generate_regex
+from core.regex.frontend.helper import get_ast_from_regex
 from core.evaluation.fsa_evaluation import evaluate_fsa
 from core.evaluation.implementation_evaluation import evaluate_implementation
 from core.regex.automata.dka.dka_builder import build_DKA
 from core.regex.automata.nka.nka_builder import build_NKA
-from core.regex.frontend.lexer import Lexer
-from core.regex.frontend.parser import Parser
 from core.evaluation.report import AssignmentReport
 
 RESULT_PATH = "output/results/assignment_report.txt"
@@ -19,22 +16,12 @@ AUTOMATON_BUILDERS = {
     "NKA": lambda ast, regex: build_NKA(ast),
 }
 
-
-def get_ast_from_regex(regex_str=None):
-    if regex_str is None:
-        regex_str = generate_regex()
-
-    lexer = Lexer(regex_str)
-    parser = Parser(lexer)
-    return parser.parse()
-
-
 if __name__ == "__main__":
-    generate_moodle_xml(
-        3,
-        "output/templates.xml",
-        "output/quiz.xml"
-    )
+    # generate_moodle_xml(
+    #     5,
+    #     "output/templates.xml",
+    #     "output/quiz.xml"
+    # )
     validate_scoring_profile()
 
     report = AssignmentReport(RESULT_PATH)

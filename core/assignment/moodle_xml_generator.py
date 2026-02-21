@@ -1,14 +1,9 @@
-import random
 import copy
 import re
 import xml.etree.ElementTree as ET
 
 from core.assignment.assignment_variables import generate_assignment_variables
 from core.config.settings_parse import CATEGORY
-from core.regex.generators.random_regex import generate_valid_regex
-
-
-SPECIAL_SYMBOLS = list("!@$%^&*-+=<>?~")
 
 
 TEMPLATE_NAME_MAP = {
