@@ -1,267 +1,276 @@
 import random
 from typing import List
 
+from core.regex.automata.dka.dka_builder import build_DKA
+from core.regex.automata.utils.automata_operations import get_regex_alphabet
+from core.regex.frontend.helper import get_ast_from_regex, regex_from_tree
 
-def generate_from_tree(node: dict, alphabet: List[str], max_iterations: int = 3) -> str:
+
+# ---------------------------------------------------------------------------
+# Accepted word generation
+# ---------------------------------------------------------------------------
+# Strategy: walk the AST and at every Star node try a range of iteration
+# counts (0..max_iterations). We enumerate combinations systematically by
+# assigning each Star a different count per attempt, then fall back to random
+# variation. Because every regex is guaranteed to contain at least one Star
+# the word space is infinite, so filling any medium-sized count is always
+# possible without duplicates.
+# ---------------------------------------------------------------------------
+
+def _collect_stars(node: dict) -> List[dict]:
+    """Return every Star node in the tree in traversal order."""
+    result = []
+
+    def _walk(n: dict):
+        children = n.get("children", [])
+        if n.get("type") == "element" and children and children[0].get("value") == "<LBRACE>":
+            result.append(n)
+        for child in children:
+            if isinstance(child, dict):
+                _walk(child)
+
+    _walk(node)
+    return result
+
+
+def _generate_word(node: dict, star_counts: dict, max_iterations: int) -> str:
     """
-    Recursively generate a word from parse tree.
+    Walk the AST and produce one word.
 
-    Args:
-        node: Parse tree node
-        alphabet: List of valid symbols
-        max_iterations: Maximum repetitions for {}
-
-    Returns:
-        Generated word as string
+    star_counts maps id(star_node) -> exact iteration count to use.
+    Any star not in the map falls back to a random count in [0, max_iterations].
     """
     node_type = node.get("type")
 
     if node_type == "symbol":
         value = node.get("value", "")
-        # Skip structural symbols like <PIPE>, <LPAREN>, etc.
-        if value.startswith("<"):
+        return "" if value.startswith("<") else value
+
+    if node_type in ("regular", "sequence"):
+        return "".join(
+            _generate_word(child, star_counts, max_iterations)
+            for child in node.get("children", [])
+        )
+
+    if node_type == "alternative":
+        sequences = [
+            c for c in node.get("children", [])
+            if c.get("type") != "symbol"
+        ]
+        if not sequences:
             return ""
-        return value
+        return _generate_word(random.choice(sequences), star_counts, max_iterations)
 
-    elif node_type == "regular":
+    if node_type == "element":
         children = node.get("children", [])
-        return "".join(generate_from_tree(child, alphabet, max_iterations) for child in children)
-
-    elif node_type == "alternative":
-        # Choose one of the alternatives (skip PIPE symbols)
-        children = node.get("children", [])
-        sequences = [c for c in children if c.get("type") != "symbol"]
-        if sequences:
-            chosen = random.choice(sequences)
-            return generate_from_tree(chosen, alphabet, max_iterations)
-        return ""
-
-    elif node_type == "sequence":
-        children = node.get("children", [])
-        return "".join(generate_from_tree(child, alphabet, max_iterations) for child in children)
-
-    elif node_type == "element":
-        children = node.get("children", [])
-
-        # Check for special constructs
         if len(children) >= 3:
-            first_symbol = children[0].get("value", "")
+            first = children[0].get("value", "")
 
-            # {} - zero or more (star)
-            if first_symbol == "<LBRACE>":
-                iterations = random.randint(0, max_iterations)
-                inner = children[1]
-                return "".join(generate_from_tree(inner, alphabet, max_iterations) for _ in range(iterations))
+            if first == "<LBRACE>":
+                count = star_counts.get(id(node), random.randint(0, max_iterations))
+                return "".join(
+                    _generate_word(children[1], star_counts, max_iterations)
+                    for _ in range(count)
+                )
 
-            # [] - optional
-            elif first_symbol == "<LBRACKET>":
+            if first == "<LBRACKET>":
                 if random.choice([True, False]):
-                    return generate_from_tree(children[1], alphabet, max_iterations)
+                    return _generate_word(children[1], star_counts, max_iterations)
                 return ""
 
-            # () - grouping
-            elif first_symbol == "<LPAREN>":
-                return generate_from_tree(children[1], alphabet, max_iterations)
+            if first == "<LPAREN>":
+                return _generate_word(children[1], star_counts, max_iterations)
 
-        # Single symbol
-        return "".join(generate_from_tree(child, alphabet, max_iterations) for child in children)
+        return "".join(
+            _generate_word(child, star_counts, max_iterations)
+            for child in children
+        )
 
     return ""
 
 
-def generate_accepted_words(tree: dict, alphabet: List[str], count: int = 10,
-                            max_iterations: int = 3) -> List[str]:
+def _iter_star_assignments(stars: List[dict], max_iterations: int):
     """
-    Generate words that should be ACCEPTED by the regex.
+    Yield star_count dicts that systematically cover the iteration space.
+
+    Phase 1 — systematic: for N stars and M+1 possible counts we cycle through
+    all combinations in a round-robin fashion. This guarantees that for a single
+    star we see every count from 0 to max_iterations before repeating.
+
+    Phase 2 — random: once systematic combinations are exhausted, yield random
+    assignments indefinitely so the caller can always fill its quota.
+    """
+    if not stars:
+        while True:
+            yield {}
+        return
+
+    # Phase 1: systematic round-robin
+    total_counts = max_iterations + 1
+    # Number of systematic combos before we start repeating
+    # (cap at a reasonable ceiling to avoid huge loops for many stars)
+    n_systematic = total_counts ** min(len(stars), 3)
+
+    for i in range(n_systematic):
+        assignment = {}
+        remainder = i
+        for star in stars:
+            assignment[id(star)] = remainder % total_counts
+            remainder //= total_counts
+        yield assignment
+
+    # Phase 2: random forever
+    while True:
+        yield {id(star): random.randint(0, max_iterations) for star in stars}
+
+
+def generate_accepted_words(
+    tree: dict,
+    count: int = 10,
+    max_iterations: int = 5,
+) -> List[str]:
+    """
+    Generate exactly `count` unique words accepted by the regex.
+
+    Raises RuntimeError if the word space is exhausted before `count` unique
+    words are found (should not happen for any regex with a Star node).
+    """
+    stars = _collect_stars(tree)
+    seen: set[str] = set()
+    words: List[str] = []
+    max_attempts = count * 200  # generous ceiling to avoid infinite loops
+
+    for star_counts in _iter_star_assignments(stars, max_iterations):
+        if len(words) == count:
+            break
+        if max_attempts <= 0:
+            raise RuntimeError(
+                f"Could not generate {count} unique accepted words — "
+                "try increasing max_iterations or reducing count."
+            )
+        max_attempts -= 1
+
+        word = _generate_word(tree, star_counts, max_iterations)
+        if word not in seen:
+            seen.add(word)
+            words.append(word)
+
+    return words
+
+
+# ---------------------------------------------------------------------------
+# Rejected word generation
+# ---------------------------------------------------------------------------
+# Strategy: generate candidate strings from the alphabet (with varying lengths
+# and compositions) and verify each one against the DFA. Only confirmed-wrong
+# words are kept. Because we verify via DFA these are guaranteed rejections.
+# ---------------------------------------------------------------------------
+
+def _check_word_rejected(word: str, automaton) -> bool:
+    """Return True if the DFA rejects `word`."""
+    state = automaton.start
+    for char in word:
+        transitions = state.transitions.get(char, set())
+        if not transitions:
+            return True  # dead — rejected
+        state = next(iter(transitions))
+    return state not in automaton.accepts
+
+
+def _candidate_rejected_words(alphabet: List[str], max_len: int = 8):
+    """
+    Yield an infinite stream of candidate strings to test for rejection.
+
+    Mix of strategies to cover diverse failure modes:
+      - Pure random strings of varying length (most common)
+      - Length-0 empty string
+      - Single characters
+      - Repeated single characters
+    """
+    # Always try empty string first
+    yield ""
+
+    # Single characters
+    for ch in alphabet:
+        yield ch
+
+    # Then random mix
+    while True:
+        strategy = random.random()
+
+        if strategy < 0.6:
+            # Random string, biased toward short-to-medium lengths
+            length = random.randint(1, max_len)
+            yield "".join(random.choice(alphabet) for _ in range(length))
+
+        elif strategy < 0.8:
+            # Repeated single character (catches many simple length violations)
+            ch = random.choice(alphabet)
+            length = random.randint(2, max_len)
+            yield ch * length
+
+        else:
+            # Two random words concatenated (longer, tests suffix mismatches)
+            a = "".join(random.choice(alphabet) for _ in range(random.randint(1, 4)))
+            b = "".join(random.choice(alphabet) for _ in range(random.randint(1, 4)))
+            yield a + b
+
+
+def generate_rejected_words(
+    tree: dict,
+    count: int = 10,
+    max_attempts: int = 10_000,
+) -> List[str]:
+    """
+    Generate exactly `count` unique words guaranteed to be rejected by the DFA.
 
     Args:
-        tree: Parse tree from Parser
-        alphabet: List of valid symbols
-        count: Number of words to generate
-        max_iterations: Maximum repetitions for {}
+        tree:          Parse tree (unused here, reserved for future heuristics)
+        count:         Number of rejected words to produce
+        max_attempts:  Hard ceiling on DFA checks before giving up
 
-    Returns:
-        List of accepted words
+    Raises:
+        RuntimeError if `count` confirmed-rejected words cannot be found within
+        max_attempts checks (very unlikely for any non-trivial regex).
     """
-    words = set()
-    attempts = 0
-    max_attempts = count * 10
 
-    while len(words) < count and attempts < max_attempts:
-        try:
-            word = generate_from_tree(tree, alphabet, max_iterations)
-            words.add(word)
-        except Exception:
-            pass
+    alphabet = get_regex_alphabet(tree)
+
+    regex = regex_from_tree(tree)
+    automaton = build_DKA(tree, regex)
+
+    seen: set[str] = set()
+    words: List[str] = []
+    attempts = 0
+
+    for candidate in _candidate_rejected_words(alphabet):
+        if len(words) == count:
+            break
+        if attempts >= max_attempts:
+            raise RuntimeError(
+                f"Could not find {count} rejected words within {max_attempts} attempts. "
+                "The regex may accept almost all strings over this alphabet."
+            )
         attempts += 1
 
-    return list(words)
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+
+        if _check_word_rejected(candidate, automaton):
+            words.append(candidate)
+
+    return words
 
 
-def mutate_word(word: str, alphabet: List[str]) -> str:
-    """
-    Mutate a word by adding, removing, or changing characters.
-
-    Args:
-        word: Original word
-        alphabet: List of valid symbols
-
-    Returns:
-        Mutated word
-    """
-    if not word:
-        # If empty, return a random word
-        length = random.randint(1, 3)
-        return ''.join(random.choice(alphabet) for _ in range(length))
-
-    mutation_type = random.choice(['add', 'remove', 'change'])
-
-    if mutation_type == 'add':
-        # Add random character at random position
-        pos = random.randint(0, len(word))
-        return word[:pos] + random.choice(alphabet) + word[pos:]
-
-    elif mutation_type == 'remove' and len(word) > 1:
-        # Remove random character
-        pos = random.randint(0, len(word) - 1)
-        return word[:pos] + word[pos + 1:]
-
-    elif mutation_type == 'change':
-        # Change random character
-        pos = random.randint(0, len(word) - 1)
-        new_char = random.choice([c for c in alphabet if c != word[pos]])
-        if new_char:
-            return word[:pos] + new_char + word[pos + 1:]
-
-    return word
-
-
-def violate_structure(word: str, alphabet: List[str]) -> str:
-    """
-    Violate word structure by duplication, truncation, swapping, or insertion.
-
-    Args:
-        word: Original word
-        alphabet: List of valid symbols
-
-    Returns:
-        Word with violated structure
-    """
-    if not word:
-        # If empty, return a random word
-        length = random.randint(1, 5)
-        return ''.join(random.choice(alphabet) for _ in range(length))
-
-    violation_type = random.choice(['duplicate', 'truncate', 'swap', 'insert'])
-
-    if violation_type == 'duplicate' and len(word) > 0:
-        # Duplicate a part
-        pos = random.randint(0, len(word))
-        return word[:pos] + word[:pos]
-
-    elif violation_type == 'truncate' and len(word) > 1:
-        # Remove a portion
-        length = random.randint(1, len(word) - 1)
-        return word[:length]
-
-    elif violation_type == 'swap' and len(word) > 1:
-        # Swap two characters
-        i = random.randint(0, len(word) - 2)
-        chars = list(word)
-        chars[i], chars[i + 1] = chars[i + 1], chars[i]
-        return ''.join(chars)
-
-    elif violation_type == 'insert':
-        # Insert random characters
-        pos = random.randint(0, len(word))
-        insert_len = random.randint(1, 3)
-        insertion = ''.join(random.choice(alphabet) for _ in range(insert_len))
-        return word[:pos] + insertion + word[pos:]
-
-    return word
-
-
-def generate_rejected_words(tree: dict, alphabet: List[str], count: int = 10,
-                            max_iterations: int = 3) -> List[str]:
-    """
-    Generate words that are likely REJECTED by the regex.
-    Note: Some generated words might still be accepted - your reference automaton
-    will filter these during testing.
-
-    Args:
-        tree: Parse tree from Parser
-        alphabet: List of valid symbols
-        count: Number of words to generate
-        max_iterations: Maximum repetitions for {}
-
-    Returns:
-        List of potentially rejected words
-    """
-    rejected = set()
-
-    # Strategy 1: Random words from alphabet (count // 3)
-    for _ in range(count // 3):
-        length = random.randint(1, 10)
-        word = ''.join(random.choice(alphabet) for _ in range(length))
-        rejected.add(word)
-
-    # Strategy 2: Mutate accepted words (count // 3)
-    accepted = generate_accepted_words(tree, alphabet, count // 3, max_iterations)
-    for word in accepted:
-        mutated = mutate_word(word, alphabet)
-        rejected.add(mutated)
-
-    # Strategy 3: Violate structure (count // 3)
-    for _ in range(count // 3):
-        base_word = generate_from_tree(tree, alphabet, max_iterations)
-        violated = violate_structure(base_word, alphabet)
-        rejected.add(violated)
-
-    # Convert to list and trim to requested count
-    result = list(rejected)[:count]
-
-    # Fill with random words if needed
-    while len(result) < count:
-        length = random.randint(1, 8)
-        word = ''.join(random.choice(alphabet) for _ in range(length))
-        if word not in result:
-            result.append(word)
-
-    return result
-
-
-# Example usage and testing
 if __name__ == "__main__":
-    from core.regex.frontend.lexer import Lexer
-    from core.regex.frontend.parser import Parser
+    # Example usage (requires a parsed tree and DFA instance):
+    regex = "({N|~}|[l|A])>"
+    tree = get_ast_from_regex(regex)
+    alphabet = get_regex_alphabet(tree)
+    dka = build_DKA(tree, regex)
 
-    ALPHABET = ['a', 'b', 'c', 'd']
-
-    # Example regex patterns
-    test_patterns = [
-        "a|b",  # Simple union
-        "ab",  # Concatenation
-        "{a}b",  # Star then symbol
-        "[a]b",  # Optional then symbol
-        "(a|b)c",  # Grouped union then symbol
-        "a{bc}d",  # Symbol, star group, symbol
-    ]
-
-    for pattern in test_patterns:
-        print(f"\n{'=' * 50}")
-        print(f"Pattern: {pattern}")
-        print('=' * 50)
-
-        # Parse the regex
-        lexer = Lexer(pattern)
-        parser = Parser(lexer)
-        tree = parser.parse()
-
-        # Generate words
-        accepted = generate_accepted_words(tree, ALPHABET, count=5, max_iterations=3)
-        rejected = generate_rejected_words(tree, ALPHABET, count=5, max_iterations=3)
-
-        print(f"\nAccepted words: {accepted}")
-        print(f"Rejected words: {rejected}")
-        print(f"\nNote: Some 'rejected' words might actually be accepted.")
-        print(f"Your reference automaton will verify during testing.")
+    accepted = generate_accepted_words(tree, count=10, max_iterations=5)
+    print(accepted)
+    rejected = generate_rejected_words(tree, alphabet, dka, count=10)
+    print(rejected)

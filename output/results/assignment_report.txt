@@ -1,57 +1,62 @@
 ============================================================
 FSA Credit Test A – Evaluation Report
 Student: zakhar.fesiuk@student.tuke.sk
-Generated: 2026-02-15 17:42:24.642534
+Generated: 2026-02-21 19:12:16.460526
 ============================================================
 Configuration
 ------------------------------------------------------------
 Regex: 0|1{0|1}
-Automaton type: NKA
-Implementation: recursive
+Automaton type: DKA
+Implementation: iterative
 
 ------------------------------------------------------------
-1. FSA Specification Verification        [ 0 pts / 30 pts ]
+1. FSA Specification Verification        [ 40 pts / 40 pts ]
 ------------------------------------------------------------
 
 1.1 Alphabet correctness: PASSED
 
 1.2 Structural Equivalence Verification
 
-Structural equivalence verification: FAILED
-[ 0 pts / 30 pts ]
+Structural equivalence verification: PASSED
+[ 30 pts / 30 pts ]
+
+1.3 State Annotation Verification
+
+State annotation verification: PASSED
+[ 10 pts / 10 pts ]
 
 ------------------------------------------------------------
-2. FSA Implementation Testing            [ 70 pts / 70 pts ]
+2. FSA Implementation Testing            [ 60 pts / 60 pts ]
 ------------------------------------------------------------
 
 2.1 Static Analysis: PASSED
 
-2.2 Functional Testing (recursive):
+2.2 Functional Testing (iterative):
 
 Group 1: PASSED
-Words: 11, 101, 0101010, , 1
-[ 11.67 pts / 11.67 pts ]
+Words: , 0, 1, 00, 10
+[ 10.0 pts / 10.0 pts ]
 
 Group 2: PASSED
-Words: 1111, 100, 1110, 1, 0
-[ 11.67 pts / 11.67 pts ]
+Words: 11, 000, 101, 1000, 1010
+[ 10.0 pts / 10.0 pts ]
 
 Group 3: PASSED
-Words: 0, 100, 110110, 1100, 0
-[ 11.67 pts / 11.67 pts ]
+Words: 1011, 1100, 1101, 1110, 1111
+[ 10.0 pts / 10.0 pts ]
 
 Group 4: PASSED
-Words: 1, 1100, 0, 0, 0
-[ 11.67 pts / 11.67 pts ]
+Words: 00100, 01110, 11000, 11011, 11100
+[ 10.0 pts / 10.0 pts ]
 
 Group 5: PASSED
-Words: 1, 100011, 0, 0, 1
-[ 11.67 pts / 11.67 pts ]
+Words: 11110, 100110, 101000, 101010, 101111
+[ 10.0 pts / 10.0 pts ]
 
 Group 6: PASSED
-Words: 0, 0, 0, 0, 0
-[ 11.67 pts / 11.67 pts ]
+Words: 110100, 111000, 111010, 111110, 0000000
+[ 10.0 pts / 10.0 pts ]
 
 ============================================================
-FINAL SCORE:                            [ 70 pts / 100 pts ]
+FINAL SCORE:                            [ 100 pts / 100 pts ]
 ============================================================

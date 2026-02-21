@@ -1,21 +1,17 @@
-import random
-
 from core.assignment.utils import load_module_from_path
 from core.config.settings_parse import DKA_IMPLEMENTATION, NKA_IMPLEMENTATION, TEST_WORDS_COUNT, BAD_WORD_RATIO_LEVEL, \
     GROUP_SIZE
 from core.evaluation.report import AssignmentReport
 from core.evaluation.utils.difference_print import format_acceptance_diff
 from core.evaluation.utils.helpers import split_into_groups
-from core.regex.automata.utils.automata_operations import get_regex_alphabet
 from tasks.task2_behavioral_testing.checker.utils import check_no_iteration, check_no_recursion
 from tasks.task2_behavioral_testing.generator.dka.iterative import generate_iterative_dka
 from tasks.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
 from tasks.task2_behavioral_testing.generator.nka.iterative import generate_iterative_nka
 from tasks.task2_behavioral_testing.generator.nka.recursive import generate_recursive_nka
-from tasks.task2_behavioral_testing.word_generation.testing_words_generator import (
-    generate_accepted_words,
-    generate_rejected_words,
-)
+from tasks.task2_behavioral_testing.word_generation.testing_words_generator import generate_accepted_words, \
+    generate_rejected_words
+
 
 IMPLEMENTATION_CONFIG = {
     ("DKA", "iterative"): {
@@ -103,7 +99,6 @@ def evaluate_implementation(
 
         # Generate and shuffle test words
         words = generate_test_words(ast)
-        random.shuffle(words)
 
         # Run group testing
         group_results, score = run_group_tests(words, reference_fn, student_fn, impl_point)
@@ -149,18 +144,17 @@ def generate_test_words(ast: dict) -> list[str]:
 
     accepted_count = total - rejected_count
 
-    alphabet = get_regex_alphabet(ast)
-
     words = []
+
     words.extend(
-        generate_accepted_words(ast, alphabet, count=accepted_count, max_iterations=3)
+        generate_accepted_words(ast, count=accepted_count, max_iterations=5)
     )
-    print(len(words))
-    print(len(set(words)))
+
     words.extend(
-        generate_rejected_words(ast, alphabet, count=rejected_count, max_iterations=3)
+        generate_rejected_words(ast, count=rejected_count)
     )
-    print(len(words))
+
+    words.sort(key=lambda w: (len(w), w))
 
     return words
 

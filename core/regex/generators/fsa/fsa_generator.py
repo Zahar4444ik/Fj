@@ -100,7 +100,6 @@ def fsa_from_dka(dka, filename):
                     (dka.name_map[state], sym, dka.name_map[t])
                 )
                 alphabet.add(sym)
-    print(alphabet)
 
     transitions.sort()
 

@@ -95,8 +95,8 @@ def test_student_random():
         path="task2/data/nka_recursive/reference_random.py"
     )
 
-    words = generate_accepted_words(tree, ['0', '1'], count=5, max_iterations=3)
-    words.extend(generate_rejected_words(tree, ['0', '1'], count=5, max_iterations=3))
+    words = generate_accepted_words(tree, count=5, max_iterations=3)
+    words.extend(generate_rejected_words(tree, count=5))
 
     for w in words:
         ref = safe_call(reference.q0, w)

@@ -57,8 +57,8 @@ def test_student_random():
         path="task2/data/dka_iterative/reference_random.py"
     )
 
-    words = generate_accepted_words(tree, ['0', '1'], count=5, max_iterations=3)
-    words.extend(generate_rejected_words(tree, ['0', '1'], count=5, max_iterations=3))
+    words = generate_accepted_words(tree, count=5, max_iterations=5)
+    words.extend(generate_rejected_words(tree, count=5))
 
     for word in words:
         assert reference.dfa.check(word) == student_random.dfa.check(word)
