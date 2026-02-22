@@ -1,4 +1,4 @@
-def q0(string: str) -> bool:
+def tralala(string: str) -> bool:
     return q1(string) or q9(string)
 
 
@@ -47,6 +47,6 @@ if __name__ == "__main__":
     while input_string != "quit":
         print(
             f"Reťazec '{input_string}' "
-            f"{'JE ' if q0(input_string) else 'NIE JE '}akceptovaný!"
+            f"{'JE ' if tralala(input_string) else 'NIE JE '}akceptovaný!"
         )
         input_string = input("Zadaj vstupný reťazec> ")

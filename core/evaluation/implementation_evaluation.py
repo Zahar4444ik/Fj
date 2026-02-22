@@ -9,8 +9,23 @@ from tasks.task2_behavioral_testing.generator.dka.iterative import generate_iter
 from tasks.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
 from tasks.task2_behavioral_testing.generator.nka.iterative import generate_iterative_nka
 from tasks.task2_behavioral_testing.generator.nka.recursive import generate_recursive_nka
+from tasks.task2_behavioral_testing.generator.utils.resursive_helper import get_start_state_for_recursive
 from tasks.task2_behavioral_testing.word_generation.testing_words_generator import generate_accepted_words, \
     generate_rejected_words
+
+
+def get_recursive_check_fn(mod, start_state):
+    try:
+        fn = getattr(mod, start_state)
+    except AttributeError:
+        raise AttributeError(
+            f"Student module does not implement function '{start_state}'"
+        )
+
+    if not callable(fn):
+        raise TypeError(f"'{start_state}' exists but is not callable")
+
+    return fn
 
 
 IMPLEMENTATION_CONFIG = {
@@ -32,7 +47,7 @@ IMPLEMENTATION_CONFIG = {
         "static_check": check_no_iteration,
         "static_error_reason": "use of iteration",
         "generate": generate_recursive_dka,
-        "get_check_fn": lambda mod: mod.q0,
+        "get_check_fn": get_recursive_check_fn,
     },
     ("NKA", "iterative"): {
         "student_path": "tasks/student_io/automaton/student_nka_iterative.py",
@@ -52,7 +67,7 @@ IMPLEMENTATION_CONFIG = {
         "static_check": check_no_iteration,
         "static_error_reason": "use of iteration",
         "generate": generate_recursive_nka,
-        "get_check_fn": lambda mod: mod.q0,
+        "get_check_fn": get_recursive_check_fn,
     },
 }
 
@@ -74,7 +89,10 @@ def evaluate_implementation(
     """
     report.set_current_score(0)
     cfg = IMPLEMENTATION_CONFIG[(automaton_type, variant)]
-    impl_point = DKA_IMPLEMENTATION if automaton_type == "DKA" else NKA_IMPLEMENTATION
+    impl_points = {
+        "DKA": DKA_IMPLEMENTATION,
+        "NKA": NKA_IMPLEMENTATION,
+    }[automaton_type]
 
     # ============================================================
     # 1. Static analysis
@@ -94,21 +112,26 @@ def evaluate_implementation(
         reference = load_module_from_path(cfg["module_name"], cfg["reference_path"])
         student = load_module_from_path(cfg["student_module_name"], cfg["student_path"])
 
-        reference_fn = cfg["get_check_fn"](reference)
-        student_fn = cfg["get_check_fn"](student)
+        if variant == "recursive":
+            start_state = get_start_state_for_recursive(f"tasks/student_io/fsa/student_{automaton_type.lower()}.fsa")
+            student_fn = cfg["get_check_fn"](student, start_state)
+            reference_fn = cfg["get_check_fn"](reference, "q0")
+        else:
+            reference_fn = cfg["get_check_fn"](reference)
+            student_fn = cfg["get_check_fn"](student)
 
         # Generate and shuffle test words
         words = generate_test_words(ast)
 
         # Run group testing
-        group_results, score = run_group_tests(words, reference_fn, student_fn, impl_point)
+        group_results, score = run_group_tests(words, reference_fn, student_fn, impl_points)
 
         report.increase_score(score)
 
     # ============================================================
     # 3. Add to report
     # ============================================================
-    report.section("2. FSA Implementation Testing", max_points=impl_point)
+    report.section("2. FSA Implementation Testing", max_points=impl_points)
     report.subsection(f"2.1 Static Analysis: {'PASSED' if static_passed else 'FAILED'}")
 
     if not static_passed:

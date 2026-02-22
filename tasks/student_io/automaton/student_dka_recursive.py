@@ -1,4 +1,4 @@
-def q0(string: str) -> bool:
+def s0(string: str) -> bool:
     if len(string) == 0:
         return False
     else:
