@@ -12,7 +12,7 @@ For each student .zip in SUBMISSIONS_PATH:
 Directory layout assumed:
     SUBMISSIONS_PATH/
         student@email.com.zip
-        students.json               ← produced by moodle_downloader.py
+        students.json               ← produced by download_solutions.py
 
 Output:
     RESULT_PATH/
@@ -36,8 +36,8 @@ from core.regex.frontend.helper import get_ast_from_regex
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 
-SUBMISSIONS_PATH = r"/tasks/student_io/solutions"
-RESULT_PATH      = r"/output/results"
+SUBMISSIONS_PATH = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io\solutions"
+RESULT_PATH      = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\results"
 
 AUTOMATON_BUILDERS = {
     "DKA": lambda ast, regex: build_DKA(ast, regex),
@@ -66,7 +66,7 @@ SUMMARY_FILE  = os.path.join(SUBMISSIONS_PATH, "grading_summary.csv")
 def load_students() -> dict:
     if not os.path.exists(STUDENTS_FILE):
         raise FileNotFoundError(
-            f"students.json not found at {STUDENTS_FILE}. Run moodle_downloader.py first."
+            f"students.json not found at {STUDENTS_FILE}. Run download_solutions.py first."
         )
     with open(STUDENTS_FILE, encoding="utf-8") as f:
         return json.load(f)
