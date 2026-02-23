@@ -7,26 +7,28 @@ from core.evaluation.report import AssignmentReport
 from tasks.task1_isomorphism.checker.compare import (
     prepare_automaton_for_fsa_test,
     check_isomorphism,
-    check_annotations, check_alphabet,
+    check_annotations,
+    check_alphabet,
 )
+import os
 
 FSA_CONFIG = {
     "DKA": {
         "generate": fsa_from_dka,
-        "reference_path": "output/fsa/dka.fsa",
-        "student_path": "tasks/student_io/fsa/student_dka.fsa",
+        "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\fsa\dka.fsa",
+        "student_fsa_filename": "specification.fsa",
         "check_annotations": True,
     },
     "NKA": {
         "generate": fsa_from_nka,
-        "reference_path": "output/fsa/nka.fsa",
-        "student_path": "tasks/student_io/fsa/student_nka.fsa",
+        "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\fsa\nka.fsa",
+        "student_fsa_filename": "specification.fsa",
         "check_annotations": False,
     },
 }
 
 
-def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport) -> float:
+def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport, work_dir: str) -> float:
     type_cfg = FSA_CONFIG[automaton_type]
 
     # ============================================================
@@ -34,7 +36,9 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
     # ============================================================
     type_cfg["generate"](automaton, filename=type_cfg["reference_path"])
     reference = prepare_automaton_for_fsa_test(type_cfg["reference_path"])
-    student = prepare_automaton_for_fsa_test(type_cfg["student_path"])
+
+    student_path = os.path.join(work_dir, type_cfg["student_fsa_filename"])
+    student = prepare_automaton_for_fsa_test(student_path)
 
     # ============================================================
     # 2. Run all checks

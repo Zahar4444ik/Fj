@@ -31,7 +31,7 @@ PASSWORD      = ""                        # TUKE password
 ASSIGNMENT_LINK = "https://moodle.fei.tuke.sk/mod/quiz/view.php?id=14339"
 STUDENT_GROUP = "Všetci účastníci"        # or e.g. "01 Pondelok 07:30 (Novotný)"
 QUESTION      = 1                         # question number to download
-DOWNLOAD_PATH = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io"
+DOWNLOAD_PATH = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io\solutions"
 
 # How many seconds to wait for a .zip file to appear on disk after clicking download
 DOWNLOAD_TIMEOUT = 30
@@ -114,7 +114,9 @@ def scrape_task_metadata(driver: webdriver.Chrome, wait: WebDriverWait) -> dict:
 
     # ── Full question text for automaton/implementation detection ────────────
     try:
-        question_div = wait.until(EC.presence_of_element_located((By.XPATH, q_xpath)))
+        question_div = wait.until(EC.presence_of_element_located(
+            (By.CSS_SELECTOR, ".qtext")
+        ))
         full_text = question_div.text
     except TimeoutException:
         log.warning("  Could not locate question div for metadata scraping")
@@ -124,9 +126,9 @@ def scrape_task_metadata(driver: webdriver.Chrome, wait: WebDriverWait) -> dict:
 
     # automaton type
     if "NFA" in first_sentence:
-        automaton_type = "NFA"
+        automaton_type = "NKA"
     elif "DFA" in first_sentence:
-        automaton_type = "DFA"
+        automaton_type = "DKA"
     else:
         automaton_type = None
         log.warning("  Could not detect automaton type in: %s", first_sentence)
@@ -237,7 +239,7 @@ def open_attempts_page(driver: webdriver.Chrome, wait: WebDriverWait) -> int:
     page_size_input = driver.find_element(By.ID, "id_pagesize")
     page_size_input.clear()
     page_size_input.send_keys(str(count))
-    driver.find_element(By.ID, "id_submitbutton2").click()   # explicit button, not .submit()
+    driver.find_element(By.ID, "id_submitbutton").click()   # explicit button, not .submit()
     wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
 
     log.info("Total students: %d", count)

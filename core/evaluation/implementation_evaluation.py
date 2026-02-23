@@ -1,3 +1,5 @@
+import os
+
 from core.assignment.utils import load_module_from_path
 from core.config.settings_parse import DKA_IMPLEMENTATION, NKA_IMPLEMENTATION, TEST_WORDS_COUNT, BAD_WORD_RATIO_LEVEL, \
     GROUP_SIZE
@@ -28,20 +30,21 @@ def get_recursive_check_fn(mod, start_state):
     return fn
 
 
+# student_path is now absent — it is built at runtime from work_dir
 IMPLEMENTATION_CONFIG = {
     ("DKA", "iterative"): {
-        "student_path": "tasks/student_io/automaton/student_dka_iterative.py",
-        "reference_path": "output/automata/dka_iterative.py",
+        "student_filename": "automaton.py",
+        "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\automata\dka_iterative.py",
         "module_name": "dka_iterative",
         "student_module_name": "student_dka_iterative",
         "static_check": check_no_recursion,
         "static_error_reason": "use of recursion",
         "generate": generate_iterative_dka,
-        "get_check_fn": lambda mod: mod.dfa.check,
+        "get_check_fn": lambda mod, _: mod.dfa.check,
     },
     ("DKA", "recursive"): {
-        "student_path": "tasks/student_io/automaton/student_dka_recursive.py",
-        "reference_path": "output/automata/dka_recursive.py",
+        "student_filename": "automaton.py",
+        "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\automata\dka_recursive.py",
         "module_name": "dka_recursive",
         "student_module_name": "student_dka_recursive",
         "static_check": check_no_iteration,
@@ -50,18 +53,18 @@ IMPLEMENTATION_CONFIG = {
         "get_check_fn": get_recursive_check_fn,
     },
     ("NKA", "iterative"): {
-        "student_path": "tasks/student_io/automaton/student_nka_iterative.py",
-        "reference_path": "output/automata/nka_iterative.py",
+        "student_filename": "automaton.py",
+        "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\automata\nka_iterative.py",
         "module_name": "nka_iterative",
         "student_module_name": "student_nka_iterative",
         "static_check": check_no_recursion,
         "static_error_reason": "use of recursion",
         "generate": generate_iterative_nka,
-        "get_check_fn": lambda mod: mod.nfa.check,
+        "get_check_fn": lambda mod, _: mod.nfa.check,
     },
     ("NKA", "recursive"): {
-        "student_path": "tasks/student_io/automaton/student_nka_recursive.py",
-        "reference_path": "output/automata/nka_recursive.py",
+        "student_filename": "automaton.py",
+        "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\automata\nka_recursive.py",
         "module_name": "nka_recursive",
         "student_module_name": "student_nka_recursive",
         "static_check": check_no_iteration,
@@ -76,7 +79,8 @@ def evaluate_implementation(
         ast: dict,
         automaton_type: str,
         variant: str,
-        report: AssignmentReport
+        report: AssignmentReport,
+        work_dir: str,
 ) -> float:
     """
     Unified evaluation for both iterative and recursive implementations.
@@ -85,6 +89,7 @@ def evaluate_implementation(
     :param automaton_type: "DKA" or "NKA"
     :param variant: "iterative" or "recursive"
     :param report: Assignment report
+    :param work_dir: Path to the student's extracted submission directory
     :return: Score earned
     """
     report.set_current_score(0)
@@ -94,10 +99,14 @@ def evaluate_implementation(
         "NKA": NKA_IMPLEMENTATION,
     }[automaton_type]
 
+    # Build student paths from work_dir at runtime
+    student_path     = os.path.join(work_dir, cfg["student_filename"])
+    student_fsa_path = os.path.join(work_dir, "specification.fsa")
+
     # ============================================================
     # 1. Static analysis
     # ============================================================
-    static_errors = cfg["static_check"](cfg["student_path"])
+    static_errors = cfg["static_check"](student_path)
     static_passed = not static_errors
 
     # ============================================================
@@ -108,22 +117,20 @@ def evaluate_implementation(
 
     if static_passed:
         # Generate reference and load modules
-        cfg["generate"](ast)
-        reference = load_module_from_path(cfg["module_name"], cfg["reference_path"])
-        student = load_module_from_path(cfg["student_module_name"], cfg["student_path"])
+        cfg["generate"](ast, cfg["reference_path"])
+        reference   = load_module_from_path(cfg["module_name"], cfg["reference_path"])
+        student     = load_module_from_path(cfg["student_module_name"], student_path)
 
         if variant == "recursive":
-            start_state = get_start_state_for_recursive(f"tasks/student_io/fsa/student_{automaton_type.lower()}.fsa")
-            student_fn = cfg["get_check_fn"](student, start_state)
+            start_state  = get_start_state_for_recursive(student_fsa_path)
+            student_fn   = cfg["get_check_fn"](student, start_state)
             reference_fn = cfg["get_check_fn"](reference, "q0")
         else:
-            reference_fn = cfg["get_check_fn"](reference)
-            student_fn = cfg["get_check_fn"](student)
+            reference_fn = cfg["get_check_fn"](reference, None)
+            student_fn   = cfg["get_check_fn"](student, None)
 
-        # Generate and shuffle test words
+        # Generate test words and run group testing
         words = generate_test_words(ast)
-
-        # Run group testing
         group_results, score = run_group_tests(words, reference_fn, student_fn, impl_points)
 
         report.increase_score(score)
@@ -159,24 +166,14 @@ def evaluate_implementation(
 
 def generate_test_words(ast: dict) -> list[str]:
     """Generate test words based on configuration."""
-
-    total = TEST_WORDS_COUNT
-    ratio = BAD_WORD_RATIO_LEVEL
-
+    total          = TEST_WORDS_COUNT
+    ratio          = BAD_WORD_RATIO_LEVEL
     rejected_count = int(total * ratio)
-
     accepted_count = total - rejected_count
 
     words = []
-
-    words.extend(
-        generate_accepted_words(ast, count=accepted_count, max_iterations=5)
-    )
-
-    words.extend(
-        generate_rejected_words(ast, count=rejected_count)
-    )
-
+    words.extend(generate_accepted_words(ast, count=accepted_count, max_iterations=5))
+    words.extend(generate_rejected_words(ast, count=rejected_count))
     words.sort(key=lambda w: (len(w), w))
 
     return words
@@ -189,13 +186,11 @@ def run_group_tests(words: list[str], reference_fn, student_fn, impl_points: int
     Returns:
         (group_results, total_score)
     """
-    group_size = GROUP_SIZE
-
-    groups = split_into_groups(words, group_size)
+    groups           = split_into_groups(words, GROUP_SIZE)
     points_per_group = float(impl_points / len(groups))
 
     results = []
-    score = 0.0
+    score   = 0.0
 
     for idx, group in enumerate(groups, start=1):
         mismatches = []
@@ -203,7 +198,6 @@ def run_group_tests(words: list[str], reference_fn, student_fn, impl_points: int
         for word in group:
             ref = reference_fn(word)
             stu = student_fn(word)
-
             if ref != stu:
                 mismatches.append({
                     "word": word,
@@ -212,7 +206,6 @@ def run_group_tests(words: list[str], reference_fn, student_fn, impl_points: int
                 })
 
         group_passed = len(mismatches) == 0
-
         results.append({
             "index": idx,
             "words": group,
