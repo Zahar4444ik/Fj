@@ -4,8 +4,8 @@ states: {
 	s1="0|1{.0|.1}.",
 	s2="0|1{0|1}."
 }
-start: s0
-accepting: {s2, s1}
+initial_state: s0
+accepting_states: {s2, s1}
 
 transitions:{
   s0 -1-> s1,

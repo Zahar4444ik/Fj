@@ -1,7 +1,7 @@
 alphabet: {a, b}
 states: {p, q}
-start: p
-accepting: {q}
+initial_state: p
+accepting_states: {q}
 
 transitions:{
   p -a-> q,

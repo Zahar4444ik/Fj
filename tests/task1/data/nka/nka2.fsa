@@ -1,7 +1,7 @@
 alphabet: {a}
 states: {s, t, u}
-start: s
-accepting: {u}
+initial_state: s
+accepting_states: {u}
 
 transitions: {
   s -ε-> t,

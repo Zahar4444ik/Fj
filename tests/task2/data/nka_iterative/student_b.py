@@ -21,8 +21,8 @@ class NFA:
             for s in self.transition_table[(actual_state, string[0])]:
                 self.stack.append((s, string[1:]))
 
-        if (actual_state, "") in self.transition_table:
-            for s in self.transition_table[(actual_state, "")]:
+        if (actual_state, "eps") in self.transition_table:
+            for s in self.transition_table[(actual_state, "eps")]:
                 self.stack.append((s, string))
 
     def check(self, string):
@@ -43,7 +43,7 @@ class NFA:
 
 
 transition_table = {
-    (State.q0, ''): {State.q1},
+    (State.q0, 'eps'): {State.q1},
     (State.q1, '0'): {State.q1},
     (State.q1, '1'): {State.q1},
     (State.q1, '0'): {State.q2},

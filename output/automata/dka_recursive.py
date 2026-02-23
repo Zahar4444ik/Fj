@@ -13,9 +13,9 @@ def q0(string: str) -> bool:
     else:
         match string[0]:
             case '0':
-                return q1(string[1:])
-            case '1':
                 return q2(string[1:])
+            case '1':
+                return q1(string[1:])
             case _:
                 return False
 
@@ -25,6 +25,10 @@ def q1(string: str) -> bool:
         return True
     else:
         match string[0]:
+            case '0':
+                return q1(string[1:])
+            case '1':
+                return q1(string[1:])
             case _:
                 return False
 
@@ -34,10 +38,6 @@ def q2(string: str) -> bool:
         return True
     else:
         match string[0]:
-            case '0':
-                return q2(string[1:])
-            case '1':
-                return q2(string[1:])
             case _:
                 return False
 

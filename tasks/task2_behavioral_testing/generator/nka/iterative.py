@@ -50,8 +50,8 @@ def generate_iterative_nka(syntax_tree, path="output/automata/nka_iterative.py")
                         self.stack.append((state, string[1:]))
 
                 # Epsilon transitions
-                if (actual_state, "") in self.transition_table:
-                    for state in self.transition_table[(actual_state, "")]:
+                if (actual_state, "eps") in self.transition_table:
+                    for state in self.transition_table[(actual_state, "eps")]:
                         self.stack.append((state, string))
 
             def check(self, string: str) -> bool:

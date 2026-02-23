@@ -40,10 +40,10 @@ class DFA:
 # Transition table
 # ============================================================
 transition_table = {
-    (State.q0, '0'): State.q1,
-    (State.q0, '1'): State.q2,
-    (State.q2, '0'): State.q2,
-    (State.q2, '1'): State.q2,
+    (State.q0, '0'): State.q2,
+    (State.q0, '1'): State.q1,
+    (State.q1, '0'): State.q1,
+    (State.q1, '1'): State.q1,
 
 }
 

@@ -14,20 +14,20 @@ states: {
     q10
 }
 
-start: q0
-accepting: {q10, q2, q5, q8}
+initial_state: q0
+accepting_states: {q10, q2, q5, q8}
 
 transitions: {
-    q0 -ε-> q1,
-    q0 -ε-> q3,
+    q0 -eps-> q1,
+    q0 -eps-> q3,
     q1 -0-> q2,
     q3 -1-> q4,
-    q4 -ε-> q5,
-    q5 -ε-> q6,
-    q6 -ε-> q7,
-    q6 -ε-> q9,
-    q7 -0-> q8,
-    q8 -ε-> q6,
-    q9 -1-> q10,
-    q10 -ε-> q6
+    q4 -eps-> q5,
+    q5 -eps-> q6,
+    q6 -eps-> q7,
+    q6 -eps-> q9,
+    q7 -1-> q8,
+    q8 -eps-> q6,
+    q9 -0-> q10,
+    q10 -eps-> q6
 }

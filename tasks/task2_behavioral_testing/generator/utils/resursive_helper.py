@@ -3,7 +3,7 @@ def get_start_state_for_recursive(fsa_path: str) -> str:
         for line in f:
             line = line.strip()
 
-            if line.startswith("start:"):
+            if line.startswith("initial_state:"):
                 return line.split(":", 1)[1].strip()
 
     raise ValueError("Start state not found in FSA file")

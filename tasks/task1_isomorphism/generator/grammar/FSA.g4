@@ -42,8 +42,8 @@ symbol
 
 ALPHABET    : 'alphabet' ;
 STATES      : 'states' ;
-START       : 'start' ;
-ACCEPTING   : 'accepting' ;
+START       : 'initial_state' ;
+ACCEPTING   : 'accepting_states' ;
 TRANSITIONS : 'transitions' ;
 
 COLON   : ':' ;

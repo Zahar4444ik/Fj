@@ -1,6 +1,6 @@
 from core.regex.automata.utils.automata_operations import get_state_name, get_transitions
 
-EPSILON_SYMBOL = 'ε'
+EPSILON_SYMBOL = 'eps'
 
 
 def write_fsa(
@@ -30,10 +30,10 @@ def write_fsa(
         f.write("}\n\n")
 
         # Start
-        f.write(f"start: {start}\n")
+        f.write(f"initial_state: {start}\n")
 
         # Accepting
-        f.write(f"accepting: {{{', '.join(sorted(accepting))}}}\n\n")
+        f.write(f"accepting_states: {{{', '.join(sorted(accepting))}}}\n\n")
 
         # Transitions
         f.write("transitions: {\n")

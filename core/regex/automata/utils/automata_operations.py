@@ -1,6 +1,6 @@
 from typing import Any
 
-EPSILON_SYMBOL = 'ε'
+EPSILON_SYMBOL = 'eps'
 
 
 def get_ast(regex):
