@@ -1,8 +1,9 @@
 """
+solution_evaluation.py
 ---------
 Testing pipeline for student submissions.
 
-For each student .zip in SUBMISSIONS_PATH:
+For each student .zip in SOLUTIONS_PATH:
   1. Extract into a working directory
   2. Validate required files are present
   3. Build the automaton from the student's task metadata
@@ -10,7 +11,7 @@ For each student .zip in SUBMISSIONS_PATH:
   5. Save the report to RESULT_PATH
 
 Directory layout assumed:
-    SUBMISSIONS_PATH/
+    SOLUTIONS_PATH/
         student@email.com.zip
         students.json               ← produced by download_solutions.py
 
@@ -36,7 +37,7 @@ from core.regex.frontend.helper import get_ast_from_regex
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 
-SUBMISSIONS_PATH = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io\solutions"
+SOLUTIONS_PATH = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io\solutions"
 RESULT_PATH      = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\results"
 
 AUTOMATON_BUILDERS = {
@@ -51,15 +52,15 @@ logging.basicConfig(
     format="%(asctime)s  %(levelname)-8s  %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler(os.path.join(SUBMISSIONS_PATH, "grader.log"), encoding="utf-8"),
+        logging.FileHandler(os.path.join(SOLUTIONS_PATH, "grader.log"), encoding="utf-8"),
     ],
 )
 log = logging.getLogger(__name__)
 
 # ─────────────────────────── FILE PATHS ──────────────────────────────────────
 
-STUDENTS_FILE = os.path.join(SUBMISSIONS_PATH, "students.json")
-SUMMARY_FILE  = os.path.join(SUBMISSIONS_PATH, "grading_summary.csv")
+STUDENTS_FILE = os.path.join(SOLUTIONS_PATH, "students.json")
+SUMMARY_FILE  = os.path.join(SOLUTIONS_PATH, "grading_summary.csv")
 
 # ─────────────────────────── HELPERS ─────────────────────────────────────────
 
@@ -137,58 +138,80 @@ def build_report(email: str, metadata: dict) -> AssignmentReport:
     return report
 
 
+def build_report_footer(report: AssignmentReport, score: float) -> None:
+    """Add final score to the report footer."""
+    report.footer(score)
+    report.save()
+
+
 # ─────────────────────────── MAIN PIPELINE ───────────────────────────────────
 
 def process_student(email: str, metadata: dict) -> None:
-    zip_path = os.path.join(SUBMISSIONS_PATH, f"{email}.zip")
-    work_dir = os.path.join(SUBMISSIONS_PATH, email)
+    zip_path = os.path.join(SOLUTIONS_PATH, f"{email}.zip")
+    work_dir = os.path.join(SOLUTIONS_PATH, email)
 
-    # ── Skip students with no submission (already graded 0 during download) ──
+    # ── Always build report first ────────────────────────────────────────────
+    report = build_report(email, metadata)
+    score = 0.0
+
+    def fail(reason: str, status: str):
+        nonlocal score
+        log.error("  " + reason)
+        report.add_info("\nERROR")
+        report.add_info("-" * 60)
+        report.add_info(reason)
+        score = 0.0
+        build_report_footer(report, score)
+        write_summary_row(email, status, score, reason)
+        return
+
+    # ── No submission ────────────────────────────────────────────────────────
     if metadata.get("status") == "no_submission":
-        log.info("  Skipping — no submission (already graded 0)")
-        write_summary_row(email, "no_submission", 0)
+        fail("No submission provided.", "no_submission")
         return
 
     # ── Check zip exists ─────────────────────────────────────────────────────
     if not os.path.exists(zip_path):
-        log.error("  Zip not found: %s", zip_path)
-        write_summary_row(email, "missing_zip", 0, "zip file not found")
+        fail("Zip file not found.", "missing_zip")
         return
 
     # ── Extract ──────────────────────────────────────────────────────────────
     os.makedirs(work_dir, exist_ok=True)
     if not extract_zip(zip_path, work_dir):
-        write_summary_row(email, "bad_zip", 0, "could not extract zip")
+        fail("Bad zip file — extraction failed.", "bad_zip")
         return
 
     flatten_if_single_subdir(work_dir)
 
-    # ── Validate required files ───────────────────────────────────────────────
+    # ── Validate required files ──────────────────────────────────────────────
     missing = check_required_files(work_dir)
     if missing:
-        log.error("  Missing required files: %s", missing)
-        write_summary_row(email, "missing_files", 0, f"missing: {missing}")
+        fail(f"Missing required files: {missing}", "missing_files")
         return
 
-    # ── Build report header ───────────────────────────────────────────────────
-    report = build_report(email, metadata)
+    # ── Build automaton ──────────────────────────────────────────────────────
+    try:
+        regex          = metadata["regex"]
+        automaton_type = metadata["automaton_type"]
+        implementation = metadata["implementation_type"]
 
-    # ── Build automaton from task metadata ────────────────────────────────────
-    regex          = metadata["regex"]
-    automaton_type = metadata["automaton_type"]
-    implementation = metadata["implementation_type"]
+        ast       = get_ast_from_regex(regex)
+        automaton = AUTOMATON_BUILDERS[automaton_type](ast, regex)
 
-    ast       = get_ast_from_regex(regex)
-    automaton = AUTOMATON_BUILDERS[automaton_type](ast, regex)
+    except Exception as e:
+        fail(f"Automaton build failed: {e}", "build_failed")
+        return
 
-    # ── Evaluate and save ─────────────────────────────────────────────────────
-    score = 0.0
-    score += evaluate_fsa(automaton, automaton_type, report, work_dir)
-    score += evaluate_implementation(ast, automaton_type, implementation, report, work_dir)
+    # ── Evaluate ─────────────────────────────────────────────────────────────
+    try:
+        score += evaluate_fsa(automaton, automaton_type, report, work_dir)
+        score += evaluate_implementation(ast, automaton_type, implementation, report, work_dir)
+    except Exception as e:
+        fail(f"Evaluation failed: {e}", "evaluation_failed")
+        return
 
-    report.footer(score)
-    report.save()
-
+    # ── Success ──────────────────────────────────────────────────────────────
+    build_report_footer(report, score)
     log.info("  ✔ Score: %s", score)
     write_summary_row(email, "graded", score)
 

@@ -27,8 +27,8 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 
-USERNAME        = "zf687mr"                   # TUKE login e.g. "FL123XX"
-PASSWORD        = "Zahar19%03"                   # TUKE password
+USERNAME        = ""                   # TUKE login e.g. "FL123XX"
+PASSWORD        = ""                   # TUKE password
 ASSIGNMENT_LINK = "https://moodle.fei.tuke.sk/mod/quiz/view.php?id=14339"
 STUDENT_GROUP   = "Všetci účastníci"  # or e.g. "01 Pondelok 07:30 (Novotný)"
 QUESTION        = 1                    # question number to download
@@ -88,7 +88,7 @@ def build_question_xpath(question_num: int) -> str:
     return f"//div[{sw} and {ew}]"
 
 
-def scrape_task_metadata(driver: webdriver.Chrome) -> dict:
+def scrape_task_metadata(driver: webdriver.Chrome, wait: WebDriverWait) -> dict:
     """
     Extract regex, automaton_type, and implementation_type from the question text.
 
@@ -97,7 +97,7 @@ def scrape_task_metadata(driver: webdriver.Chrome) -> dict:
     - regex:               centered paragraph (3-stage fallback)
     """
     try:
-        question_div = driver.find_element(By.CSS_SELECTOR, ".qtext")
+        question_div = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".qtext")))
         full_text = question_div.text
     except NoSuchElementException:
         log.warning("  Could not locate .qtext for metadata scraping")
@@ -268,33 +268,6 @@ def download_submission(driver: webdriver.Chrome, email: str) -> bool:
         return False  # no attachment present
 
 
-def grade_zero(driver: webdriver.Chrome, wait: WebDriverWait, parent_handle: str) -> None:
-    """Open the manual grading popup and submit 0 for the question."""
-    q_xpath = build_question_xpath(QUESTION)
-
-    try:
-        driver.find_element(By.XPATH, f"{q_xpath}//div[@class='commentlink']/a").click()
-        wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
-
-        popup = next(w for w in driver.window_handles if w != parent_handle)
-        driver.switch_to.window(popup)
-
-        grade_input = wait.until(EC.visibility_of_element_located((
-            By.XPATH, f"{q_xpath}//div[@class='felement ftext']/input[1]"
-        )))
-        grade_input.clear()
-        grade_input.send_keys("0")
-        driver.find_element(By.ID, "id_submitbutton").click()
-
-        driver.close()
-        driver.switch_to.window(parent_handle)
-        log.info("  → Graded 0 (no submission)")
-
-    except (TimeoutException, NoSuchElementException) as exc:
-        log.error("  ✘ Could not grade 0: %s", exc)
-        driver.switch_to.window(parent_handle)
-
-
 # ─────────────────────────── MAIN LOOP ───────────────────────────────────────
 
 def run() -> None:
@@ -322,16 +295,14 @@ def run() -> None:
             log.info("[%d/%d] Processing %s", idx + 1, total, email)
             open_attempt_detail(driver, idx)
 
-            metadata = scrape_task_metadata(driver)
+            metadata = scrape_task_metadata(driver, wait)
             downloaded = download_submission(driver, email)
 
             if downloaded:
                 metadata["status"] = "downloaded"
             else:
                 log.info("  No attachment found — grading 0")
-                grade_zero(driver, wait, parent)
                 metadata["status"] = "no_submission"
-                metadata["grade"]  = 0
 
             # ── Save immediately so a crash mid-run is resumable ─────────────
             students[email] = metadata
