@@ -48,7 +48,6 @@ class AssignmentReport:
         Format: "description: PASSED/FAILED"
         Followed by: "[ X pts / Y pts ]"
         """
-        self.lines.append("")
         status = "PASSED" if passed else "FAILED"
         self.lines.append(f"{description}: {status}")
 

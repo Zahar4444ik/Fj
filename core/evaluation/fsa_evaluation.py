@@ -76,17 +76,17 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
 
     report.subsection(f"1.1 Alphabet correctness: {'PASSED' if alphabet_passed else 'FAILED'}")
 
-    report.subsection("1.2 Structural Equivalence Verification")
+    report.subsection("1.2 Isomorphism with Reference Automaton")
     report.add_result(
-        "Structural equivalence verification",
+        "Isomorphism verification",
         iso_passed,
         points=iso_points,
     )
 
     if type_cfg["check_annotations"]:
-        report.subsection("1.3 State Annotation Verification")
+        report.subsection("1.3 State Annotations")
         report.add_result(
-            "State annotation verification",
+            "State annotations verification",
             ann_passed,
             points=ann_points,
         )
