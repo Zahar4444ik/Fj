@@ -11,7 +11,7 @@
     <idnumber></idnumber>
   </question>
 
-<!-- question: 1443005  -->
+<!-- question: 1443211  -->
   <question type="essay">
     <name>
       <text>dfa_iterative_template</text>
@@ -25,8 +25,10 @@
 <p dir="ltr">Navrhnite deterministický konečnostavový automat (DFA) pre jazyk špecifikovaný nasledujúcim regulárnym výrazom <strong>vy</strong><strong>užitím metódy tokenov&nbsp;</strong>a naprogramujte jeho<strong>&nbsp;iteratívnu&nbsp;</strong>implementáciu<span>&nbsp;</span>$$\{c[a] | ab\}b$$</p>Pri riešení zadania sa riaďte nasledujúcimi technickými pokynmi k jeho vypracovaniu a odovzdaniu. Stiahnite si&nbsp;<a href="@@PLUGINFILE@@/skeleton_dfa_iter.zip" title="kostru riešenia">kostru riešenia</a>, ktorá má nasledujúcu štruktúru:<br>
 <p></p>
 <ul>
-    <li><span data-start="704" data-end="715">specification.fsa – súbor s<strong> formálnou špecifikáciou výsledného DFA</strong>. Súbor musí obsahovať<span> <span data-start="185" data-end="206" style="">abecedu</span><strong>&nbsp;</strong></span>automatu, stavy vrátane ich anotácií, prechody, počiatočný stav a akceptačné stavy zapísané v doménovo-špecifickom jazyku predstavenom na cvičeniach. <em>Samotný postup návrhu automatu je nutné taktiež písomne zdokumentovať na priloženom pomocnom hárku papiera.</em></span></li><li>automaton.py&nbsp;– skript s definíciou triedy DFA, ktorú<strong>&nbsp;je potrebné implementovať</strong>. Táto trieda musí obsahovať verejnú&nbsp;<strong>metódu check</strong> s parametrom reprezentujúcim vstupný reťazec a návratovou (pravdivostnou) hodnotou určujúcou, či daný reťazec patrí alebo nepatrí do jazyka špecifikovaného zadaným regulárnym výrazom.&nbsp;<em>V tomto skripte nie je povolené využívať žiadnu rekurziu.</em></li>
-    <li>main.py&nbsp;– skript na manuálne testovanie implementácie.&nbsp;Skript je možné spustiť v adresári so súbormi riešenia príkazom <pre>py main.py</pre></li>
+    <li><span data-start="704" data-end="715">specification.fsa – súbor s<strong> formálnou špecifikáciou výsledného DFA</strong>. Súbor musí obsahovať<span> <span data-start="185" data-end="206" style="">abecedu</span><strong>&nbsp;</strong></span>automatu, stavy vrátane ich anotácií, prechody, počiatočný stav a akceptačné stavy zapísané v doménovo-špecifickom jazyku predstavenom na cvičeniach. <em>Samotný postup návrhu automatu je nutné taktiež písomne zdokumentovať na priloženom pomocnom hárku papiera.</em></span></li>
+    <li>automaton.py&nbsp;– skript s definíciou triedy DFA, ktorú<strong>&nbsp;je potrebné implementovať</strong>. Táto trieda musí obsahovať verejnú&nbsp;<strong>metódu check</strong> s parametrom reprezentujúcim vstupný reťazec a návratovou (pravdivostnou) hodnotou určujúcou, či daný reťazec patrí alebo nepatrí do jazyka špecifikovaného zadaným regulárnym výrazom.&nbsp;<em>V tomto skripte nie je povolené využívať žiadnu rekurziu.</em></li>
+    <li>main.py&nbsp;– skript na manuálne testovanie implementácie.&nbsp;Skript je možné spustiť v adresári so súbormi riešenia príkazom <code>py main.py</code>
+    </li>
 </ul>
 <p></p>Pri riešení nie je povolené využívať žiadne externé knižnice, meniť názvy jednotlivých súborov, tried alebo metód ani štruktúru riešenia. Po doplnení&nbsp;formálnej špecifikácie automatu a požadovanej funkcionality jeho implementácie zabaľte vaše riešenie (príslušnú trojicu súborov specification.fsa, automaton.py a main.py) do zip archívu&nbsp;<strong>bez akýchkoľvek podadresárov</strong>&nbsp;a nahrajte ho ako odpoveď. Na pomenovaní archívu nezáleží.<br><br><br>
 <ul>
@@ -57,7 +59,7 @@
     </responsetemplate>
   </question>
 
-<!-- question: 1443006  -->
+<!-- question: 1443212  -->
   <question type="essay">
     <name>
       <text>dfa_recursive_template</text>
@@ -71,8 +73,10 @@
 <p dir="ltr">Navrhnite deterministický konečnostavový automat (DFA) pre jazyk špecifikovaný nasledujúcim regulárnym výrazom <strong></strong><strong>vy</strong><strong>užitím metódy tokenov</strong><strong>&nbsp;</strong>a naprogramujte jeho<strong>&nbsp;rekurzívnu&nbsp;</strong>implementáciu<span>&nbsp;</span>$$\{c[a] | ab\}b$$</p>Pri riešení zadania sa riaďte nasledujúcimi technickými pokynmi k jeho vypracovaniu a odovzdaniu. Stiahnite si&nbsp;<a href="@@PLUGINFILE@@/skeleton_dfa_rec.zip" title="kostru riešenia">kostru riešenia</a>, ktorá má nasledujúcu štruktúru:<br>
 <p></p>
 <ul>
-    <li><span data-start="704" data-end="715">specification.fsa</span> – súbor s&nbsp;<strong data-start="752" data-end="822">formálnou špecifikáciou výsledného DFA</strong>. Súbor musí obsahovať&nbsp;<span data-start="185" data-end="206">abecedu</span><strong>&nbsp;</strong>automatu, stavy vrátane ich anotácií, prechody, počiatočný stav a akceptačné stavy zapísané v <span><span data-start="927" data-end="985" style="">doménovo-špecifickom jazyku predstavenom na cvičeniach</span>. <em>Samotný postup návrhu automatu je nutné taktiež <span>písomne zdokumentovať</span><strong> </strong>na priloženom pomocnom hárku papiera.</em></span></li><li>automaton.py&nbsp;– skript s <strong>rekurzívnou implementáciou výsledného DFA</strong>. Každý stav DFA musí byť implementovaný ako samostatná funkcia s parametrom reprezentujúcim ešte nespracovanú časť vstupného reťazca a návratovou (pravdivostnou) hodnotou určujúcou, či daný reťazec patrí alebo nepatrí do jazyka špecifikovaného daným regulárnym výrazom. <span><em>Názvy funkcií reprezentujúcich jednotlivé stavy musia byť zhodné s názvami stavov uvedenými vo formálnej špecifikácii&nbsp;</em></span><em>a v tomto skripte nie je povolené využívať žiadne iteratívne konštrukcie.</em></li>
-    <li>main.py&nbsp;– skript na manuálne testovanie implementácie.&nbsp;Skript je možné spustiť v adresári so súbormi riešenia príkazom <pre>py main.py</pre></li>
+    <li><span data-start="704" data-end="715">specification.fsa</span> – súbor s&nbsp;<strong data-start="752" data-end="822">formálnou špecifikáciou výsledného DFA</strong>. Súbor musí obsahovať&nbsp;<span data-start="185" data-end="206">abecedu</span><strong>&nbsp;</strong>automatu, stavy vrátane ich anotácií, prechody, počiatočný stav a akceptačné stavy zapísané v <span><span data-start="927" data-end="985" style="">doménovo-špecifickom jazyku predstavenom na cvičeniach</span>. <em>Samotný postup návrhu automatu je nutné taktiež <span>písomne zdokumentovať</span><strong> </strong>na priloženom pomocnom hárku papiera.</em></span></li>
+    <li>automaton.py&nbsp;– skript s <strong>rekurzívnou implementáciou výsledného DFA</strong>. Každý stav DFA musí byť implementovaný ako samostatná funkcia s parametrom reprezentujúcim ešte nespracovanú časť vstupného reťazca a návratovou (pravdivostnou) hodnotou určujúcou, či daný reťazec patrí alebo nepatrí do jazyka špecifikovaného daným regulárnym výrazom. <span><em>Názvy funkcií reprezentujúcich jednotlivé stavy musia byť zhodné s názvami stavov uvedenými vo formálnej špecifikácii&nbsp;</em></span><em>a v tomto skripte nie je povolené využívať žiadne iteratívne konštrukcie.</em></li>
+    <li>main.py&nbsp;– skript na manuálne testovanie implementácie.&nbsp;Skript je možné spustiť v adresári so súbormi riešenia príkazom <code>py main.py</code>
+    </li>
 </ul>
 <p></p>Pri riešení nie je povolené využívať žiadne externé knižnice, meniť názvy jednotlivých súborov, tried alebo metód ani štruktúru riešenia. Po doplnení&nbsp;formálnej špecifikácie automatu a požadovanej funkcionality jeho implementácie zabaľte vaše riešenie (príslušnú trojicu súborov specification.fsa, automaton.py a main.py) do zip archívu&nbsp;<strong>bez akýchkoľvek podadresárov</strong>&nbsp;a nahrajte ho ako odpoveď. Na pomenovaní archívu nezáleží.<br><br><br>
 <ul>
@@ -103,7 +107,7 @@
     </responsetemplate>
   </question>
 
-<!-- question: 1443007  -->
+<!-- question: 1443213  -->
   <question type="essay">
     <name>
       <text>nfa_iterative_template</text>
@@ -118,8 +122,10 @@
 <p></p>
 <ul>
     <li><span data-start="704" data-end="715">specification.fsa – súbor s <strong>formálnou špecifikáciou výsledného NFA</strong>. Súbor musí obsahovať&nbsp;<span data-start="185" data-end="206">abecedu</span><strong>&nbsp;</strong>automatu,&nbsp;stavy, prechody, počiatočný stav a akceptačné stavy zapísané v doménovo-špecifickom jazyku predstavenom na cvičeniach. <em>Samotný postup návrhu automatu je nutné taktiež písomne zdokumentovať na priloženom pomocnom hárku papiera.</em></span><br></li>
-    <li>automaton.py&nbsp;– skript s definíciou triedy NFA, ktorú<strong>&nbsp;je potrebné implementovať</strong>. Táto trieda musí obsahovať verejnú&nbsp;<strong>metódu check</strong>&nbsp;s parametrom reprezentujúcim vstupný reťazec a návratovou (pravdivostnou) hodnotou určujúcou, či daný reťazec patrí alebo nepatrí do jazyka špecifikovaného zadaným regulárnym výrazom. <em>V tomto skripte nie je povolené využívať žiadnu rekurziu.</em><div><div></div></div></li>
-    <li>main.py&nbsp;– skript na manuálne testovanie implementácie.&nbsp;Skript je možné spustiť v adresári so súbormi riešenia príkazom <pre>py main.py</pre></li>
+    <li>automaton.py&nbsp;– skript s definíciou triedy NFA, ktorú<strong>&nbsp;je potrebné implementovať</strong>. Táto trieda musí obsahovať verejnú&nbsp;<strong>metódu check</strong>&nbsp;s parametrom reprezentujúcim vstupný reťazec a návratovou (pravdivostnou) hodnotou určujúcou, či daný reťazec patrí alebo nepatrí do jazyka špecifikovaného zadaným regulárnym výrazom. <em>V tomto skripte nie je povolené využívať žiadnu rekurziu.</em>
+    </li>
+    <li>main.py&nbsp;– skript na manuálne testovanie implementácie.&nbsp;Skript je možné spustiť v adresári so súbormi riešenia príkazom <code>py main.py</code>
+    </li>
 </ul>
 <p></p>Pri riešení nie je povolené využívať žiadne externé knižnice, meniť názvy jednotlivých súborov, tried alebo metód ani štruktúru riešenia. Po doplnení&nbsp;formálnej špecifikácie automatu a požadovanej funkcionality jeho implementácie zabaľte vaše riešenie (príslušnú trojicu súborov specification.fsa, automaton.py a main.py) do zip archívu&nbsp;<strong>bez akýchkoľvek podadresárov</strong>&nbsp;a nahrajte ho ako odpoveď. Na pomenovaní archívu nezáleží.<br><br><br>
 <ul>
@@ -150,7 +156,7 @@
     </responsetemplate>
   </question>
 
-<!-- question: 1443008  -->
+<!-- question: 1443214  -->
   <question type="essay">
     <name>
       <text>nfa_recursive_template</text>
@@ -164,8 +170,10 @@
 <p dir="ltr">Navrhnite nedeterministický konečnostavový automat (NFA) pre jazyk špecifikovaný&nbsp;nasledujúcim regulárnym výrazom&nbsp;<strong>vy</strong><strong>užitím metódy prezentovanej na cvičeniach&nbsp;</strong>a naprogramujte jeho<strong>&nbsp;rekurzívnu&nbsp;</strong>implementáciu<span>&nbsp;</span>$$\{c[a] | ab\}b$$</p>Pri riešení zadania sa riaďte nasledujúcimi technickými pokynmi k jeho vypracovaniu a odovzdaniu. Stiahnite si&nbsp;<a href="@@PLUGINFILE@@/skeleton_nfa_rec.zip" title="kostru riešenia">kostru riešenia</a>, ktorá má nasledujúcu štruktúru:<br>
 <p></p>
 <ul>
-    <li><span data-start="704" data-end="715">specification.fsa</span> – súbor s&nbsp;<strong data-start="752" data-end="822">formálnou špecifikáciou výsledného DFA</strong>. Súbor musí obsahovať <span data-start="185" data-end="206">abecedu</span><strong>&nbsp;</strong>automatu,&nbsp;stavy, prechody, počiatočný stav a akceptačné stavy zapísané v <span><span data-start="927" data-end="985" style="">doménovo-špecifickom jazyku predstavenom na cvičeniach</span>. <em>Samotný postup návrhu automatu je nutné taktiež <span>písomne zdokumentovať</span><strong> </strong>na priloženom pomocnom hárku papiera.</em></span></li><li>automaton.py&nbsp;– skript s <strong>rekurzívnou implementáciou výsledného NFA</strong>. Každý stav NFA musí byť implementovaný ako samostatná funkcia s parametrom reprezentujúcim&nbsp;ešte nespracovanú časť vstupného reťazca a návratovou (pravdivostnou) hodnotou určujúcou, či daný reťazec patrí alebo nepatrí do jazyka špecifikovaného daným regulárnym výrazom. <span><em>Názvy funkcií reprezentujúcich jednotlivé stavy musia byť zhodné s názvami stavov uvedenými vo formálnej špecifikácii<span><em>&nbsp;</em></span><em>a v tomto skripte nie je povolené využívať žiadne iteratívne konštrukcie.</em></em></span></li>
-    <li>main.py&nbsp;– skript na manuálne testovanie implementácie.&nbsp;Skript je možné spustiť v adresári so súbormi riešenia príkazom <pre>py main.py</pre></li>
+    <li><span data-start="704" data-end="715">specification.fsa</span> – súbor s&nbsp;<strong data-start="752" data-end="822">formálnou špecifikáciou výsledného DFA</strong>. Súbor musí obsahovať <span data-start="185" data-end="206">abecedu</span><strong>&nbsp;</strong>automatu,&nbsp;stavy, prechody, počiatočný stav a akceptačné stavy zapísané v <span><span data-start="927" data-end="985" style="">doménovo-špecifickom jazyku predstavenom na cvičeniach</span>. <em>Samotný postup návrhu automatu je nutné taktiež <span>písomne zdokumentovať</span><strong> </strong>na priloženom pomocnom hárku papiera.</em></span></li>
+    <li>automaton.py&nbsp;– skript s <strong>rekurzívnou implementáciou výsledného NFA</strong>. Každý stav NFA musí byť implementovaný ako samostatná funkcia s parametrom reprezentujúcim&nbsp;ešte nespracovanú časť vstupného reťazca a návratovou (pravdivostnou) hodnotou určujúcou, či daný reťazec patrí alebo nepatrí do jazyka špecifikovaného daným regulárnym výrazom. <span><em>Názvy funkcií reprezentujúcich jednotlivé stavy musia byť zhodné s názvami stavov uvedenými vo formálnej špecifikácii<span><em>&nbsp;</em></span><em>a v tomto skripte nie je povolené využívať žiadne iteratívne konštrukcie.</em></em></span></li>
+    <li>main.py&nbsp;– skript na manuálne testovanie implementácie.&nbsp;Skript je možné spustiť v adresári so súbormi riešenia príkazom <code>py main.py</code>
+    </li>
 </ul>
 <p></p>Pri riešení nie je povolené využívať žiadne externé knižnice, meniť názvy jednotlivých súborov, tried alebo metód ani štruktúru riešenia. Po doplnení&nbsp;formálnej špecifikácie automatu a požadovanej funkcionality jeho implementácie zabaľte vaše riešenie (príslušnú trojicu súborov specification.fsa, automaton.py a main.py) do zip archívu&nbsp;<strong>bez akýchkoľvek podadresárov</strong>&nbsp;a nahrajte ho ako odpoveď. Na pomenovaní archívu nezáleží.<br><br><br>
 <ul>
