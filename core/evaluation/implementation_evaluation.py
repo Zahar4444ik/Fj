@@ -43,7 +43,7 @@ IMPLEMENTATION_CONFIG = {
         "get_check_fn": lambda mod, _: mod.dfa.check,
     },
     ("DKA", "recursive"): {
-        "student_filename": "automaton.py",
+        "student_filename": "student_nka_iterative.py",
         "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\automata\dka_recursive.py",
         "module_name": "dka_recursive",
         "student_module_name": "student_dka_recursive",
@@ -53,7 +53,7 @@ IMPLEMENTATION_CONFIG = {
         "get_check_fn": get_recursive_check_fn,
     },
     ("NKA", "iterative"): {
-        "student_filename": "automaton.py",
+        "student_filename": "student_nka_iterative.py",
         "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\automata\nka_iterative.py",
         "module_name": "nka_iterative",
         "student_module_name": "student_nka_iterative",
@@ -63,7 +63,7 @@ IMPLEMENTATION_CONFIG = {
         "get_check_fn": lambda mod, _: mod.nfa.check,
     },
     ("NKA", "recursive"): {
-        "student_filename": "automaton.py",
+        "student_filename": "student_nka_iterative.py",
         "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\automata\nka_recursive.py",
         "module_name": "nka_recursive",
         "student_module_name": "student_nka_recursive",

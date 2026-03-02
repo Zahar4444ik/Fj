@@ -37,10 +37,35 @@ def generate_iterative_nka(syntax_tree, path="output/automata/nka_iterative.py")
         f.write(dedent("""
 
         class NFA:
-            def __init__(self, transition_table: dict, accepted_states: set, init_state: State):
-                self.transition_table = transition_table
-                self.accepted_states = accepted_states
-                self.init_state = init_state
+            def __init__(self):
+                self.transition_table = {
+        """))
+
+        # Generate transitions
+        transition_dict = defaultdict(set)
+
+        for from_state, symbol, to_state in get_transitions(nka):
+            transition_dict[(from_state, symbol)].add(to_state)
+
+        for (from_state, symbol), to_states in sorted(transition_dict.items()):
+            symbol_repr = repr(symbol) if symbol != "ε" else "''"
+            targets = ", ".join(f"State.{s}" for s in sorted(to_states))
+            f.write(
+                f"            (State.{from_state}, {symbol_repr}): {{{targets}}},\n"
+            )
+
+        f.write("        }\n")
+        f.write("        self.accepted_states = {\n")
+
+        for acc_state in nka.accepts:
+            f.write(f"            State.{state_names[acc_state]},\n")
+        f.write("        }\n")
+
+        # Initial state
+        f.write(f"        self.init_state = State.{state_names[nka.start]}")
+
+        # Instantiate automaton
+        f.write(dedent("""
                 self.stack = None
 
             def expand_actual_configuration(self, actual_state: State, string: str) -> None:
@@ -73,49 +98,7 @@ def generate_iterative_nka(syntax_tree, path="output/automata/nka_iterative.py")
                 return False
 
 
-        # ============================================================
-        # Transition table
-        # ============================================================
-        transition_table = {
-        """))
-
-        # Generate transitions
-        transition_dict = defaultdict(set)
-
-        for from_state, symbol, to_state in get_transitions(nka):
-            transition_dict[(from_state, symbol)].add(to_state)
-
-        for (from_state, symbol), to_states in sorted(transition_dict.items()):
-            symbol_repr = repr(symbol) if symbol != "ε" else "''"
-            targets = ", ".join(f"State.{s}" for s in sorted(to_states))
-            f.write(
-                f"    (State.{from_state}, {symbol_repr}): {{{targets}}},\n"
-            )
-
-        f.write(dedent("""
-        }
-
-
-        # ============================================================
-        # Accepting states
-        # ============================================================
-        accepted_states = {
-        """))
-
-        for acc_state in nka.accepts:
-            f.write(f"    State.{state_names[acc_state]},\n")
-        f.write("}\n\n")
-
-        # Initial state
-        f.write(f"init_state = State.{state_names[nka.start]}\n\n")
-
-        # Instantiate automaton
-        f.write(dedent("""
-        nfa = NFA(
-            transition_table=transition_table,
-            accepted_states=accepted_states,
-            init_state=init_state
-        )
+        nfa = NFA()
 
 
         if __name__ == "__main__":

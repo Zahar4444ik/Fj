@@ -1,4 +1,4 @@
-from core.assignment.assignment_description import get_assignment_description
+from automated_testing.solution_evaluation import SOLUTIONS_PATH
 from core.assignment.assignment_variables import generate_assignment_variables
 from core.assignment.moodle_xml_generator import generate_moodle_xml
 from core.config.settings_parse import TITLE
@@ -11,6 +11,8 @@ from core.regex.automata.nka.nka_builder import build_NKA
 from core.evaluation.report import AssignmentReport
 
 RESULT_PATH = "output/results/assignment_report.txt"
+SOLUTION_PATH_FSA = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io\fsa"
+SOLUTION_PATH_AUTOMATON = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io\automaton"
 
 AUTOMATON_BUILDERS = {
     "DKA": lambda ast, regex: build_DKA(ast, regex),
@@ -29,17 +31,16 @@ if __name__ == "__main__":
     report.header(TITLE, "zakhar.fesiuk@student.tuke.sk")
 
     assignment_variables = generate_assignment_variables()
-    assignment_description = get_assignment_description(assignment_variables)
 
     # regex = assignment_variables["regex"]
     print(assignment_variables["regex"])
     regex = "0|1{0|1}"  # Hardcoded for testing purposes
 
     # automaton_type = assignment_variables["automaton_type"]
-    automaton_type = "NKA"  # Hardcoded for testing purposes
+    automaton_type = "DKA"  # Hardcoded for testing purposes
 
-    implementation = assignment_variables["implementation"]
-    # implementation = "iterative"  # Hardcoded for testing purposes
+    # implementation = assignment_variables["implementation"]
+    implementation = "iterative"  # Hardcoded for testing purposes
 
     report.add_info("Configuration")
     report.add_info("-" * 60)
@@ -51,8 +52,8 @@ if __name__ == "__main__":
     automaton = AUTOMATON_BUILDERS[automaton_type](ast, regex)
 
     score = 0.0
-    score += evaluate_fsa(automaton, automaton_type, report)
-    score += evaluate_implementation(ast, automaton_type, implementation, report)
+    score += evaluate_fsa(automaton, automaton_type, report, SOLUTION_PATH_FSA)
+    score += evaluate_implementation(ast, automaton_type, implementation, report, SOLUTION_PATH_AUTOMATON)
 
     report.footer(score)
     report.save()

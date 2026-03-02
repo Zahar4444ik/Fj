@@ -36,10 +36,31 @@ def generate_iterative_dka(syntax_tree, path="output/automata/dka_iterative.py")
         f.write(dedent("""
 
         class DFA:
-            def __init__(self, transition_table: dict, accepted_states: set, init_state: State):
-                self.transition_table = transition_table
-                self.accepted_states = accepted_states
-                self.init_state = init_state
+            def __init__(self):
+                self.transition_table = {
+                """))
+
+        transition_table = {}
+        for from_state, symbol, to_state in get_transitions(dka):
+            transition_table[(from_state, symbol)] = to_state
+
+        for (from_state, symbol), to_state in transition_table.items():
+            f.write(
+                f"            (State.{from_state}, {repr(symbol)}): "
+                f"State.{to_state},\n"
+            )
+
+        f.write("        }\n")
+        f.write("        self.accepted_states = {\n")
+
+        for acc in dka.accepts:
+            f.write(f"            State.{state_names[acc]},\n")
+
+        f.write("        }\n")
+
+        f.write(f"        self.init_state = State.{state_names[dka.start]}")
+
+        f.write(dedent("""
                 self.actual_state = None
 
             def check(self, string: str) -> bool:
@@ -52,46 +73,8 @@ def generate_iterative_dka(syntax_tree, path="output/automata/dka_iterative.py")
 
                 return self.actual_state in self.accepted_states
 
-
-        # ============================================================
-        # Transition table
-        # ============================================================
-        transition_table = {
-        """))
-
-        transition_table = {}
-        for from_state, symbol, to_state in get_transitions(dka):
-            transition_table[(from_state, symbol)] = to_state
-
-        for (from_state, symbol), to_state in transition_table.items():
-            f.write(
-                f"    (State.{from_state}, {repr(symbol)}): "
-                f"State.{to_state},\n"
-            )
-
-        f.write(dedent("""
-        }
-
-
-        # ============================================================
-        # Accepting states
-        # ============================================================
-        accepted_states = {
-        """))
-
-        for acc in dka.accepts:
-            f.write(f"    State.{state_names[acc]},\n")
-
-        f.write("}\n\n")
-
-        f.write(f"init_state = State.{state_names[dka.start]}\n\n")
-
-        f.write(dedent("""
-        dfa = DFA(
-            transition_table=transition_table,
-            accepted_states=accepted_states,
-            init_state=init_state
-        )
+        
+        dfa = DFA()
 
 
         if __name__ == "__main__":

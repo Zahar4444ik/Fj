@@ -27,10 +27,26 @@ class State(Enum):
 
 
 class NFA:
-    def __init__(self, transition_table: dict, accepted_states: set, init_state: State):
-        self.transition_table = transition_table
-        self.accepted_states = accepted_states
-        self.init_state = init_state
+    def __init__(self):
+        self.transition_table = {
+            (State.q0, ''): {State.q1, State.q3},
+            (State.q1, '0'): {State.q2},
+            (State.q10, ''): {State.q6},
+            (State.q3, '1'): {State.q4},
+            (State.q4, ''): {State.q5},
+            (State.q5, ''): {State.q6},
+            (State.q6, ''): {State.q7, State.q9},
+            (State.q7, '1'): {State.q8},
+            (State.q8, ''): {State.q6},
+            (State.q9, '0'): {State.q10},
+        }
+        self.accepted_states = {
+            State.q5,
+            State.q8,
+            State.q2,
+            State.q10,
+        }
+        self.init_state = State.q0
         self.stack = None
 
     def expand_actual_configuration(self, actual_state: State, string: str) -> None:
@@ -63,42 +79,7 @@ class NFA:
         return False
 
 
-# ============================================================
-# Transition table
-# ============================================================
-transition_table = {
-    (State.q0, ''): {State.q1, State.q3},
-    (State.q1, '0'): {State.q2},
-    (State.q10, ''): {State.q6},
-    (State.q3, '1'): {State.q4},
-    (State.q4, ''): {State.q5},
-    (State.q5, ''): {State.q6},
-    (State.q6, ''): {State.q7, State.q9},
-    (State.q7, '1'): {State.q8},
-    (State.q8, ''): {State.q6},
-    (State.q9, '0'): {State.q10},
-
-}
-
-
-# ============================================================
-# Accepting states
-# ============================================================
-accepted_states = {
-    State.q5,
-    State.q8,
-    State.q2,
-    State.q10,
-}
-
-init_state = State.q0
-
-
-nfa = NFA(
-    transition_table=transition_table,
-    accepted_states=accepted_states,
-    init_state=init_state
-)
+nfa = NFA()
 
 
 if __name__ == "__main__":
