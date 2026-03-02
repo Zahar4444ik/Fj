@@ -10,7 +10,7 @@ else:
 
 def serializedATN():
     return [
-        4,1,17,107,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        4,1,18,107,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
         6,2,7,7,7,2,8,7,8,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,
         1,1,1,5,1,32,8,1,10,1,12,1,35,9,1,1,1,3,1,38,8,1,1,1,1,1,1,2,1,2,
         1,2,1,2,1,2,1,2,5,2,48,8,2,10,2,12,2,51,9,2,1,2,3,2,54,8,2,1,2,1,
@@ -61,7 +61,7 @@ class FSAParser ( Parser ):
     symbolicNames = [ "<INVALID>", "ALPHABET", "STATES", "START", "ACCEPTING", 
                       "TRANSITIONS", "COLON", "COMMA", "LBRACE", "RBRACE", 
                       "EQUAL", "DASH", "ARROW", "SYMBOL", "ID", "EPSILON", 
-                      "STRING", "WS" ]
+                      "STRING", "COMMENT", "WS" ]
 
     RULE_file = 0
     RULE_alphabet = 1
@@ -93,7 +93,8 @@ class FSAParser ( Parser ):
     ID=14
     EPSILON=15
     STRING=16
-    WS=17
+    COMMENT=17
+    WS=18
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
