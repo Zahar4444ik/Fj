@@ -1,0 +1,6 @@
+# TODO: Navrhnite nedeterministický konečnostavový automat (NFA) ekvivalentný zadanému regulárnemu výrazu.
+# - automat môže obsahovať viacero prechodov pre rovnaký symbol z jedného stavu
+# - epsilon prechody sú POVOLENÉ (ak sú potrebné) a môžu byť označené ako 'eps', 'epsilon' alebo 'ε'
+# - definícia musí obsahovať: abecedu automatu, množinu stavov, počiatočný stav, množinu akceptačných stavov a prechodovú funkciu
+# - je potrebné použiť presne tieto kľúčové slová: alphabet, states, initial_state, accepting_states, transitions
+# - tento súbor bude automaticky spracovaný a porovnaný so vzorovým riešením pomocou kontroly štrukturálnej ekvivalencie

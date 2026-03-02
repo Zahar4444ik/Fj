@@ -1,0 +1,6 @@
+# TODO: Navrhnite deterministický konečnostavový automat (DFA) ekvivalentný zadanému regulárnemu výrazu.
+# - automat musí byť deterministický (pre každý stav a symbol abecedy existuje najviac jeden prechod)
+# - definícia musí obsahovať: abecedu automatu, množinu stavov, počiatočný stav, množinu akceptačných stavov a prechodovú funkciu
+# - každý stav musí obsahovať anotáciu (token) zodpovedajúcu metóde tokenov použitej pri konštrukcii DFA (napr. ".a|.b{a}", kde "." označuje aktuálnu pozíciu tokenu)
+# - je potrebné použiť presne tieto kľúčové slová: alphabet, states, initial_state, accepting_states, transitions
+# - tento súbor bude automaticky spracovaný a porovnaný so vzorovým riešením pomocou kontroly štrukturálnej ekvivalencie
