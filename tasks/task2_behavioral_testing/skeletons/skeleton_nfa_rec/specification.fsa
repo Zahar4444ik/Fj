@@ -1,0 +1,4 @@
+# TODO: Navrhnite nedeterministický konečnostavový automat (NFA) ekvivalentný zadanému regulárnemu výrazu.
+# - špecifikácia musí obsahovať nasledujúce komponenty: alphabet, states, initial_state, accepting_states, transitions
+# - epsilon prechody sú POVOLENÉ (ak sú potrebné) a môžu byť označené ako 'eps', 'epsilon' alebo 'ε'
+# - tento súbor bude automaticky spracovaný a porovnaný s referenčným riešením

@@ -1,0 +1,4 @@
+# TODO: Navrhnite deterministický konečnostavový automat (DFA) ekvivalentný zadanému regulárnemu výrazu.
+# - špecifikácia musí obsahovať nasledujúce komponenty: alphabet, states, initial_state, accepting_states, transitions
+# - každý stav musí obsahovať anotáciu (regularny vyraz s rozlozenim tokenov) zodpovedajúcu metóde tokenov použitej pri konštrukcii DFA (napr. ".a|.b{a}", kde "." označuje aktuálnu pozíciu tokenu)
+# - tento súbor bude automaticky spracovaný a porovnaný s referenčným riešením
