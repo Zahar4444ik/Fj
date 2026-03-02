@@ -68,9 +68,11 @@ class AssignmentReport:
         :param passed: Whether group passed
         :param points: Points for this group
         """
+
+        safe_words = ['""' if w == "" else w for w in words]
         status = "PASSED" if passed else "FAILED"
         self.lines.append(f"Group {group_index}: {status}")
-        self.lines.append(f"Words: {', '.join(words)}")
+        self.lines.append(f"Words: {', '.join(safe_words)}")
 
         self.lines.append(f"[ {round(points, 2) if passed else 0} pts / {round(points, 2)} pts ]\n")
 

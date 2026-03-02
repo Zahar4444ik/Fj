@@ -15,9 +15,8 @@ def format_annotation_diff(reference, student) -> str:
         exp = ref_ann.get(cid, "")
         got = stu_ann.get(cid, "")
         if exp != got:
-            ref_name = ref_id_to_state.get(cid, "?")
             stu_name = stu_id_to_state.get(cid, "?")
-            lines.append(f"{ref_name}/{stu_name:<11} {exp:<27} {got}")
+            lines.append(f"{stu_name:<11} {exp:<27} {got}")
             has_diff = True
 
     if not has_diff:
@@ -50,7 +49,7 @@ def format_acceptance_diff(mismatches: list[dict]) -> str:
 
     for m in mismatches:
         lines.append(
-            f"{m['word']:<15} "
+            f"{m['word'] if m['word'] != '' else f'"{m['word']}"':<15} "
             f"{fmt(m['expected']):<15} "
             f"{fmt(m['got'])}"
         )
