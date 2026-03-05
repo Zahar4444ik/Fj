@@ -127,33 +127,36 @@ def _iter_star_assignments(stars: List[dict], max_iterations: int):
 def generate_accepted_words(
     tree: dict,
     count: int = 10,
-    max_iterations: int = 5,
+    max_iterations: int = 10,
 ) -> List[str]:
     """
     Generate exactly `count` unique words accepted by the regex.
 
-    Raises RuntimeError if the word space is exhausted before `count` unique
-    words are found (should not happen for any regex with a Star node).
+    Automatically increases max_iterations if the word space is exhausted
+    before `count` unique words are found.
     """
     stars = _collect_stars(tree)
     seen: set[str] = set()
     words: List[str] = []
-    max_attempts = count * 200  # generous ceiling to avoid infinite loops
 
-    for star_counts in _iter_star_assignments(stars, max_iterations):
-        if len(words) == count:
-            break
-        if max_attempts <= 0:
-            raise RuntimeError(
-                f"Could not generate {count} unique accepted words — "
-                "try increasing max_iterations or reducing count."
-            )
-        max_attempts -= 1
+    while len(words) < count:
+        max_attempts = count * 200
+        stars = _collect_stars(tree)
 
-        word = _generate_word(tree, star_counts, max_iterations)
-        if word not in seen:
-            seen.add(word)
-            words.append(word)
+        for star_counts in _iter_star_assignments(stars, max_iterations):
+            if len(words) == count:
+                break
+            if max_attempts <= 0:
+                break  # retry with higher max_iterations
+            max_attempts -= 1
+
+            word = _generate_word(tree, star_counts, max_iterations)
+            if word not in seen:
+                seen.add(word)
+                words.append(word)
+
+        if len(words) < count:
+            max_iterations += 1  # expand search space and retry
 
     return words
 
@@ -265,12 +268,12 @@ def generate_rejected_words(
 
 if __name__ == "__main__":
     # Example usage (requires a parsed tree and DFA instance):
-    regex = "({N|~}|[l|A])>"
+    regex = "j{t∗}[E|s]"
     tree = get_ast_from_regex(regex)
     alphabet = get_regex_alphabet(tree)
     dka = build_DKA(tree, regex)
 
     accepted = generate_accepted_words(tree, count=10, max_iterations=5)
     print(accepted)
-    rejected = generate_rejected_words(tree, alphabet, dka, count=10)
+    rejected = generate_rejected_words(tree, count=10, max_attempts=1000)
     print(rejected)
