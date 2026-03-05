@@ -1,0 +1,17 @@
+# I guess it is an alphabet
+
+alphabet: {0, 1}
+states: {
+	s0=".0|.1{0|1}",
+	s1="0|1{.0|.1}.",
+	s2="0|1{0|1}." # Here would be a comment
+}
+initial_state: s0
+accepting_states: {s2, s1} # here is a comment
+
+transitions:{
+  s0 -1-> s1,
+  s0 -0-> s2,
+  s1 -1-> s1,
+  s1 -0-> s1
+}

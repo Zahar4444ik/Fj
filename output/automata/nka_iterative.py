@@ -16,6 +16,8 @@ class State(Enum):
     q0 = auto()
     q1 = auto()
     q10 = auto()
+    q11 = auto()
+    q12 = auto()
     q2 = auto()
     q3 = auto()
     q4 = auto()
@@ -29,22 +31,22 @@ class State(Enum):
 class NFA:
     def __init__(self):
         self.transition_table = {
-            (State.q0, 'eps'): {State.q1, State.q3},
-            (State.q1, '0'): {State.q2},
-            (State.q10, 'eps'): {State.q6},
-            (State.q3, '1'): {State.q4},
-            (State.q4, 'eps'): {State.q5},
-            (State.q5, 'eps'): {State.q6},
-            (State.q6, 'eps'): {State.q7, State.q9},
-            (State.q7, '1'): {State.q8},
-            (State.q8, 'eps'): {State.q6},
-            (State.q9, '0'): {State.q10},
+            (State.q0, 'j'): {State.q1},
+            (State.q1, 'eps'): {State.q2},
+            (State.q10, 'eps'): {State.q11},
+            (State.q11, '*'): {State.q12},
+            (State.q12, 'eps'): {State.q3, State.q9},
+            (State.q2, 'eps'): {State.q3, State.q9},
+            (State.q3, 'eps'): {State.q4},
+            (State.q4, 'eps'): {State.q5, State.q7},
+            (State.q5, 'E'): {State.q6},
+            (State.q7, 's'): {State.q8},
+            (State.q9, 't'): {State.q10},
         }
         self.accepted_states = {
-            State.q10,
-            State.q5,
+            State.q6,
             State.q8,
-            State.q2,
+            State.q3,
         }
         self.init_state = State.q0
         self.stack = None

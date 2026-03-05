@@ -30,8 +30,8 @@ from selenium.webdriver.common.keys import Keys
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 
-USERNAME        = ""
-PASSWORD        = ""
+USERNAME        = "zf687mr"
+PASSWORD        = "Zahar19%03"
 ASSIGNMENT_LINK = "https://moodle.fei.tuke.sk/mod/quiz/view.php?id=14339"
 STUDENT_GROUP   = "Všetci účastníci"
 QUESTION        = 1
@@ -214,19 +214,21 @@ def paste_report_comment(driver: webdriver.Chrome, wait: WebDriverWait, report_t
                 .replace(">", "&gt;")
         )
 
+        html = f"<pre style='font-family: monospace; white-space: pre-wrap;'>{safe_line}</pre>"
+
         # Append line
         driver.execute_script(
             "arguments[0].innerHTML += arguments[1];",
             comment_box,
-            safe_line
+            html
         )
 
-        # Add line break (except after last line)
-        if i < len(lines) - 1:
-            driver.execute_script(
-                "arguments[0].innerHTML += '<br>';",
-                comment_box
-            )
+        # # Add line break (except after last line)
+        # if i < len(lines) - 1:
+        #     driver.execute_script(
+        #         "arguments[0].innerHTML += '<br>';",
+        #         comment_box
+        #     )
 
         # Optional tiny delay to mimic human input (helps flaky editors)
         time.sleep(0.02)
