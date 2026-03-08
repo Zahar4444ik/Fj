@@ -13,13 +13,13 @@ from tasks.task1_isomorphism.checker.compare import (
 import os
 
 FSA_CONFIG = {
-    "DKA": {
+    "dfa": {
         "generate": fsa_from_dka,
         "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\fsa\dka.fsa",
         "student_fsa_filename": "specification.fsa",
         "check_annotations": True,
     },
-    "NKA": {
+    "nfa": {
         "generate": fsa_from_nka,
         "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\fsa\nka.fsa",
         "student_fsa_filename": "specification.fsa",

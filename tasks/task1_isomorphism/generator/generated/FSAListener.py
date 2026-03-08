@@ -17,6 +17,15 @@ class FSAListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by FSAParser#section.
+    def enterSection(self, ctx:FSAParser.SectionContext):
+        pass
+
+    # Exit a parse tree produced by FSAParser#section.
+    def exitSection(self, ctx:FSAParser.SectionContext):
+        pass
+
+
     # Enter a parse tree produced by FSAParser#alphabet.
     def enterAlphabet(self, ctx:FSAParser.AlphabetContext):
         pass

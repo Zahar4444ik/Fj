@@ -1,7 +1,15 @@
 grammar FSA;
 
 file
-    : alphabet states start accepting transitions EOF
+    : section+ EOF
+    ;
+
+section
+    : alphabet
+    | states
+    | start
+    | accepting
+    | transitions
     ;
 
 alphabet

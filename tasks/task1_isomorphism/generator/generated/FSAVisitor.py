@@ -14,6 +14,11 @@ class FSAVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by FSAParser#section.
+    def visitSection(self, ctx:FSAParser.SectionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by FSAParser#alphabet.
     def visitAlphabet(self, ctx:FSAParser.AlphabetContext):
         return self.visitChildren(ctx)
