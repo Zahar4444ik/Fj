@@ -39,7 +39,7 @@ def format_acceptance_diff(mismatches: list[dict]) -> str:
     lines = [
         "Acceptance mismatches detected:",
         "",
-        f"{'Word':<15} {'Expected':<15} {'Received'}",
+        f"{'Input string':<15} {'Expected':<15} {'Received'}",
         "-" * 60,
     ]
 
