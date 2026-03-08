@@ -3,8 +3,7 @@ import string
 ALPHABET = (
     list(string.ascii_lowercase) +
     list(string.ascii_uppercase) +
-    list(string.digits) +
-    list("!@#$%^&*-_+=<>?~")
+    list(string.digits)
 )
 
 

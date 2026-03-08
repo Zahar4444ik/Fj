@@ -32,41 +32,41 @@ def get_recursive_check_fn(mod, start_state):
 
 # student_path is now absent — it is built at runtime from work_dir
 IMPLEMENTATION_CONFIG = {
-    ("DKA", "iterative"): {
+    ("dfa", "iterative"): {
         "student_filename": "automaton.py",
         "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\automata\dka_iterative.py",
         "module_name": "dka_iterative",
-        "student_module_name": "student_dka_iterative",
+        "student_module_name": "automaton",
         "static_check": check_no_recursion,
         "static_error_reason": "use of recursion",
         "generate": generate_iterative_dka,
-        "get_check_fn": lambda mod, _: mod.dfa.check,
+        "get_check_fn": lambda mod, _: mod.DFA().check,
     },
-    ("DKA", "recursive"): {
+    ("dfa", "recursive"): {
         "student_filename": "automaton.py",
         "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\automata\dka_recursive.py",
         "module_name": "dka_recursive",
-        "student_module_name": "student_dka_recursive",
+        "student_module_name": "automaton",
         "static_check": check_no_iteration,
         "static_error_reason": "use of iteration",
         "generate": generate_recursive_dka,
         "get_check_fn": get_recursive_check_fn,
     },
-    ("NKA", "iterative"): {
+    ("nfa", "iterative"): {
         "student_filename": "automaton.py",
         "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\automata\nka_iterative.py",
         "module_name": "nka_iterative",
-        "student_module_name": "student_nka_iterative",
+        "student_module_name": "automaton",
         "static_check": check_no_recursion,
         "static_error_reason": "use of recursion",
         "generate": generate_iterative_nka,
-        "get_check_fn": lambda mod, _: mod.nfa.check,
+        "get_check_fn": lambda mod, _: mod.NFA().check,
     },
-    ("NKA", "recursive"): {
+    ("nfa", "recursive"): {
         "student_filename": "automaton.py",
         "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\automata\nka_recursive.py",
         "module_name": "nka_recursive",
-        "student_module_name": "student_nka_recursive",
+        "student_module_name": "automaton",
         "static_check": check_no_iteration,
         "static_error_reason": "use of iteration",
         "generate": generate_recursive_nka,
@@ -95,8 +95,8 @@ def evaluate_implementation(
     report.set_current_score(0)
     cfg = IMPLEMENTATION_CONFIG[(automaton_type, variant)]
     impl_points = {
-        "DKA": DKA_IMPLEMENTATION,
-        "NKA": NKA_IMPLEMENTATION,
+        "dfa": DKA_IMPLEMENTATION,
+        "nfa": NKA_IMPLEMENTATION,
     }[automaton_type]
 
     # Build student paths from work_dir at runtime
