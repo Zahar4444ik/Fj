@@ -23,13 +23,13 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.common.exceptions import TimeoutException
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 
 USERNAME        = ""                   # TUKE login e.g. "FL123XX"
 PASSWORD        = ""                   # TUKE password
-ASSIGNMENT_LINK = "https://moodle.fei.tuke.sk/mod/quiz/view.php?id=14339"
+ASSIGNMENT_LINK = "https://moodle.fei.tuke.sk/mod/quiz/view.php?id=14374"
 STUDENT_GROUP   = "Všetci účastníci"  # or e.g. "01 Pondelok 07:30 (Novotný)"
 QUESTION        = 1                    # question number to download
 DOWNLOAD_PATH   = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io\solutions"
@@ -88,82 +88,68 @@ def build_question_xpath(question_num: int) -> str:
     return f"//div[{sw} and {ew}]"
 
 
-def scrape_task_metadata(driver: webdriver.Chrome, wait: WebDriverWait) -> dict:
+def get_question_name(driver: webdriver.Chrome, wait: WebDriverWait) -> str | None:
     """
-    Extract regex, automaton_type, and implementation_type from the question text.
-
-    - automaton_type:      first sentence contains 'DFA'/'NFA' → mapped to 'DKA'/'NKA'
-    - implementation_type: first sentence contains iterative/recursive keyword
-    - regex:               centered paragraph (3-stage fallback)
+    Read the question name from the attempt review summary table.
+    Moodle renders it as a <td class="cell"> next to <th>Otázka</th>.
     """
     try:
-        question_div = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".qtext")))
-        full_text = question_div.text
-    except NoSuchElementException:
-        log.warning("  Could not locate .qtext for metadata scraping")
-        return {"regex": None, "automaton_type": None, "implementation_type": None}
+        name_elem = wait.until(EC.presence_of_element_located((
+            By.XPATH, "//th[@scope='row'][.='Otázka']/following-sibling::td[@class='cell']"
+        )))
+        return name_elem.text.strip()
+    except TimeoutException:
+        log.warning("  Could not find question name element on page")
+        return None
 
-    first_sentence = full_text.split(".")[0]
 
-    # ── Automaton type ────────────────────────────────────────────────────────
-    if "NFA" in first_sentence or "NKA" in first_sentence:
-        automaton_type = "NKA"
-    elif "DFA" in first_sentence or "DKA" in first_sentence:
-        automaton_type = "DKA"
-    else:
+def parse_metadata_from_name(question_name: str) -> dict:
+    """
+    Parse automaton_type, implementation_type, and regex from the question name.
+
+    Expected format: "<automaton_type>_<implementation_type>_<regex>"
+    Example:         "DKA_iterative_{c[a]|ab}b"
+
+    Uses maxsplit=2 so the regex part (which may itself contain '_') is
+    always preserved intact as the third element.
+    """
+    automatons = {"DKA": "dfa", "NKA": "nfa"}
+
+    empty = {"regex": None, "automaton_type": None, "implementation_type": None}
+
+    parts = question_name.split("_", maxsplit=2)
+    if len(parts) != 3:
+        log.warning("  Unexpected question name format: %r (expected 3 parts, got %d)", question_name, len(parts))
+        return empty
+
+    automaton_raw, implementation_raw, regex = parts
+
+    automaton_type = automaton_raw
+    if automaton_type in ("DKA", "NKA"):
+        automaton_type = automatons[automaton_type]
+    if automaton_type not in ("dfa", "nfa"):
+        log.warning("  Unknown automaton type %r in question name %r", automaton_raw, question_name)
         automaton_type = None
-        log.warning("  Could not detect automaton type in: %s", first_sentence)
 
-    # ── Implementation type ───────────────────────────────────────────────────
-    if any(kw in first_sentence.lower() for kw in ("rekurzívnu", "recursive", "rekurzivnu")):
-        implementation_type = "recursive"
-    elif any(kw in first_sentence.lower() for kw in ("iteratívnu", "iterative", "iterativnu")):
-        implementation_type = "iterative"
-    else:
+    implementation_type = implementation_raw.lower()
+    if implementation_type not in ("iterative", "recursive"):
+        log.warning("  Unknown implementation %r in question name %r", implementation_raw, question_name)
         implementation_type = None
-        log.warning("  Could not detect implementation type in: %s", first_sentence)
 
-    # ── Regex (3-stage fallback) ──────────────────────────────────────────────
-    regex = None
-    try:
-        q_xpath = build_question_xpath(QUESTION)
-
-        # Stage 1: centered element inside question body
-        centered = driver.find_elements(
-            By.XPATH,
-            f"{q_xpath}//*[contains(@style,'center') or contains(@class,'text-center')]"
-        )
-        if centered:
-            regex = centered[0].text.strip() or None
-
-        # Stage 2: short space-free <p> — regex expressions have no spaces
-        if not regex:
-            for p in driver.find_elements(By.XPATH, f"{q_xpath}//p"):
-                txt = p.text.strip()
-                if txt and len(txt) < 60 and " " not in txt:
-                    regex = txt
-                    break
-
-        # Stage 3: token in full text containing regex special characters
-        if not regex:
-            for token in full_text.split():
-                if any(c in token for c in ("{", "}", "|", "*", "+")) and len(token) < 60:
-                    regex = token
-                    break
-
-    except Exception as exc:
-        log.warning("  Regex scrape error: %s", exc)
-
-    if regex:
-        log.info("  Metadata → regex=%s  automaton=%s  impl=%s", regex, automaton_type, implementation_type)
-    else:
-        log.warning("  Could not extract regex from question text")
-
+    log.info("  Metadata → regex=%s  automaton=%s  impl=%s", regex, automaton_type, implementation_type)
     return {
         "regex": regex,
         "automaton_type": automaton_type,
         "implementation_type": implementation_type,
     }
+
+
+def get_metadata(driver: webdriver.Chrome, wait: WebDriverWait) -> dict:
+    """Read the question name from the page and parse metadata from it."""
+    name = get_question_name(driver, wait)
+    if not name:
+        return {"regex": None, "automaton_type": None, "implementation_type": None}
+    return parse_metadata_from_name(name)
 
 
 # ─────────────────────────── BROWSER SETUP ───────────────────────────────────
@@ -229,12 +215,21 @@ def get_student_email(driver: webdriver.Chrome, wait: WebDriverWait, idx: int) -
     ))).text.strip()
 
 
-def open_attempt_detail(driver: webdriver.Chrome, idx: int) -> None:
-    driver.find_element(
+def open_attempt_detail(driver: webdriver.Chrome, wait: WebDriverWait, idx: int, parent: str) -> None:
+    """Click the 'Zhodnotiť odpoveď' grading link and switch focus to the new window."""
+
+    wait.until(EC.element_to_be_clickable(( # HARDCODED FOR 2 solution
         By.XPATH,
         f"//tbody/tr[@class='gradedattempt' or @class='']"
-        f"[@id='mod-quiz-report-overview-report_r{idx}']/td[3]/a[2]"
-    ).click()
+        f"[@id='mod-quiz-report-overview-report_r{idx}']"
+        f"//a[contains(@href,'slot={QUESTION}') and contains(@title,'Zhodnoti')]"
+    ))).click()
+
+    # Wait for the new window to appear and switch to it
+    wait.until(lambda d: len(d.window_handles) > 1)
+    new_window = next(w for w in driver.window_handles if w != parent)
+    driver.switch_to.window(new_window)
+    wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
 
 
 def download_submission(driver: webdriver.Chrome, email: str) -> bool:
@@ -293,9 +288,9 @@ def run() -> None:
                 continue
 
             log.info("[%d/%d] Processing %s", idx + 1, total, email)
-            open_attempt_detail(driver, idx)
+            open_attempt_detail(driver, wait, idx, parent)
 
-            metadata = scrape_task_metadata(driver, wait)
+            metadata = get_metadata(driver, wait)
             downloaded = download_submission(driver, email)
 
             if downloaded:
@@ -308,7 +303,9 @@ def run() -> None:
             students[email] = metadata
             save_students(students)
 
-            driver.execute_script("window.history.go(-1)")
+            # ── Close grading window and return to attempts list ─────────────
+            driver.close()
+            driver.switch_to.window(parent)
             wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
 
     except Exception as exc:

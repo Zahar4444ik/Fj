@@ -30,9 +30,9 @@ from selenium.webdriver.common.keys import Keys
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 
-USERNAME        = "zf687mr"
-PASSWORD        = "Zahar19%03"
-ASSIGNMENT_LINK = "https://moodle.fei.tuke.sk/mod/quiz/view.php?id=14339"
+USERNAME        = ""
+PASSWORD        = ""
+ASSIGNMENT_LINK = "https://moodle.fei.tuke.sk/mod/quiz/view.php?id=14374"
 STUDENT_GROUP   = "Všetci účastníci"
 QUESTION        = 1
 
@@ -95,9 +95,8 @@ def load_report(email: str) -> tuple[str | None, float | None]:
 
 
 def build_question_xpath(question_num: int) -> str:
-    sw = "starts-with(@id, 'question')"
-    ew = f"substring(@id, string-length(@id) - string-length('{question_num}')+1) = '{question_num}'"
-    return f"//div[{sw} and {ew}]"
+    """Match the question div whose id ends with '-<question_num>'."""
+    return f"//div[starts-with(@id, 'question') and substring(@id, string-length(@id) - string-length('-{question_num}') + 1) = '-{question_num}']"
 
 # ─────────────────────────── BROWSER SETUP ───────────────────────────────────
 
@@ -158,31 +157,38 @@ def get_student_email(driver: webdriver.Chrome, wait: WebDriverWait, idx: int) -
 
 def open_grading_popup(driver: webdriver.Chrome, wait: WebDriverWait, idx: int, parent: str) -> bool:
     """
-    Click the student's attempt, then open the grading popup for QUESTION.
+    Click the 'Komentujte alebo prepíšte známku' link for the correct slot
+    directly from the attempts list row, opening the grading popup.
     Switches driver focus to the popup window.
     Returns True on success.
     """
-    # Open attempt detail
-    driver.find_element(
+    # Navigate to attempt review page for this student
+    wait.until(EC.element_to_be_clickable((
         By.XPATH,
         f"//tbody/tr[@class='gradedattempt' or @class='']"
-        f"[@id='mod-quiz-report-overview-report_r{idx}']/td[3]/a[2]"
-    ).click()
+        f"[@id='mod-quiz-report-overview-report_r{idx}']"
+        f"//a[contains(@href,'slot={QUESTION}') and contains(@title,'Zhodnoti')]"
+    ))).click()
+
+    wait.until(lambda d: len(d.window_handles) > 1)
+    review_window = next(w for w in driver.window_handles if w != parent)
+    driver.switch_to.window(review_window)
     wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
 
-    # Click comment/grade link to open popup
+    # Click the comment/grade link for the correct question slot
     q_xpath = build_question_xpath(QUESTION)
     try:
         wait.until(EC.visibility_of_element_located(
-            (By.XPATH, f"{q_xpath}//div[@class='commentlink']/a")
+            (By.XPATH, f"{q_xpath}//div[@class='commentlink']/a[contains(@href,'slot={QUESTION}')]")
         )).click()
     except TimeoutException:
         log.error("  Could not find grading link for question %d", QUESTION)
+        driver.close()
+        driver.switch_to.window(parent)
         return False
 
-    wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
-
-    popup = next(w for w in driver.window_handles if w != parent)
+    wait.until(lambda d: len(d.window_handles) > 2)
+    popup = next(w for w in driver.window_handles if w not in (parent, review_window))
     driver.switch_to.window(popup)
     driver.set_window_size(1024, 768)
     return True
@@ -193,9 +199,7 @@ def paste_report_comment(driver: webdriver.Chrome, wait: WebDriverWait, report_t
     Paste report_text into Moodle's Atto editor line-by-line instead of one injection.
     Each line is appended individually, preserving formatting and editor behavior.
     """
-
     q_xpath = build_question_xpath(QUESTION)
-
     comment_box = wait.until(EC.visibility_of_element_located((
         By.XPATH, f"{q_xpath}//div[@class='editor_atto_content_wrap']//div"
     )))
@@ -205,33 +209,22 @@ def paste_report_comment(driver: webdriver.Chrome, wait: WebDriverWait, report_t
 
     driver.execute_script("arguments[0].innerHTML = '<br>';", comment_box)
 
-    lines = report_text.split("\n")
+    safe_text = (
+        report_text
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
 
-    for i, line in enumerate(lines):
-        safe_line = (
-            line.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-        )
+    html = f"<pre style='font-family: monospace; white-space: pre-wrap; margin: 0;'>{safe_text}</pre>"
 
-        html = f"<pre style='font-family: monospace; white-space: pre-wrap;'>{safe_line}</pre>"
+    driver.execute_script(
+        "arguments[0].innerHTML += arguments[1];",
+        comment_box,
+        html
+    )
 
-        # Append line
-        driver.execute_script(
-            "arguments[0].innerHTML += arguments[1];",
-            comment_box,
-            html
-        )
-
-        # # Add line break (except after last line)
-        # if i < len(lines) - 1:
-        #     driver.execute_script(
-        #         "arguments[0].innerHTML += '<br>';",
-        #         comment_box
-        #     )
-
-        # Optional tiny delay to mimic human input (helps flaky editors)
-        time.sleep(0.02)
+    time.sleep(0.02)
 
 
 def submit_grade(driver: webdriver.Chrome, wait: WebDriverWait, score: float) -> None:
@@ -242,7 +235,7 @@ def submit_grade(driver: webdriver.Chrome, wait: WebDriverWait, score: float) ->
         By.XPATH, f"{q_xpath}//div[@class='felement ftext']/input[1]"
     )))
 
-    grade_value = str(score / 10)  # HARDCODED
+    grade_value = str(score/10)
 
     grade_input.clear()
     grade_input.send_keys(grade_value)
@@ -282,9 +275,6 @@ def upload_student(
 
     # ── Open grading popup ────────────────────────────────────────────────────
     if not open_grading_popup(driver, wait, idx, parent):
-        driver.switch_to.window(parent)
-        driver.execute_script("window.history.go(-1)")
-        wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
         return
 
     # ── Paste report and submit grade ─────────────────────────────────────────
@@ -295,11 +285,13 @@ def upload_student(
     except (TimeoutException, NoSuchElementException) as exc:
         log.error("  ✘ Upload failed: %s", exc)
     finally:
+        # Close grading popup, then close review window, return to attempts list
         driver.close()
+        review_window = next((w for w in driver.window_handles if w != parent), None)
+        if review_window:
+            driver.switch_to.window(review_window)
+            driver.close()
         driver.switch_to.window(parent)
-
-    driver.execute_script("window.history.go(-1)")
-    wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
 
 
 def run() -> None:

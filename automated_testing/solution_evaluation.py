@@ -41,8 +41,8 @@ SOLUTIONS_PATH = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\ta
 RESULT_PATH      = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\results"
 
 AUTOMATON_BUILDERS = {
-    "DKA": lambda ast, regex: build_DKA(ast, regex),
-    "NKA": lambda ast, regex: build_NKA(ast),
+    "dfa": lambda ast, regex: build_DKA(ast, regex),
+    "nfa": lambda ast, regex: build_NKA(ast),
 }
 
 # ─────────────────────────── LOGGING SETUP ───────────────────────────────────
@@ -60,9 +60,9 @@ log = logging.getLogger(__name__)
 # ─────────────────────────── FILE PATHS ──────────────────────────────────────
 
 STUDENTS_FILE = os.path.join(SOLUTIONS_PATH, "students.json")
-SUMMARY_FILE  = os.path.join(SOLUTIONS_PATH, "grading_summary.csv")
 
 # ─────────────────────────── HELPERS ─────────────────────────────────────────
+
 
 def load_students() -> dict:
     if not os.path.exists(STUDENTS_FILE):
@@ -71,15 +71,6 @@ def load_students() -> dict:
         )
     with open(STUDENTS_FILE, encoding="utf-8") as f:
         return json.load(f)
-
-
-def write_summary_row(email: str, status: str, score, error: str = "") -> None:
-    write_header = not os.path.exists(SUMMARY_FILE)
-    with open(SUMMARY_FILE, "a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if write_header:
-            writer.writerow(["email", "status", "score", "error"])
-        writer.writerow([email, status, score, error])
 
 
 def extract_zip(zip_path: str, target_dir: str) -> bool:
@@ -122,6 +113,19 @@ def check_required_files(work_dir: str) -> list[str]:
     return [f for f in required if not os.path.exists(os.path.join(work_dir, f))]
 
 
+def cleanup_student_files(zip_path: str, work_dir: str) -> None:
+    """Remove student's zip file and extracted directory."""
+    try:
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
+            log.info("  Cleaned up zip file")
+        if os.path.exists(work_dir):
+            shutil.rmtree(work_dir)
+            log.info("  Cleaned up working directory")
+    except Exception as e:
+        log.warning("  Cleanup failed: %s", e)
+
+
 def build_report(email: str, metadata: dict) -> AssignmentReport:
     """Initialise the report and write the configuration header."""
     os.makedirs(RESULT_PATH, exist_ok=True)
@@ -162,7 +166,6 @@ def process_student(email: str, metadata: dict) -> None:
         report.add_info(reason)
         score = 0.0
         build_report_footer(report, score)
-        write_summary_row(email, status, score, reason)
         return
 
     # ── No submission ────────────────────────────────────────────────────────
@@ -193,7 +196,7 @@ def process_student(email: str, metadata: dict) -> None:
     try:
         regex          = metadata["regex"]
         automaton_type = metadata["automaton_type"]
-        implementation = metadata["implementation_type"]
+        variant        = metadata["implementation_type"]
 
         ast       = get_ast_from_regex(regex)
         automaton = AUTOMATON_BUILDERS[automaton_type](ast, regex)
@@ -205,7 +208,7 @@ def process_student(email: str, metadata: dict) -> None:
     # ── Evaluate ─────────────────────────────────────────────────────────────
     try:
         score += evaluate_fsa(automaton, automaton_type, report, work_dir)
-        score += evaluate_implementation(ast, automaton_type, implementation, report, work_dir)
+        score += evaluate_implementation(ast, automaton_type, variant, report, work_dir)
     except Exception as e:
         fail(f"Evaluation failed: {e}", "evaluation_failed")
         return
@@ -213,7 +216,7 @@ def process_student(email: str, metadata: dict) -> None:
     # ── Success ──────────────────────────────────────────────────────────────
     build_report_footer(report, score)
     log.info("  ✔ Score: %s", score)
-    write_summary_row(email, "graded", score)
+    cleanup_student_files(zip_path, work_dir)
 
 
 def run() -> None:
@@ -227,9 +230,6 @@ def run() -> None:
             process_student(email, metadata)
         except Exception as exc:
             log.exception("  Unexpected error for %s: %s", email, exc)
-            write_summary_row(email, "unexpected_error", 0, str(exc))
-
-    log.info("Done. Summary → %s", SUMMARY_FILE)
 
 
 if __name__ == "__main__":
