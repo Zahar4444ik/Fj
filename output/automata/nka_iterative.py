@@ -33,20 +33,20 @@ class NFA:
         self.transition_table = {
             (State.q0, 'j'): {State.q1},
             (State.q1, 'eps'): {State.q2},
-            (State.q10, 'eps'): {State.q11},
-            (State.q11, '*'): {State.q12},
-            (State.q12, 'eps'): {State.q3, State.q9},
-            (State.q2, 'eps'): {State.q3, State.q9},
-            (State.q3, 'eps'): {State.q4},
-            (State.q4, 'eps'): {State.q5, State.q7},
-            (State.q5, 'E'): {State.q6},
-            (State.q7, 's'): {State.q8},
-            (State.q9, 't'): {State.q10},
+            (State.q11, 'E'): {State.q12},
+            (State.q2, 'eps'): {State.q3, State.q7},
+            (State.q3, 't'): {State.q4},
+            (State.q4, 'eps'): {State.q5},
+            (State.q5, '1'): {State.q6},
+            (State.q6, 'eps'): {State.q3, State.q7},
+            (State.q7, 'eps'): {State.q8},
+            (State.q8, 'eps'): {State.q11, State.q9},
+            (State.q9, 's'): {State.q10},
         }
         self.accepted_states = {
-            State.q6,
-            State.q8,
-            State.q3,
+            State.q7,
+            State.q12,
+            State.q10,
         }
         self.init_state = State.q0
         self.stack = None

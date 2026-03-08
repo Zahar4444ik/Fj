@@ -72,12 +72,11 @@ def generate_iterative_dka(syntax_tree, path="output/automata/dka_iterative.py")
                     self.actual_state = self.transition_table[(self.actual_state, symbol)]
 
                 return self.actual_state in self.accepted_states
-
-        
-        dfa = DFA()
-
+                
 
         if __name__ == "__main__":
+            dfa = DFA()
+        
             input_string = input("Zadaj vstupný reťazec> ")
             while input_string != "quit":
                 print(

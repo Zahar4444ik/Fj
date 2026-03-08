@@ -42,4 +42,5 @@ def check_no_recursion(path: str | Path) -> list[str]:
 
     checker = RecursionChecker()
     checker.visit(tree)
+    checker.detect_recursion()
     return checker.errors
