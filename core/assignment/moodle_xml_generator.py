@@ -7,10 +7,10 @@ from core.config.settings_parse import CATEGORY
 
 
 TEMPLATE_NAME_MAP = {
-    "dfa_iterative_template": "DKA_iterative",
-    "dfa_recursive_template": "DKA_recursive",
-    "nfa_iterative_template": "NKA_iterative",
-    "nfa_recursive_template": "NKA_recursive",
+    "dfa_iterative_template": "dfa_iterative",
+    "dfa_recursive_template": "dfa_recursive",
+    "nfa_iterative_template": "nfa_iterative",
+    "nfa_recursive_template": "nfa_recursive",
 }
 
 
@@ -72,6 +72,18 @@ def set_question_id(question_element: ET.Element, id_value: int):
     idnumber_node.text = str(id_value)
 
 
+def set_question_name(question_element: ET.Element, automaton_type: str, implementation: str, regex: str):
+    """Set the question name to format: automaton_type_implementation_regex"""
+    name_node = question_element.find("name/text")
+    if name_node is None:
+        name_elem = question_element.find("name")
+        if name_elem is None:
+            name_elem = ET.SubElement(question_element, "name")
+        name_node = ET.SubElement(name_elem, "text")
+
+    name_node.text = f"{automaton_type}_{implementation}_{regex}"
+
+
 def generate_moodle_xml(count: int, template_path: str, output_path: str):
     templates = load_templates(template_path)
 
@@ -93,6 +105,7 @@ def generate_moodle_xml(count: int, template_path: str, output_path: str):
 
         inject_regex(new_question, assignment["regex"])
         set_question_id(new_question, i)
+        set_question_name(new_question, assignment['automaton_type'], assignment['implementation'], assignment['regex'])
 
         quiz.append(new_question)
 
