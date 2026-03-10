@@ -43,7 +43,7 @@ def generate_recursive_nka(syntax_tree, path="output/automata/nka_recursive.py")
             for symbol, to_state in transition_dict.get(state, []):
                 to_name = to_state
 
-                if symbol == "ε" or symbol == "":
+                if symbol in ["ε", "eps", "epsilon"] or symbol == "":
                     clauses.append(f"{to_name}(string)")
                 else:
                     clauses.append(

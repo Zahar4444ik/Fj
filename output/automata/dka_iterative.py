@@ -44,10 +44,9 @@ class DFA:
         return self.actual_state in self.accepted_states
 
 
-dfa = DFA()
-
-
 if __name__ == "__main__":
+    dfa = DFA()
+
     input_string = input("Zadaj vstupný reťazec> ")
     while input_string != "quit":
         print(
