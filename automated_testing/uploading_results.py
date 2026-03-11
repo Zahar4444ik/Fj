@@ -28,16 +28,19 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
+from core.config.settings_parse import USERNAME, PASSWORD, ASSIGNMENT_LINK, DOWNLOAD_PATH, RESULTS_PATH
+from core.config.validation import validate_all_settings
+
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 
-USERNAME        = ""
-PASSWORD        = ""
-ASSIGNMENT_LINK = "https://moodle.fei.tuke.sk/mod/quiz/view.php?id=14374"
+USERNAME        = USERNAME
+PASSWORD        = PASSWORD
+ASSIGNMENT_LINK = ASSIGNMENT_LINK
 STUDENT_GROUP   = "Všetci účastníci"
 QUESTION        = 1
 
-SUBMISSIONS_PATH = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io\solutions"
-RESULTS_PATH     = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\results"
+SUBMISSIONS_PATH = DOWNLOAD_PATH
+RESULTS_PATH     = RESULTS_PATH
 STUDENTS_FILE    = os.path.join(SUBMISSIONS_PATH, "students.json")
 
 # Pause every N students to avoid overwhelming Moodle (seconds)
@@ -58,11 +61,24 @@ log = logging.getLogger(__name__)
 
 # ─────────────────────────── HELPERS ─────────────────────────────────────────
 
+
 def load_students() -> dict:
     if not os.path.exists(STUDENTS_FILE):
         raise FileNotFoundError(f"students.json not found at {STUDENTS_FILE}")
     with open(STUDENTS_FILE, encoding="utf-8") as f:
         return json.load(f)
+
+
+def save_students(students: dict) -> None:
+    with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(students, f, ensure_ascii=False, indent=2)
+
+
+def delete_report(email: str) -> None:
+    path = os.path.join(RESULTS_PATH, f"{email}_report.txt")
+    if os.path.exists(path):
+        os.remove(path)
+        log.info("  Deleted report: %s", path)
 
 
 def parse_score_from_report(report_text: str) -> float | None:
@@ -224,7 +240,7 @@ def paste_report_comment(driver: webdriver.Chrome, wait: WebDriverWait, report_t
         html
     )
 
-    time.sleep(0.02)
+    time.sleep(0.2)
 
 
 def submit_grade(driver: webdriver.Chrome, wait: WebDriverWait, score: float) -> None:
@@ -255,8 +271,14 @@ def upload_student(
     idx: int,
     email: str,
     metadata: dict,
+    students: dict,
 ) -> None:
     status = metadata.get("status")
+
+    # ── Skip if already successfully uploaded ────────────────────────────────
+    if metadata.get("upload_status") == "uploaded":
+        log.info("  Already uploaded — skipping")
+        return
 
     # ── Determine report text and score ──────────────────────────────────────
     if status == "no_submission":
@@ -266,26 +288,33 @@ def upload_student(
         report_text, score = load_report(email)
         if report_text is None:
             log.error("  Skipping %s — report file missing", email)
+            metadata["upload_status"] = "failed"
+            save_students(students)
             return
         if score is None:
             log.error("  Skipping %s — could not parse score from report", email)
+            metadata["upload_status"] = "failed"
+            save_students(students)
             return
 
     log.info("  Score: %s", score)
 
     # ── Open grading popup ────────────────────────────────────────────────────
     if not open_grading_popup(driver, wait, idx, parent):
+        metadata["upload_status"] = "failed"
+        save_students(students)
         return
 
     # ── Paste report and submit grade ─────────────────────────────────────────
+    uploaded = False
     try:
         paste_report_comment(driver, wait, report_text)
         submit_grade(driver, wait, score)
+        uploaded = True
         log.info("  ✔ Uploaded")
     except (TimeoutException, NoSuchElementException) as exc:
         log.error("  ✘ Upload failed: %s", exc)
     finally:
-        # Close grading popup, then close review window, return to attempts list
         driver.close()
         review_window = next((w for w in driver.window_handles if w != parent), None)
         if review_window:
@@ -293,8 +322,20 @@ def upload_student(
             driver.close()
         driver.switch_to.window(parent)
 
+    # ── Update students.json and clean up report ──────────────────────────────
+    if uploaded:
+        metadata["upload_status"] = "uploaded"
+        save_students(students)
+        if status != "no_submission":  # no_submission has no report file to delete
+            delete_report(email)
+    else:
+        metadata["upload_status"] = "failed"
+        save_students(students)
+
 
 def run() -> None:
+    validate_all_settings()
+
     students = load_students()
     log.info("Loaded %d students from students.json", len(students))
 
@@ -314,7 +355,7 @@ def run() -> None:
                 log.warning("  Not in students.json — skipping")
                 continue
 
-            upload_student(driver, wait, parent, idx, email, students[email])
+            upload_student(driver, wait, parent, idx, email, students[email], students)
 
             # Brief pause every N students to avoid hammering Moodle
             if (idx + 1) % BATCH_PAUSE_EVERY == 0:

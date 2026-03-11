@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 
 from core.assignment.assignment_variables import generate_assignment_variables
 from core.config.settings_parse import CATEGORY
-
+from core.config.validation import validate_all_settings
 
 TEMPLATE_NAME_MAP = {
     "dfa_iterative_template": "dfa_iterative",
@@ -85,6 +85,8 @@ def set_question_name(question_element: ET.Element, automaton_type: str, impleme
 
 
 def generate_moodle_xml(count: int, template_path: str, output_path: str):
+    validate_all_settings()
+
     templates = load_templates(template_path)
 
     quiz = ET.Element("quiz")

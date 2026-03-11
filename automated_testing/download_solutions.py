@@ -19,20 +19,25 @@ import re
 import json
 import time
 import logging
+import requests
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
+from core.config.settings_parse import PASSWORD, USERNAME, ASSIGNMENT_LINK, DOWNLOAD_PATH
+from core.config.validation import validate_all_settings
+
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 
-USERNAME        = ""                   # TUKE login e.g. "FL123XX"
-PASSWORD        = ""                   # TUKE password
-ASSIGNMENT_LINK = "https://moodle.fei.tuke.sk/mod/quiz/view.php?id=14374"
+USERNAME        = USERNAME                   # TUKE login e.g. "FL123XX"
+PASSWORD        = PASSWORD                   # TUKE password
+ASSIGNMENT_LINK = ASSIGNMENT_LINK
 STUDENT_GROUP   = "Všetci účastníci"  # or e.g. "01 Pondelok 07:30 (Novotný)"
 QUESTION        = 1                    # question number to download
-DOWNLOAD_PATH   = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io\solutions"
+DOWNLOAD_PATH   = DOWNLOAD_PATH
 
 DOWNLOAD_TIMEOUT = 30  # seconds to wait for a .zip to appear on disk
 
@@ -233,7 +238,6 @@ def open_attempt_detail(driver: webdriver.Chrome, wait: WebDriverWait, idx: int,
 
 
 def download_submission(driver: webdriver.Chrome, email: str) -> bool:
-    """Try to find and download the .zip attachment. Returns True on success."""
     q_xpath = build_question_xpath(QUESTION)
     attachment_xpath = f"{q_xpath}//div[@class='attachments']//a"
 
@@ -241,32 +245,35 @@ def download_submission(driver: webdriver.Chrome, email: str) -> bool:
         link_elem = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, attachment_xpath))
         )
-        file_name    = link_elem.text.strip()
         download_url = link_elem.get_attribute("href")
 
-        driver.get(download_url)
+        # Copy session cookies from Selenium into requests
+        session = requests.Session()
+        for cookie in driver.get_cookies():
+            session.cookies.set(cookie["name"], cookie["value"])
 
-        original_path = os.path.join(DOWNLOAD_PATH, file_name)
-        final_path    = os.path.join(DOWNLOAD_PATH, f"{email}.zip")
+        response = session.get(download_url, stream=True, timeout=30)
 
-        if wait_for_file(original_path):
-            if os.path.exists(final_path):
-                os.remove(final_path)
-            os.rename(original_path, final_path)
+        if response.status_code == 200 and "zip" in response.headers.get("Content-Type", ""):
+            final_path = os.path.join(DOWNLOAD_PATH, f"{email}.zip")
+            with open(final_path, "wb") as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
             log.info("  ✔ Downloaded → %s.zip", email)
             return True
         else:
-            log.warning("  ✘ Download timed out for %s (file: %s)", email, file_name)
+            log.warning("  ✘ Unexpected response for %s: %s %s",
+                        email, response.status_code, response.headers.get("Content-Type"))
             return False
 
     except TimeoutException:
-        return False  # no attachment present
+        return False
 
 
 # ─────────────────────────── MAIN LOOP ───────────────────────────────────────
 
 def run() -> None:
-    os.makedirs(DOWNLOAD_PATH, exist_ok=True)
+    validate_all_settings()
 
     students = load_students()
     log.info("Loaded %d previously processed students from students.json.", len(students))

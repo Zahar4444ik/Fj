@@ -21,13 +21,13 @@ Output:
 """
 
 import os
-import csv
 import json
 import shutil
 import zipfile
 import logging
 
-from core.config.settings_parse import TITLE
+from core.config.settings_parse import TITLE, DOWNLOAD_PATH, RESULTS_PATH
+from core.config.validation import validate_all_settings
 from core.evaluation.fsa_evaluation import evaluate_fsa
 from core.evaluation.implementation_evaluation import evaluate_implementation
 from core.evaluation.report import AssignmentReport
@@ -37,8 +37,8 @@ from core.regex.frontend.helper import get_ast_from_regex
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 
-SOLUTIONS_PATH = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io\solutions"
-RESULT_PATH      = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\results"
+SOLUTIONS_PATH = DOWNLOAD_PATH
+RESULT_PATH    = RESULTS_PATH
 
 AUTOMATON_BUILDERS = {
     "dfa": lambda ast, regex: build_DKA(ast, regex),
@@ -109,12 +109,15 @@ def flatten_if_single_subdir(work_dir: str) -> None:
 
 def check_required_files(work_dir: str) -> list[str]:
     """Return list of missing required files."""
-    required = ["automaton.py", "specification.fsa"]
+    required = ["specification.fsa"]
     return [f for f in required if not os.path.exists(os.path.join(work_dir, f))]
 
 
-def cleanup_student_files(zip_path: str, work_dir: str) -> None:
+def cleanup_student_files(email: str) -> None:
     """Remove student's zip file and extracted directory."""
+    zip_path = os.path.join(SOLUTIONS_PATH, f"{email}.zip")
+    work_dir = os.path.join(SOLUTIONS_PATH, email)
+
     try:
         if os.path.exists(zip_path):
             os.remove(zip_path)
@@ -216,10 +219,10 @@ def process_student(email: str, metadata: dict) -> None:
     # ── Success ──────────────────────────────────────────────────────────────
     build_report_footer(report, score)
     log.info("  ✔ Score: %s", score)
-    cleanup_student_files(zip_path, work_dir)
 
 
 def run() -> None:
+    validate_all_settings()
     students = load_students()
     total = len(students)
     log.info("Starting grader — %d students", total)
@@ -228,6 +231,7 @@ def run() -> None:
         log.info("[%d/%d] %s", idx, total, email)
         try:
             process_student(email, metadata)
+            # cleanup_student_files(email)
         except Exception as exc:
             log.exception("  Unexpected error for %s: %s", email, exc)
 

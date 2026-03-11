@@ -35,3 +35,15 @@ DKA_IMPLEMENTATION = int(os.getenv("DKA_IMPLEMENTATION", 0))
 # -----------------------------
 NKA_FSA_ISOMORPHISM = int(os.getenv("NKA_FSA_ISOMORPHISM", 0))
 NKA_IMPLEMENTATION = int(os.getenv("NKA_IMPLEMENTATION", 0))
+
+
+# -----------------------------
+# Automated testing
+# -----------------------------
+USERNAME = os.getenv("USER", "")
+PASSWORD = os.getenv("PASSWORD", "")
+
+ASSIGNMENT_LINK = os.getenv("ASSIGNMENT_LINK", "")
+
+DOWNLOAD_PATH = os.getenv("DOWNLOAD_PATH", "")
+RESULTS_PATH = os.getenv("RESULTS_PATH", "")
