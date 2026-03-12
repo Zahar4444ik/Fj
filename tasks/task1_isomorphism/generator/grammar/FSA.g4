@@ -62,12 +62,12 @@ EQUAL   : '=' ;
 DASH    : '-' ;
 ARROW   : '->' ;
 
-SYMBOL
-    : [a-zA-Z0-9!@#$%^&*\-_+=<>?~]
-    ;
-
 ID
     : [a-zA-Z_] [a-zA-Z_0-9]*
+    ;
+
+SYMBOL
+    : [a-zA-Z0-9]
     ;
 
 EPSILON
