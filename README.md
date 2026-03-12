@@ -2,7 +2,7 @@
 
 A comprehensive Python system for generating, managing, and evaluating finite state automaton (FSA) assignments for students. Automates question generation, solution download, evaluation, and result upload to Moodle.
 
-**Status:** ✅ Production Ready | **Python:** 3.12+ 
+**Status:** ✅ Production Ready | **Python:** 3.13+ 
 
 ---
 
@@ -66,7 +66,7 @@ Generate Questions → Download Solutions → Evaluate Implementations → Uploa
 
 ### Prerequisites
 
-- **Python 3.12+**
+- **Python 3.13+**
 - Dependencies from `requirements.txt`
 
 ### Installation
@@ -126,11 +126,12 @@ python main.py --help
 
 Edit `.env` file to configure all settings:
 
-### Moodle Access (Required)
+### Moodle Settings
 ```env
 MOODLE_USERNAME="your_username"
 MOODLE_PASSWORD="your_password"
 ASSIGNMENT_LINK="https://moodle.fei.tuke.sk/mod/quiz/view.php?id=14374"
+QUESTION_NUMBER=1
 ```
 
 ### Question Generation
@@ -268,70 +269,6 @@ python main.py --help
 
 ---
 
-## 📦 Testing Utilities
-
-### Generate FSA and Automata Files
-
-Quick testing utility to generate reference files:
-
-```python
-from testing_utils import generate_fsa, generate_automata
-
-# Generate FSA files (dka.fsa and nka.fsa)
-paths = generate_fsa("0|1{0|1}")
-print(paths["dfa"])   # output/fsa/dka.fsa
-print(paths["nfa"])   # output/fsa/nka.fsa
-
-# Generate all automata implementations
-paths = generate_automata("0|1{0|1}")
-print(paths["dfa_iterative"])  # output/automata/dka_iterative.py
-print(paths["nfa_recursive"])  # output/automata/nka_recursive.py
-```
-
-### Run Tests
-
-```bash
-# All tests
-pytest tests/
-
-# Specific test file
-pytest tests/task1/test_isomorphism.py
-
-# Verbose output
-pytest tests/ -v
-
-# With coverage
-pytest tests/ --cov
-```
-
----
-
-## 📋 Configuration Files
-
-### `.env`
-Main configuration file with all settings:
-- Moodle credentials (username, password)
-- Assignment link
-- Scoring weights
-- File paths
-- Question difficulty
-- Test settings
-
-### `settings_parse.py`
-Loads and parses `.env` variables:
-- Type conversion (int, float, Path)
-- Default values
-- Organized into logical sections by workflow stage
-
-### `validation.py`
-Validates all configuration:
-- Type checking
-- Range validation
-- Cross-field validation (e.g., scoring totals must equal 100)
-- Clear error messages for any issues
-
----
-
 ## 📈 Workflow Example
 
 ```bash
@@ -451,7 +388,7 @@ echo ".env" >> .gitignore
 
 ## 🚀 Getting Started Checklist
 
-- [ ] Python 3.12+ installed
+- [ ] Python 3.13+ installed
 - [ ] Project downloaded/cloned
 - [ ] Virtual environment created: `python -m venv venv`
 - [ ] Virtual environment activated
@@ -503,4 +440,4 @@ COMPLETE
 
 For issues or questions, check the troubleshooting section or review code comments.
 
-Last updated: March 12, 2026 | Python 3.12+
+Last updated: March 12, 2026 | Python 3.13+
