@@ -27,7 +27,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from core.config.settings_parse import PASSWORD, USERNAME, ASSIGNMENT_LINK, DOWNLOAD_PATH
+from core.config.settings_parse import PASSWORD, USERNAME, ASSIGNMENT_LINK, DOWNLOAD_PATH, QUESTION_NUMBER
 from core.config.validation import validate_all_settings
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
@@ -36,7 +36,7 @@ USERNAME        = USERNAME                   # TUKE login e.g. "FL123XX"
 PASSWORD        = PASSWORD                   # TUKE password
 ASSIGNMENT_LINK = ASSIGNMENT_LINK
 STUDENT_GROUP   = "Všetci účastníci"  # or e.g. "01 Pondelok 07:30 (Novotný)"
-QUESTION        = 1                    # question number to download
+QUESTION        = QUESTION_NUMBER                    # question number to download
 DOWNLOAD_PATH   = DOWNLOAD_PATH
 
 DOWNLOAD_TIMEOUT = 30  # seconds to wait for a .zip to appear on disk
@@ -273,8 +273,6 @@ def download_submission(driver: webdriver.Chrome, email: str) -> bool:
 # ─────────────────────────── MAIN LOOP ───────────────────────────────────────
 
 def run() -> None:
-    validate_all_settings()
-
     students = load_students()
     log.info("Loaded %d previously processed students from students.json.", len(students))
 

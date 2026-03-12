@@ -4,6 +4,7 @@ from core.assignment.quiz_generator import generate_quiz
 import automated_testing.download_solutions as downloader
 import automated_testing.evaluate_solutions as evaluator
 import automated_testing.upload_results as uploader
+from core.config.validation import validate_all_settings
 
 
 def run_automated_pipeline():
@@ -27,6 +28,8 @@ def main():
     subparsers.add_parser("auto", help="Run full pipeline (Download -> Evaluate -> Upload)")
 
     args = parser.parse_args()
+
+    validate_all_settings()
 
     # Map commands to functions
     if args.command == "generate":

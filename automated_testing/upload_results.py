@@ -28,7 +28,7 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
-from core.config.settings_parse import USERNAME, PASSWORD, ASSIGNMENT_LINK, DOWNLOAD_PATH, RESULTS_PATH
+from core.config.settings_parse import USERNAME, PASSWORD, ASSIGNMENT_LINK, DOWNLOAD_PATH, RESULTS_PATH, QUESTION_NUMBER
 from core.config.validation import validate_all_settings
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
@@ -37,7 +37,7 @@ USERNAME        = USERNAME
 PASSWORD        = PASSWORD
 ASSIGNMENT_LINK = ASSIGNMENT_LINK
 STUDENT_GROUP   = "Všetci účastníci"
-QUESTION        = 1
+QUESTION        = QUESTION_NUMBER
 
 SUBMISSIONS_PATH = DOWNLOAD_PATH
 RESULTS_PATH     = RESULTS_PATH
@@ -334,8 +334,6 @@ def upload_student(
 
 
 def run() -> None:
-    validate_all_settings()
-
     students = load_students()
     log.info("Loaded %d students from students.json", len(students))
 

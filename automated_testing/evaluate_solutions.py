@@ -164,6 +164,7 @@ def process_student(email: str, metadata: dict) -> None:
     def fail(reason: str, status: str):
         nonlocal score
         log.error("  " + reason)
+        report.add_info("-" * 60)
         report.add_info("\nERROR")
         report.add_info("-" * 60)
         report.add_info(reason)
@@ -222,7 +223,6 @@ def process_student(email: str, metadata: dict) -> None:
 
 
 def run() -> None:
-    validate_all_settings()
     students = load_students()
     total = len(students)
     log.info("Starting grader — %d students", total)

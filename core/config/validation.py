@@ -194,6 +194,9 @@ def _validate_moodle_settings():
     if not ASSIGNMENT_LINK or not isinstance(ASSIGNMENT_LINK, str):
         errors.append("ASSIGNMENT_LINK must be a non-empty string (required for automated testing)")
 
+    if QUESTION_NUMBER <= 0:
+        errors.append("QUESTION_NUMBER must be > 0")
+
     # Path validation
     if not DOWNLOAD_PATH or not isinstance(DOWNLOAD_PATH, str):
         errors.append("DOWNLOAD_PATH must be a non-empty string (required for automated testing)")

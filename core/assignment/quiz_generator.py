@@ -181,23 +181,19 @@ def _write_quiz_to_file(quiz_element: ET.Element, output_path: Path) -> None:
 
 def generate_quiz() -> None:
     try:
-        # Step 1: Validate
-        validate_all_settings()
-        logger.info("Configuration validated")
-
-        # Step 2: Prepare output directory
+        # Step 1: Prepare output directory
         _ensure_output_directory()
 
-        # Step 3: Load templates
+        # Step 2: Load templates
         templates = _load_templates()
         logger.info(f"Loaded {len(templates)} question templates")
 
-        # Step 4: Build quiz
+        # Step 3: Build quiz
         quiz_count = NUMBER_OF_QUESTIONS
         quiz_xml = _build_quiz_xml(templates, quiz_count)
         logger.info(f"Generated quiz structure with {quiz_count} questions")
 
-        # Step 5: Write to file
+        # Step 4: Write to file
         _write_quiz_to_file(quiz_xml, OUTPUT_FILE)
 
     except Exception as e:
