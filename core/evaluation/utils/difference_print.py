@@ -1,4 +1,4 @@
-from tasks.task1_isomorphism.generator.automata.canonical import canonical_signature
+from testing.task1_isomorphism.generator.automata.canonical import canonical_signature
 
 
 def format_annotation_diff(reference, student) -> str:

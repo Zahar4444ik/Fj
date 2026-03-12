@@ -1,6 +1,6 @@
-from tasks.task1_isomorphism.generator.automata.canonical import canonical_signature
-from tasks.task1_isomorphism.generator.automata.normalize import normalize_automaton
-from tasks.task1_isomorphism.generator.automata.parser import parse_fsa
+from testing.task1_isomorphism.generator.automata.canonical import canonical_signature
+from testing.task1_isomorphism.generator.automata.normalize import normalize_automaton
+from testing.task1_isomorphism.generator.automata.parser import parse_fsa
 
 
 def check_alphabet(reference, student):

@@ -2,8 +2,8 @@ from task2.data.dka_recursive import student_b, student_a, student_random
 import importlib.util
 import sys
 
-from tasks.task2_behavioral_testing.generator.utils.safe_call import safe_call
-from tasks.task2_behavioral_testing.word_generation.testing_words_generator import generate_accepted_words, \
+from testing.task2_behavioral_testing.generator.utils.safe_call import safe_call
+from testing.task2_behavioral_testing.word_generation.testing_words_generator import generate_accepted_words, \
     generate_rejected_words
 
 
@@ -18,7 +18,7 @@ def load_module_from_path(module_name, path):
 def prepare_reference_automaton(pattern, module_name, path):
     from core.regex.frontend.lexer import Lexer
     from core.regex.frontend.parser import Parser
-    from tasks.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
+    from testing.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
 
     lexer = Lexer(pattern)
     parser = Parser(lexer)

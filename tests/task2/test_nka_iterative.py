@@ -14,7 +14,7 @@ def load_module_from_path(module_name, path):
 def prepare_reference_automaton(pattern, module_name, path):
     from core.regex.frontend.lexer import Lexer
     from core.regex.frontend.parser import Parser
-    from tasks.task2_behavioral_testing.generator.nka.iterative import generate_iterative_nka
+    from testing.task2_behavioral_testing.generator.nka.iterative import generate_iterative_nka
 
     lexer = Lexer(pattern)
     parser = Parser(lexer)

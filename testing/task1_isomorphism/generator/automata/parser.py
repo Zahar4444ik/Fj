@@ -1,8 +1,8 @@
 from antlr4 import *
-from tasks.task1_isomorphism.generator.generated.FSALexer import FSALexer
-from tasks.task1_isomorphism.generator.generated.FSAListener import FSAListener
-from tasks.task1_isomorphism.generator.generated.FSAParser import FSAParser
-from tasks.task1_isomorphism.generator.automata.automaton import Automaton
+from testing.task1_isomorphism.generator.generated.FSALexer import FSALexer
+from testing.task1_isomorphism.generator.generated.FSAListener import FSAListener
+from testing.task1_isomorphism.generator.generated.FSAParser import FSAParser
+from testing.task1_isomorphism.generator.automata.automaton import Automaton
 
 
 class FSABuilder(FSAListener):

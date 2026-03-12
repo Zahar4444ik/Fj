@@ -15,7 +15,7 @@ from core.regex.automata.dka.dka_builder import DKA
 from core.regex.automata.nka.nka_builder import NKA
 from core.regex.generators.fsa.fsa_generator import fsa_from_dka, fsa_from_nka
 from core.evaluation.report import AssignmentReport
-from tasks.task1_isomorphism.checker.compare import (
+from testing.task1_isomorphism.checker.compare import (
     prepare_automaton_for_fsa_test,
     check_isomorphism,
     check_annotations,

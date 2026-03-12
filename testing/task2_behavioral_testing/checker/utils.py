@@ -1,8 +1,8 @@
 import ast
 from pathlib import Path
 
-from tasks.task2_behavioral_testing.checker.iteration_checker import IterationChecker
-from tasks.task2_behavioral_testing.checker.recursion_checker import RecursionChecker
+from testing.task2_behavioral_testing.checker.iteration_checker import IterationChecker
+from testing.task2_behavioral_testing.checker.recursion_checker import RecursionChecker
 
 
 def check_no_iteration(path: str | Path) -> list[str]:

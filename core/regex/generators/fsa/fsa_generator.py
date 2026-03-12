@@ -6,11 +6,18 @@ Outputs properly formatted finite automaton specifications.
 """
 
 import logging
+from pathlib import Path
+
 from core.regex.automata.utils.automata_operations import get_state_name, get_transitions
 
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
+
+OUTPUT_DIR = Path(__file__).resolve().parent / "output"
+FSA_DIR = OUTPUT_DIR / "fsa"
+
+FSA_DIR.mkdir(parents=True, exist_ok=True)
 
 EPSILON_SYMBOL = 'eps'
 
