@@ -1,4 +1,4 @@
-from task2.data.dka_iterative import student_b, student_a, student_random
+from tests.task2.data.dka_iterative import student_a, student_b, student_random
 import importlib.util
 import sys
 
@@ -32,7 +32,7 @@ def test_student_a():
     reference, ast = prepare_reference_automaton(
         "{0}",
         module_name="reference_a",
-        path="task2/data/dka_iterative/reference_a.py"
+        path="tests/task2/data/dka_iterative/reference_a.py"
     )
 
     assert reference.DFA().check("000") == student_a.DFA().check("000")
@@ -43,7 +43,7 @@ def test_student_b():
     reference, ast = prepare_reference_automaton(
         "{01}1",
         module_name="reference_b",
-        path="task2/data/dka_iterative/reference_b.py"
+        path="tests/task2/data/dka_iterative/reference_b.py"
     )
 
     assert reference.DFA().check("011") == student_b.DFA().check("011")
@@ -54,7 +54,7 @@ def test_student_random():
     reference, tree = prepare_reference_automaton(
         "0|1{0|1}",
         module_name="reference_random",
-        path="task2/data/dka_iterative/reference_random.py"
+        path="tests/task2/data/dka_iterative/reference_random.py"
     )
 
     words = generate_accepted_words(tree, count=5, max_iterations=5)

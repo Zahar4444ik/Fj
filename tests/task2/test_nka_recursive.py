@@ -33,7 +33,7 @@ def test_student_a():
     reference, ast = prepare_reference_automaton(
         "0",
         module_name="reference_a",
-        path="task2/data/nka_recursive/reference_a.py"
+        path="tests/task2/data/nka_recursive/reference_a.py"
     )
 
     stu = safe_call(student_a.q0, '0')
@@ -45,7 +45,7 @@ def test_student_b():
     reference, ast = prepare_reference_automaton(
         "{0}",
         module_name="reference_b",
-        path="task2/data/nka_recursive/reference_b.py"
+        path="tests/task2/data/nka_recursive/reference_b.py"
     )
 
     stu = safe_call(student_b.q0, '0000')
@@ -57,7 +57,7 @@ def test_student_infinite_loop():
     reference, ast = prepare_reference_automaton(
         "{0}",
         module_name="reference_infinite_loop",
-        path="task2/data/nka_recursive/reference_infinite_loop.py"
+        path="tests/task2/data/nka_recursive/reference_infinite_loop.py"
     )
 
     words = ["", "0", "00"]
@@ -74,7 +74,7 @@ def test_student_wrong():
     reference, ast = prepare_reference_automaton(
         "{0|1}01",
         module_name="reference_wrong",
-        path="task2/data/nka_recursive/reference_wrong.py"
+        path="tests/task2/data/nka_recursive/reference_wrong.py"
     )
 
     counterexamples = ["", "0", "111110011"]
@@ -92,7 +92,7 @@ def test_student_random():
     reference, tree = prepare_reference_automaton(
         "0|1{0|1}",
         module_name="reference_random",
-        path="task2/data/nka_recursive/reference_random.py"
+        path="tests/task2/data/nka_recursive/reference_random.py"
     )
 
     words = generate_accepted_words(tree, count=5, max_iterations=3)
