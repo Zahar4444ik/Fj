@@ -13,10 +13,18 @@ class State(Enum):
 
 
 class DFA:
-    def __init__(self, transition_table: dict, accepted_states: set, init_state: State):
-        self.transition_table = transition_table
-        self.accepted_states = accepted_states
-        self.init_state = init_state
+    def __init__(self):
+        self.transition_table = {
+            (State.q0, '0'): State.q2,
+            (State.q0, '1'): State.q1,
+            (State.q1, '0'): State.q1,
+            (State.q1, '1'): State.q1,
+        }
+        self.accepted_states = {
+            State.q1,
+            State.q2,
+        }
+        self.init_state = State.q0
         self.actual_state = None
 
     def check(self, string: str) -> bool:
@@ -28,33 +36,3 @@ class DFA:
             self.actual_state = self.transition_table[(self.actual_state, symbol)]
 
         return self.actual_state in self.accepted_states
-
-
-# ============================================================
-# Transition table
-# ============================================================
-transition_table = {
-    (State.q0, '0'): State.q2,
-    (State.q0, '1'): State.q1,
-    (State.q1, '0'): State.q1,
-    (State.q1, '1'): State.q1,
-
-}
-
-
-# ============================================================
-# Accepting states
-# ============================================================
-accepted_states = {
-    State.q1,
-    State.q2,
-}
-
-init_state = State.q0
-
-
-dfa = DFA(
-    transition_table=transition_table,
-    accepted_states=accepted_states,
-    init_state=init_state
-)

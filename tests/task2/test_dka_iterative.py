@@ -35,8 +35,8 @@ def test_student_a():
         path="task2/data/dka_iterative/reference_a.py"
     )
 
-    assert reference.dfa.check("000") == student_a.dfa.check("000")
-    assert reference.dfa.check("1") == student_a.dfa.check("1")
+    assert reference.DFA().check("000") == student_a.DFA().check("000")
+    assert reference.DFA().check("1") == student_a.DFA().check("1")
 
 
 def test_student_b():
@@ -46,8 +46,8 @@ def test_student_b():
         path="task2/data/dka_iterative/reference_b.py"
     )
 
-    assert reference.dfa.check("011") == student_b.dfa.check("011")
-    assert reference.dfa.check("010") == student_b.dfa.check("010")
+    assert reference.DFA().check("011") == student_b.DFA().check("011")
+    assert reference.DFA().check("010") == student_b.DFA().check("010")
 
 
 def test_student_random():
@@ -61,5 +61,5 @@ def test_student_random():
     words.extend(generate_rejected_words(tree, count=5))
 
     for word in words:
-        assert reference.dfa.check(word) == student_random.dfa.check(word)
+        assert reference.DFA().check(word) == student_random.DFA().check(word)
 

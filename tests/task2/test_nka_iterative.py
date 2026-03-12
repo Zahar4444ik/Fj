@@ -30,10 +30,9 @@ def test_student_a():
         "0",
         module_name="reference_a",
         path="task2/data/nka_iterative/reference_a.py"
-    ).nfa
+    )
 
-    student = student_a.nfa
-    assert reference.check("0") == student.check("0")
+    assert reference.NFA().check("0") == student_a.NFA().check("0")
 
 
 def test_student_b():
@@ -41,10 +40,9 @@ def test_student_b():
         "{0|1}01",
         module_name="reference_b",
         path="task2/data/nka_iterative/reference_b.py"
-    ).nfa
+    )
 
-    student = student_b.nfa
-    assert reference.check("0101") == student.check("0101")
+    assert reference.NFA().check("0101") == student_b.NFA().check("0101")
 
 
 def test_wrong_student_c():
@@ -52,7 +50,6 @@ def test_wrong_student_c():
         "{0}1",
         module_name="reference_c",
         path="task2/data/nka_iterative/reference_c.py"
-    ).nfa
+    )
 
-    student = student_c.nfa
-    assert reference.check("0001") != student.check("0001")
+    assert reference.NFA().check("0001") != student_c.NFA().check("0001")

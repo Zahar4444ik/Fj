@@ -10,10 +10,16 @@ class State(Enum):
 
 
 class NFA:
-    def __init__(self, transition_table, accepted_states, init_state):
-        self.transition_table = transition_table
-        self.accepted_states = accepted_states
-        self.init_state = init_state
+    def __init__(self):
+        self.transition_table = {
+            (State.q0, 'eps'): {State.q1},
+            (State.q1, '0'): {State.q1},
+            (State.q1, '1'): {State.q1},
+            (State.q1, '0'): {State.q2},
+            (State.q2, '1'): {State.q0},
+        }
+        self.accepted_states = {State.q0}
+        self.init_state = State.q0
         self.stack = None
 
     def expand_actual_configuration(self, actual_state, string):
@@ -40,17 +46,3 @@ class NFA:
 
             self.expand_actual_configuration(state, rest)
         return False
-
-
-transition_table = {
-    (State.q0, 'eps'): {State.q1},
-    (State.q1, '0'): {State.q1},
-    (State.q1, '1'): {State.q1},
-    (State.q1, '0'): {State.q2},
-    (State.q2, '1'): {State.q0},
-}
-
-accepted_states = {State.q0}
-init_state = State.q0
-
-nfa = NFA(transition_table, accepted_states, init_state)
