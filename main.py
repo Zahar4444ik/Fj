@@ -1,59 +1,46 @@
-from automated_testing.solution_evaluation import SOLUTIONS_PATH
-from core.assignment.assignment_variables import generate_assignment_variables
-from core.assignment.moodle_xml_generator import generate_moodle_xml
-from core.config.settings_parse import TITLE
-from core.config.validation import validate_scoring_profile
-from core.regex.frontend.helper import get_ast_from_regex
-from core.evaluation.fsa_evaluation import evaluate_fsa
-from core.evaluation.implementation_evaluation import evaluate_implementation
-from core.regex.automata.dka.dka_builder import build_DKA
-from core.regex.automata.nka.nka_builder import build_NKA
-from core.evaluation.report import AssignmentReport
+import argparse
 
-RESULT_PATH = "output/results/assignment_report.txt"
-SOLUTION_PATH_FSA = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io\fsa"
-SOLUTION_PATH_AUTOMATON = r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\tasks\student_io\automaton"
+from core.assignment.quiz_generator import generate_quiz
+import automated_testing.download_solutions as downloader
+import automated_testing.evaluate_solutions as evaluator
+import automated_testing.upload_results as uploader
 
-AUTOMATON_BUILDERS = {
-    "DKA": lambda ast, regex: build_DKA(ast, regex),
-    "NKA": lambda ast, regex: build_NKA(ast),
-}
+
+def run_automated_pipeline():
+    print("🚀 Starting full automated pipeline...")
+    downloader.run()
+    evaluator.run()
+    uploader.run()
+    print("✅ Full pipeline complete.")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="FJ Assignment Management Tool")
+
+    # Create subcommands
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    subparsers.add_parser("generate", help="Generate Moodle XML questions")
+    subparsers.add_parser("download", help="Download solutions from Moodle")
+    subparsers.add_parser("evaluate", help="Evaluate downloaded solutions")
+    subparsers.add_parser("upload", help="Upload results back to Moodle")
+    subparsers.add_parser("auto", help="Run full pipeline (Download -> Evaluate -> Upload)")
+
+    args = parser.parse_args()
+
+    # Map commands to functions
+    if args.command == "generate":
+        generate_quiz()
+    elif args.command == "download":
+        downloader.run()
+    elif args.command == "evaluate":
+        evaluator.run()
+    elif args.command == "upload":
+        uploader.run()
+    elif args.command == "auto":
+        run_automated_pipeline()
+    else:
+        parser.print_help()
 
 if __name__ == "__main__":
-    generate_moodle_xml(
-        10,
-        "output/templates.xml",
-        "output/quiz.xml"
-    )
-    validate_scoring_profile()
-
-    report = AssignmentReport(RESULT_PATH)
-    report.header(TITLE, "zakhar.fesiuk@student.tuke.sk")
-
-    assignment_variables = generate_assignment_variables()
-
-    # regex = assignment_variables["regex"]
-    print(assignment_variables["regex"])
-    regex = "0|1{0|1}"  # Hardcoded for testing purposes
-
-    # automaton_type = assignment_variables["automaton_type"]
-    automaton_type = "DKA"  # Hardcoded for testing purposes
-
-    # implementation = assignment_variables["implementation"]
-    implementation = "iterative"  # Hardcoded for testing purposes
-
-    report.add_info("Configuration")
-    report.add_info("-" * 60)
-    report.add_info(f"Regex: {regex}")
-    report.add_info(f"Automaton type: {automaton_type}")
-    report.add_info(f"Implementation: {implementation}")
-
-    ast = get_ast_from_regex(regex)
-    automaton = AUTOMATON_BUILDERS[automaton_type](ast, regex)
-
-    score = 0.0
-    score += evaluate_fsa(automaton, automaton_type, report, SOLUTION_PATH_FSA)
-    score += evaluate_implementation(ast, automaton_type, implementation, report, SOLUTION_PATH_AUTOMATON)
-
-    report.footer(score)
-    report.save()
+    main()
