@@ -1,49 +1,61 @@
-import os
+"""
+Configuration parser for FSA assignments lifecycle
 
+This module loads and parses environment variables from .env file..
+"""
+
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# -----------------------------
-# Global
-# -----------------------------
-CATEGORY = os.getenv("CATEGORY", "default")
-TITLE = os.getenv("TITLE", "Unnamed Test")
 
-TEST_WORDS_COUNT = int(os.getenv("TEST_WORDS_COUNT", 0))
-BAD_WORD_RATIO_LEVEL = float(os.getenv("BAD_WORD_RATIO_LEVEL", 0))
-GROUP_SIZE = int(os.getenv("GROUP_SIZE", 0))
+# -------------------------------------------------------------------------------
+# QUESTION GENERATION
+# -------------------------------------------------------------------------------
 
-REGEX_MIN_STATES_COUNT = int(os.getenv("REGEX_MIN_STATES_COUNT", 0))
-REGEX_MAX_STATES_COUNT = int(os.getenv("REGEX_MAX_STATES_COUNT", 0))
+CATEGORY = os.getenv("QUIZ_CATEGORY", "default")
 
-TOTAL_SCORE = 100  # fixed system invariant
+NUMBER_OF_QUESTIONS = int(os.getenv("NUMBER_OF_QUESTIONS", "0"))
 
+# -------------------------------------------------------------------------------
+# QUESTION PROPERTIES & EVALUATION SETTINGS
+# -------------------------------------------------------------------------------
 
-# -----------------------------
-# DKA
-# -----------------------------
-DKA_FSA_ISOMORPHISM = int(os.getenv("DKA_FSA_ISOMORPHISM", 0))
-DKA_FSA_ANNOTATIONS = int(os.getenv("DKA_FSA_ANNOTATIONS", 0))
+TITLE = os.getenv("REPORT_TITLE", "Unnamed Test")
+
+TEST_WORDS_COUNT = int(os.getenv("TEST_WORDS_COUNT", "0"))
+
+BAD_WORD_RATIO_LEVEL = float(os.getenv("BAD_WORD_RATIO_LEVEL", "0.0"))
+
+GROUP_SIZE = int(os.getenv("GROUP_SIZE", "0"))
+
+REGEX_MIN_STATES_COUNT = int(os.getenv("REGEX_MIN_STATES_COUNT", "1"))
+REGEX_MAX_STATES_COUNT = int(os.getenv("REGEX_MAX_STATES_COUNT", "1"))
+
+# System constant
+TOTAL_SCORE = 100
+
+DKA_FSA_ISOMORPHISM = int(os.getenv("DKA_FSA_ISOMORPHISM", "0"))
+DKA_FSA_ANNOTATIONS = int(os.getenv("DKA_FSA_ANNOTATIONS", "0"))
 DKA_FSA_TOTAL = DKA_FSA_ANNOTATIONS + DKA_FSA_ISOMORPHISM
+DKA_IMPLEMENTATION = int(os.getenv("DKA_IMPLEMENTATION", "0"))
 
-DKA_IMPLEMENTATION = int(os.getenv("DKA_IMPLEMENTATION", 0))
-
-
-# -----------------------------
-# NKA
-# -----------------------------
-NKA_FSA_ISOMORPHISM = int(os.getenv("NKA_FSA_ISOMORPHISM", 0))
-NKA_IMPLEMENTATION = int(os.getenv("NKA_IMPLEMENTATION", 0))
+NKA_FSA_ISOMORPHISM = int(os.getenv("NKA_FSA_ISOMORPHISM", "0"))
+NKA_IMPLEMENTATION = int(os.getenv("NKA_IMPLEMENTATION", "0"))
 
 
-# -----------------------------
-# Automated testing
-# -----------------------------
-USERNAME = os.getenv("USER", "")
-PASSWORD = os.getenv("PASSWORD", "")
+# -------------------------------------------------------------------------------
+# MOODLE AUTHENTICATION & FILE OPERATIONS
+# -------------------------------------------------------------------------------
 
+# Credentials
+USERNAME = os.getenv("MOODLE_USERNAME", "")
+PASSWORD = os.getenv("MOODLE_PASSWORD", "")
+
+# Moodle resources
 ASSIGNMENT_LINK = os.getenv("ASSIGNMENT_LINK", "")
 
-DOWNLOAD_PATH = os.getenv("DOWNLOAD_PATH", "")
-RESULTS_PATH = os.getenv("RESULTS_PATH", "")
+# File paths
+DOWNLOAD_PATH = os.getenv("SOLUTIONS_DOWNLOAD_PATH", "")
+RESULTS_PATH = os.getenv("EVALUATION_RESULTS_PATH", "")
