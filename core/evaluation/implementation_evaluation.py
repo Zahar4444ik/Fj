@@ -65,6 +65,7 @@ def _get_recursive_check_fn(mod, start_state):
 # CONFIGURATION DATA
 # ============================================================================
 
+
 IMPLEMENTATION_CONFIG = {
     ("dfa", "iterative"): {
         "student_filename": "automaton.py",

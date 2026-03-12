@@ -240,7 +240,7 @@ def paste_report_comment(driver: webdriver.Chrome, wait: WebDriverWait, report_t
         html
     )
 
-    time.sleep(0.2)
+    time.sleep(0.5) # little wait to let it comment box save report
 
 
 def submit_grade(driver: webdriver.Chrome, wait: WebDriverWait, score: float) -> None:

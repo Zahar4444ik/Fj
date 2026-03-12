@@ -38,7 +38,7 @@ from core.regex.frontend.helper import get_ast_from_regex
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 
 SOLUTIONS_PATH = DOWNLOAD_PATH
-RESULT_PATH    = RESULTS_PATH
+RESULT_PATH = RESULTS_PATH
 
 AUTOMATON_BUILDERS = {
     "dfa": lambda ast, regex: build_DKA(ast, regex),
@@ -60,6 +60,7 @@ log = logging.getLogger(__name__)
 # ─────────────────────────── FILE PATHS ──────────────────────────────────────
 
 STUDENTS_FILE = os.path.join(SOLUTIONS_PATH, "students.json")
+
 
 # ─────────────────────────── HELPERS ─────────────────────────────────────────
 
@@ -161,31 +162,32 @@ def process_student(email: str, metadata: dict) -> None:
     report = build_report(email, metadata)
     score = 0.0
 
-    def fail(reason: str, status: str):
+    def fail(reason: str, failed: bool = True):
         nonlocal score
         log.error("  " + reason)
         report.add_info("-" * 60)
         report.add_info("\nERROR")
         report.add_info("-" * 60)
         report.add_info(reason)
-        score = 0.0
-        build_report_footer(report, score)
+        if failed:
+            score = 0.0
+            build_report_footer(report, score)
         return
 
     # ── No submission ────────────────────────────────────────────────────────
     if metadata.get("status") == "no_submission":
-        fail("No submission provided.", "no_submission")
+        fail("No submission provided.")
         return
 
     # ── Check zip exists ─────────────────────────────────────────────────────
     if not os.path.exists(zip_path):
-        fail("Zip file not found.", "missing_zip")
+        fail("Zip file not found.")
         return
 
     # ── Extract ──────────────────────────────────────────────────────────────
     os.makedirs(work_dir, exist_ok=True)
     if not extract_zip(zip_path, work_dir):
-        fail("Bad zip file — extraction failed.", "bad_zip")
+        fail("Bad zip file — extraction failed.")
         return
 
     flatten_if_single_subdir(work_dir)
@@ -193,29 +195,33 @@ def process_student(email: str, metadata: dict) -> None:
     # ── Validate required files ──────────────────────────────────────────────
     missing = check_required_files(work_dir)
     if missing:
-        fail(f"Missing required files: {missing}", "missing_files")
+        fail(f"Missing required files: {missing}")
         return
 
     # ── Build automaton ──────────────────────────────────────────────────────
     try:
-        regex          = metadata["regex"]
+        regex = metadata["regex"]
         automaton_type = metadata["automaton_type"]
-        variant        = metadata["implementation_type"]
+        variant = metadata["implementation_type"]
 
-        ast       = get_ast_from_regex(regex)
+        ast = get_ast_from_regex(regex)
         automaton = AUTOMATON_BUILDERS[automaton_type](ast, regex)
 
     except Exception as e:
-        fail(f"Automaton build failed: {e}", "build_failed")
+        fail(f"Automaton build failed: {e}")
         return
 
     # ── Evaluate ─────────────────────────────────────────────────────────────
     try:
         score += evaluate_fsa(automaton, automaton_type, report, work_dir)
-        score += evaluate_implementation(ast, automaton_type, variant, report, work_dir)
+        # score += evaluate_implementation(ast, automaton_type, variant, report, work_dir)
+
+        if os.path.exists(os.path.join(work_dir, "automaton.py")):
+            score += evaluate_implementation(ast, automaton_type, variant, report, work_dir)
+        else:
+            fail("Missing file: automaton.py", failed=False)
     except Exception as e:
-        fail(f"Evaluation failed: {e}", "evaluation_failed")
-        return
+        fail(f"Evaluation failed: {e}", failed=False)
 
     # ── Success ──────────────────────────────────────────────────────────────
     build_report_footer(report, score)
@@ -231,7 +237,7 @@ def run() -> None:
         log.info("[%d/%d] %s", idx, total, email)
         try:
             process_student(email, metadata)
-            # cleanup_student_files(email)
+            cleanup_student_files(email)
         except Exception as exc:
             log.exception("  Unexpected error for %s: %s", email, exc)
 
