@@ -25,9 +25,9 @@ import json
 import shutil
 import zipfile
 import logging
+from pathlib import Path
 
-from core.config.settings_parse import TITLE, DOWNLOAD_PATH, RESULTS_PATH
-from core.config.validation import validate_all_settings
+from core.config.settings_parse import TITLE
 from core.evaluation.fsa_evaluation import evaluate_fsa
 from core.evaluation.implementation_evaluation import evaluate_implementation
 from core.evaluation.report import AssignmentReport
@@ -36,9 +36,12 @@ from core.regex.automata.nka.nka_builder import build_NKA
 from core.regex.frontend.helper import get_ast_from_regex
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-SOLUTIONS_PATH = DOWNLOAD_PATH
-RESULT_PATH = RESULTS_PATH
+SOLUTIONS_PATH = BASE_DIR / "downloads"
+SOLUTIONS_PATH.mkdir(parents=True, exist_ok=True)
+RESULT_PATH = BASE_DIR / "output" / "results"
+RESULT_PATH.mkdir(parents=True, exist_ok=True)
 
 AUTOMATON_BUILDERS = {
     "dfa": lambda ast, regex: build_DKA(ast, regex),
@@ -50,10 +53,6 @@ AUTOMATON_BUILDERS = {
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s  %(levelname)-8s  %(message)s",
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler(os.path.join(SOLUTIONS_PATH, "grader.log"), encoding="utf-8"),
-    ],
 )
 log = logging.getLogger(__name__)
 

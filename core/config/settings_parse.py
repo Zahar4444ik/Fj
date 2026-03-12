@@ -57,7 +57,3 @@ PASSWORD = os.getenv("MOODLE_PASSWORD", "")
 ASSIGNMENT_LINK = os.getenv("ASSIGNMENT_LINK", "")
 
 QUESTION_NUMBER = int(os.getenv("QUESTION_NUMBER", "1"))
-
-# File paths
-DOWNLOAD_PATH = os.getenv("SOLUTIONS_DOWNLOAD_PATH", "")
-RESULTS_PATH = os.getenv("EVALUATION_RESULTS_PATH", "")

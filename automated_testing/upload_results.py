@@ -20,6 +20,8 @@ import re
 import json
 import time
 import logging
+from pathlib import Path
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -28,10 +30,10 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
-from core.config.settings_parse import USERNAME, PASSWORD, ASSIGNMENT_LINK, DOWNLOAD_PATH, RESULTS_PATH, QUESTION_NUMBER
-from core.config.validation import validate_all_settings
+from core.config.settings_parse import USERNAME, PASSWORD, ASSIGNMENT_LINK, QUESTION_NUMBER
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 USERNAME        = USERNAME
 PASSWORD        = PASSWORD
@@ -39,8 +41,9 @@ ASSIGNMENT_LINK = ASSIGNMENT_LINK
 STUDENT_GROUP   = "Všetci účastníci"
 QUESTION        = QUESTION_NUMBER
 
-SUBMISSIONS_PATH = DOWNLOAD_PATH
-RESULTS_PATH     = RESULTS_PATH
+SUBMISSIONS_PATH = BASE_DIR / "downloads"
+RESULTS_PATH     = BASE_DIR / "output" / "results"
+RESULTS_PATH.mkdir(parents=True, exist_ok=True)
 STUDENTS_FILE    = os.path.join(SUBMISSIONS_PATH, "students.json")
 
 # Pause every N students to avoid overwhelming Moodle (seconds)
@@ -52,10 +55,6 @@ BATCH_PAUSE_SECS  = 3
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s  %(levelname)-8s  %(message)s",
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler(os.path.join(SUBMISSIONS_PATH, "uploader.log"), encoding="utf-8"),
-    ],
 )
 log = logging.getLogger(__name__)
 

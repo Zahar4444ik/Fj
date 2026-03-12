@@ -19,6 +19,8 @@ import re
 import json
 import time
 import logging
+from pathlib import Path
+
 import requests
 
 from selenium import webdriver
@@ -27,17 +29,22 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from core.config.settings_parse import PASSWORD, USERNAME, ASSIGNMENT_LINK, DOWNLOAD_PATH, QUESTION_NUMBER
-from core.config.validation import validate_all_settings
+from core.config.settings_parse import PASSWORD, USERNAME, ASSIGNMENT_LINK, QUESTION_NUMBER
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 
-USERNAME        = USERNAME                   # TUKE login e.g. "FL123XX"
-PASSWORD        = PASSWORD                   # TUKE password
-ASSIGNMENT_LINK = ASSIGNMENT_LINK
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Settings from environment
+MOODLE_USERNAME = USERNAME
+MOODLE_PASSWORD = PASSWORD
+MOODLE_ASSIGNMENT_LINK = ASSIGNMENT_LINK
+
+# Local settings
 STUDENT_GROUP   = "Všetci účastníci"  # or e.g. "01 Pondelok 07:30 (Novotný)"
 QUESTION        = QUESTION_NUMBER                    # question number to download
-DOWNLOAD_PATH   = DOWNLOAD_PATH
+DOWNLOAD_PATH   = BASE_DIR / "downloads"
+DOWNLOAD_PATH.mkdir(parents=True, exist_ok=True)
 
 DOWNLOAD_TIMEOUT = 30  # seconds to wait for a .zip to appear on disk
 
@@ -46,10 +53,6 @@ DOWNLOAD_TIMEOUT = 30  # seconds to wait for a .zip to appear on disk
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s  %(levelname)-8s  %(message)s",
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler(os.path.join(DOWNLOAD_PATH, "downloader.log"), encoding="utf-8"),
-    ],
 )
 log = logging.getLogger(__name__)
 
@@ -165,7 +168,7 @@ def create_driver() -> webdriver.Chrome:
     options.add_argument("--start-maximized")
     options.add_argument("--safebrowsing-disable-download-protection")
     options.add_experimental_option("prefs", {
-        "download.default_directory": DOWNLOAD_PATH,
+        "download.default_directory": str(DOWNLOAD_PATH),
         "download.prompt_for_download": False,
         "download.directory_upgrade": True,
         "safebrowsing.enabled": False,
@@ -179,8 +182,8 @@ def login(driver: webdriver.Chrome, wait: WebDriverWait) -> None:
     log.info("Logging in…")
     driver.get("https://moodle.fei.tuke.sk/login/index.php")
     wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
-    driver.find_element(By.ID, "username").send_keys(USERNAME)
-    driver.find_element(By.ID, "password").send_keys(PASSWORD)
+    driver.find_element(By.ID, "username").send_keys(MOODLE_USERNAME)
+    driver.find_element(By.ID, "password").send_keys(MOODLE_PASSWORD)
     driver.find_element(By.ID, "loginbtn").click()
     wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
     log.info("Login complete.")
@@ -188,7 +191,7 @@ def login(driver: webdriver.Chrome, wait: WebDriverWait) -> None:
 
 def open_attempts_page(driver: webdriver.Chrome, wait: WebDriverWait) -> int:
     """Navigate to the attempts overview and return total student count."""
-    driver.get(ASSIGNMENT_LINK)
+    driver.get(MOODLE_ASSIGNMENT_LINK)
     wait.until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "Pokusy:"))).click()
 
     if STUDENT_GROUP != "Všetci účastníci":

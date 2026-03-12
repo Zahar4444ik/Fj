@@ -197,17 +197,4 @@ def _validate_moodle_settings():
     if QUESTION_NUMBER <= 0:
         errors.append("QUESTION_NUMBER must be > 0")
 
-    # Path validation
-    if not DOWNLOAD_PATH or not isinstance(DOWNLOAD_PATH, str):
-        errors.append("DOWNLOAD_PATH must be a non-empty string (required for automated testing)")
-
-    if DOWNLOAD_PATH and not os.path.exists(DOWNLOAD_PATH):
-        errors.append(f"DOWNLOAD_PATH does not exist: {DOWNLOAD_PATH}")
-
-    if not RESULTS_PATH or not isinstance(RESULTS_PATH, str):
-        errors.append("RESULTS_PATH must be a non-empty string (required for automated testing)")
-
-    if RESULTS_PATH and not os.path.exists(RESULTS_PATH):
-        errors.append(f"RESULTS_PATH does not exist: {RESULTS_PATH}")
-
     return errors
