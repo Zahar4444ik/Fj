@@ -15,6 +15,7 @@ from core.config.settings_parse import DKA_IMPLEMENTATION, NKA_IMPLEMENTATION, T
 from core.evaluation.report import AssignmentReport
 from core.evaluation.utils.difference_print import format_acceptance_diff
 from core.evaluation.utils.helpers import split_into_groups
+from testing.task2_behavioral_testing.checker.check_imports import check_imports
 from testing.task2_behavioral_testing.checker.utils import check_no_iteration, check_no_recursion
 from testing.task2_behavioral_testing.generator.dka.iterative import generate_iterative_dka
 from testing.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
@@ -70,7 +71,7 @@ IMPLEMENTATION_CONFIG = {
         "reference_path": AUTOMATA_DIR / "dka_iterative.py",
         "module_name": "dka_iterative",
         "student_module_name": "automaton",
-        "static_check": check_no_recursion,
+        "static_check": [check_no_recursion, check_imports],
         "static_error_reason": "use of recursion",
         "generate": generate_iterative_dka,
         "get_check_fn": lambda mod, _: mod.DFA().check,
@@ -80,7 +81,7 @@ IMPLEMENTATION_CONFIG = {
         "reference_path": AUTOMATA_DIR / "dka_recursive.py",
         "module_name": "dka_recursive",
         "student_module_name": "automaton",
-        "static_check": check_no_iteration,
+        "static_check": [check_no_iteration, check_imports],
         "static_error_reason": "use of iteration",
         "generate": generate_recursive_dka,
         "get_check_fn": _get_recursive_check_fn,
@@ -90,7 +91,7 @@ IMPLEMENTATION_CONFIG = {
         "reference_path": AUTOMATA_DIR / "nka_iterative.py",
         "module_name": "nka_iterative",
         "student_module_name": "automaton",
-        "static_check": check_no_recursion,
+        "static_check": [check_no_recursion, check_imports],
         "static_error_reason": "use of recursion",
         "generate": generate_iterative_nka,
         "get_check_fn": lambda mod, _: mod.NFA().check,
@@ -100,7 +101,7 @@ IMPLEMENTATION_CONFIG = {
         "reference_path": AUTOMATA_DIR / "nka_recursive.py",
         "module_name": "nka_recursive",
         "student_module_name": "automaton",
-        "static_check": check_no_iteration,
+        "static_check": [check_no_iteration, check_imports],
         "static_error_reason": "use of iteration",
         "generate": generate_recursive_nka,
         "get_check_fn": _get_recursive_check_fn,
@@ -263,7 +264,9 @@ def evaluate_implementation(
     # Step 1: Static analysis
     logger.debug(f"Running static analysis for {automaton_type} {variant}")
     student_path = os.path.join(work_dir, cfg["student_filename"])
-    static_errors = cfg["static_check"](student_path)
+    static_errors = []
+    for check in cfg["static_check"]:
+        static_errors = check(student_path)
     static_passed = not static_errors
 
     # Step 2: Behavioral testing (only if static passed)
