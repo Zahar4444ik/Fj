@@ -1,3 +1,14 @@
+"""
+FSA Specification Evaluation
+
+Evaluates FSA specifications from student submissions against reference automatons.
+Checks for isomorphism and state annotations correctness.
+"""
+
+import logging
+import os
+from pathlib import Path
+
 from core.config.settings_parse import DKA_FSA_ISOMORPHISM, DKA_FSA_ANNOTATIONS, NKA_FSA_ISOMORPHISM
 from core.evaluation.utils.difference_print import format_annotation_diff
 from core.regex.automata.dka.dka_builder import DKA
@@ -10,69 +21,119 @@ from tasks.task1_isomorphism.checker.compare import (
     check_annotations,
     check_alphabet,
 )
-import os
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+OUTPUT_DIR = BASE_DIR / "output"
+FSA_DIR = OUTPUT_DIR / "fsa"
+
+# Ensure FSA directory exists
+FSA_DIR.mkdir(parents=True, exist_ok=True)
+
+# ============================================================================
+# LOGGING
+# ============================================================================
+
+logger = logging.getLogger(__name__)
+
+# ============================================================================
+# CONFIGURATION DATA
+# ============================================================================
 
 FSA_CONFIG = {
     "dfa": {
         "generate": fsa_from_dka,
-        "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\fsa\dka.fsa",
+        "reference_path": FSA_DIR / "dka.fsa",
         "student_fsa_filename": "specification.fsa",
         "check_annotations": True,
     },
     "nfa": {
         "generate": fsa_from_nka,
-        "reference_path": r"C:\Users\Захар\Desktop\tuke\bakalarska\fj_assignments\output\fsa\nka.fsa",
+        "reference_path": FSA_DIR / "nka.fsa",
         "student_fsa_filename": "specification.fsa",
         "check_annotations": False,
     },
 }
 
+# ============================================================================
+# HELPER FUNCTIONS
+# ============================================================================
 
-def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport, work_dir: str) -> float:
-    type_cfg = FSA_CONFIG[automaton_type]
 
-    # ============================================================
-    # 1. Generate and load automatons
-    # ============================================================
-    type_cfg["generate"](automaton, filename=type_cfg["reference_path"])
-    reference = prepare_automaton_for_fsa_test(type_cfg["reference_path"])
+def _generate_reference_fsa(automaton: NKA | DKA, reference_path: Path) -> None:
+    """Generate reference FSA file."""
+    reference_path.parent.mkdir(parents=True, exist_ok=True)
 
-    student_path = os.path.join(work_dir, type_cfg["student_fsa_filename"])
-    student = prepare_automaton_for_fsa_test(student_path)
+    if "dka" in reference_path.name.lower():
+        fsa_from_dka(automaton, filename=str(reference_path))
+    else:
+        fsa_from_nka(automaton, filename=str(reference_path))
 
-    # ============================================================
-    # 2. Run all checks
-    # ============================================================
-    alphabet_passed = check_alphabet(reference, student)
-    iso_passed = check_isomorphism(reference, student)
-    iso_points = DKA_FSA_ISOMORPHISM if automaton_type == "DKA" else NKA_FSA_ISOMORPHISM
-    ann_points = 0
-    ann_passed = None
-    ann_diff = None
+    logger.debug(f"Generated reference FSA: {reference_path}")
 
-    if type_cfg["check_annotations"]:
-        ann_passed = check_annotations(reference, student)
-        ann_points = DKA_FSA_ANNOTATIONS
-        if not ann_passed:
-            ann_diff = format_annotation_diff(reference, student)
 
-    # ============================================================
-    # 3. Calculate score
-    # ============================================================
-    score = 0.0
+def _load_reference_fsa(reference_path: Path) -> object:
+    """Load reference FSA from file."""
+    return prepare_automaton_for_fsa_test(str(reference_path))
 
-    if iso_passed:
-        score += iso_points
-        report.increase_score(iso_points)
 
-    if ann_passed:
-        score += ann_points
-        report.increase_score(ann_points)
+def _load_student_fsa(work_dir: str, student_filename: str) -> object:
+    """Load student FSA from submission."""
+    student_path = os.path.join(work_dir, student_filename)
+    return prepare_automaton_for_fsa_test(student_path)
 
-    # ============================================================
-    # 4. Add to report
-    # ============================================================
-    report.section("1. FSA Specification Verification", (iso_points + ann_points))
+
+def _run_alphabet_check(reference: object, student: object) -> bool:
+    """Check alphabet correctness."""
+    return check_alphabet(reference, student)
+
+
+def _run_isomorphism_check(reference: object, student: object) -> bool:
+    """Check isomorphism with reference automaton."""
+    return check_isomorphism(reference, student)
+
+
+def _run_annotations_check(reference: object, student: object) -> tuple:
+    """
+    Check state annotations.
+
+    Returns:
+        tuple: (passed, difference_string)
+    """
+    passed = check_annotations(reference, student)
+    diff = format_annotation_diff(reference, student) if not passed else None
+    return passed, diff
+
+
+def _get_scoring_points(automaton_type: str, check_type: str) -> int:
+    """Get points for specific check type."""
+    points_map = {
+        "dfa": {
+            "isomorphism": DKA_FSA_ISOMORPHISM,
+            "annotations": DKA_FSA_ANNOTATIONS,
+        },
+        "nfa": {
+            "isomorphism": NKA_FSA_ISOMORPHISM,
+            "annotations": 0,
+        }
+    }
+    return points_map.get(automaton_type, {}).get(check_type, 0)
+
+
+def _add_to_report(report: AssignmentReport,
+                   alphabet_passed: bool,
+                   iso_passed: bool,
+                   iso_points: int,
+                   ann_passed: bool = None,
+                   ann_points: int = 0,
+                   ann_diff: str = None) -> None:
+    """Add evaluation results to report."""
+    total_points = iso_points + ann_points
+
+    report.section("1. FSA Specification Verification", total_points)
 
     report.subsection(f"1.1 Alphabet correctness: {'PASSED' if alphabet_passed else 'FAILED'}")
 
@@ -83,7 +144,7 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         points=iso_points,
     )
 
-    if type_cfg["check_annotations"]:
+    if ann_passed is not None:
         report.subsection("1.3 State Annotations")
         report.add_result(
             "State annotations verification",
@@ -91,10 +152,65 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
             points=ann_points,
         )
 
-        if not ann_passed:
+        if not ann_passed and ann_diff:
             report.add_info("")
             report.add_info("Annotation mismatches detected:")
             report.add_info("")
             report.add_info(ann_diff)
 
+
+# ============================================================================
+# PUBLIC API
+# ============================================================================
+
+def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport, work_dir: str) -> float:
+    """
+    Evaluate FSA specification from student submission.
+
+    Args:
+        automaton: Built automaton (DFA or NFA)
+        automaton_type: "dfa" or "nfa"
+        report: Assignment report object
+        work_dir: Directory containing student submission
+
+    Returns:
+        float: Points earned for FSA evaluation
+    """
+    type_cfg = FSA_CONFIG[automaton_type]
+
+    # Step 1: Generate and load automatons
+    logger.debug(f"Generating reference FSA for {automaton_type}")
+    _generate_reference_fsa(automaton, type_cfg["reference_path"])
+    reference = _load_reference_fsa(type_cfg["reference_path"])
+    student = _load_student_fsa(work_dir, type_cfg["student_fsa_filename"])
+
+    # Step 2: Run all checks
+    logger.debug(f"Running checks for {automaton_type} FSA")
+    alphabet_passed = _run_alphabet_check(reference, student)
+    iso_passed = _run_isomorphism_check(reference, student)
+
+    iso_points = _get_scoring_points(automaton_type, "isomorphism")
+    ann_points = _get_scoring_points(automaton_type, "annotations")
+    ann_passed = None
+    ann_diff = None
+
+    if type_cfg["check_annotations"]:
+        ann_passed, ann_diff = _run_annotations_check(reference, student)
+
+    # Step 3: Calculate score
+    score = 0.0
+
+    if iso_passed:
+        score += iso_points
+        report.increase_score(iso_points)
+
+    if ann_passed:
+        score += ann_points
+        report.increase_score(ann_points)
+
+    # Step 4: Add to report
+    _add_to_report(report, alphabet_passed, iso_passed, iso_points,
+                   ann_passed, ann_points, ann_diff)
+
+    logger.info(f"FSA evaluation for {automaton_type} complete: {score} points")
     return score
