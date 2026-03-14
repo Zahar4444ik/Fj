@@ -133,14 +133,50 @@ def _ensure_output_directory() -> None:
     logger.debug(f"Output directory ready: {OUTPUT_DIR}")
 
 
+def _build_category_element(path: str) -> ET.Element:
+    """
+    Build a single Moodle category <question type="category"> element
+    for the given full path, e.g. '$course$/top/Zapoctovka A/prakticka cast'.
+    """
+    category_q = ET.Element("question", type="category")
+
+    category_node = ET.SubElement(category_q, "category")
+    text = ET.SubElement(category_node, "text")
+    text.text = path
+
+    info = ET.SubElement(category_q, "info", format="html")
+    ET.SubElement(info, "text")
+
+    ET.SubElement(category_q, "idnumber")
+
+    return category_q
+
+
+def _build_category_elements(category: str) -> list[ET.Element]:
+    """
+    Build one category <question> element per path segment.
+
+    A plain string like "Zapoctovka A" produces one element:
+        $course$/top/Zapoctovka A
+
+    A path like "Zapoctovka A/prakticka cast" produces two elements:
+        $course$/top/Zapoctovka A
+        $course$/top/Zapoctovka A/prakticka cast
+    """
+    segments = category.strip("/").split("/")
+    elements = []
+    for i in range(1, len(segments) + 1):
+        path = "$course$/top/" + "/".join(segments[:i])
+        elements.append(_build_category_element(path))
+    return elements
+
+
 def _build_quiz_xml(templates: dict, question_count: int) -> ET.Element:
     quiz = ET.Element("quiz")
 
-    # Add category definition
-    category = ET.SubElement(quiz, "question", type="category")
-    cat_node = ET.SubElement(category, "category")
-    text = ET.SubElement(cat_node, "text")
-    text.text = f"$course$/top/{CATEGORY}"
+    # Add category hierarchy — one element per path segment
+    for category_element in _build_category_elements(CATEGORY):
+        quiz.append(category_element)
 
     # Generate and add questions
     for i in range(question_count):
