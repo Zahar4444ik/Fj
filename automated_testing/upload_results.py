@@ -35,9 +35,12 @@ from core.config.settings_parse import USERNAME, PASSWORD, ASSIGNMENT_LINK, QUES
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-USERNAME        = USERNAME
-PASSWORD        = PASSWORD
-ASSIGNMENT_LINK = ASSIGNMENT_LINK
+# Settings from environment
+MOODLE_USERNAME = USERNAME
+MOODLE_PASSWORD = PASSWORD
+MOODLE_ASSIGNMENT_LINK = ASSIGNMENT_LINK
+
+
 STUDENT_GROUP   = "Všetci účastníci"
 QUESTION        = QUESTION_NUMBER
 
@@ -125,15 +128,49 @@ def create_driver() -> webdriver.Chrome:
 # ─────────────────────────── CORE STEPS ──────────────────────────────────────
 
 
+def _is_logged_in(driver: webdriver.Chrome) -> bool:
+    """Check if login succeeded by verifying we left the login page."""
+    url = driver.current_url
+    return "moodle.fei.tuke.sk" in url and "login" not in url
+
+
 def login(driver: webdriver.Chrome, wait: WebDriverWait) -> None:
     log.info("Logging in…")
+
+    # ── Attempt 1: SSO (KPI) login ───────────────────────────────────────────
+    try:
+        driver.get(
+            "https://sso.kpi.fei.tuke.sk/login"
+            "?service=https%3A%2F%2Fmoodle.fei.tuke.sk%2Flogin%2Findex.php%3FauthCAS%3DCAS"
+        )
+        wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
+        driver.find_element(By.ID, "username").send_keys(MOODLE_USERNAME)
+        driver.find_element(By.ID, "password").send_keys(MOODLE_PASSWORD)
+        driver.find_element(By.NAME, "submit").click()
+        wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
+
+        if _is_logged_in(driver):
+            log.info("Login successful (SSO).")
+            return
+        log.warning("SSO login failed — trying direct Moodle login…")
+    except Exception as exc:
+        log.warning("SSO login error (%s) — trying direct Moodle login…", exc)
+
+    # ── Attempt 2: direct Moodle login ───────────────────────────────────────
     driver.get("https://moodle.fei.tuke.sk/login/index.php")
     wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
-    driver.find_element(By.ID, "username").send_keys(USERNAME)
-    driver.find_element(By.ID, "password").send_keys(PASSWORD)
+
+    username_field = driver.find_element(By.ID, "username")
+    username_field.clear()
+    username_field.send_keys(MOODLE_USERNAME)
+    driver.find_element(By.ID, "password").send_keys(MOODLE_PASSWORD)
     driver.find_element(By.ID, "loginbtn").click()
     wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
-    log.info("Login complete.")
+
+    if _is_logged_in(driver):
+        log.info("Login successful (direct).")
+    else:
+        raise RuntimeError("Both login methods failed — check credentials or Moodle availability.")
 
 
 def open_attempts_page(driver: webdriver.Chrome, wait: WebDriverWait) -> int:

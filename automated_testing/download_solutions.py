@@ -41,9 +41,9 @@ MOODLE_PASSWORD = PASSWORD
 MOODLE_ASSIGNMENT_LINK = ASSIGNMENT_LINK
 
 # Local settings
-STUDENT_GROUP   = "Všetci účastníci"  # or e.g. "01 Pondelok 07:30 (Novotný)"
-QUESTION        = QUESTION_NUMBER                    # question number to download
-DOWNLOAD_PATH   = BASE_DIR / "downloads"
+STUDENT_GROUP = "Všetci účastníci"  # or e.g. "01 Pondelok 07:30 (Novotný)"
+QUESTION = QUESTION_NUMBER  # question number to download
+DOWNLOAD_PATH = BASE_DIR / "downloads"
 DOWNLOAD_PATH.mkdir(parents=True, exist_ok=True)
 
 DOWNLOAD_TIMEOUT = 30  # seconds to wait for a .zip to appear on disk
@@ -178,15 +178,49 @@ def create_driver() -> webdriver.Chrome:
 
 # ─────────────────────────── CORE STEPS ──────────────────────────────────────
 
+def _is_logged_in(driver: webdriver.Chrome) -> bool:
+    """Check if login succeeded by verifying we left the login page."""
+    url = driver.current_url
+    return "moodle.fei.tuke.sk" in url and "login" not in url
+
+
 def login(driver: webdriver.Chrome, wait: WebDriverWait) -> None:
     log.info("Logging in…")
+
+    # ── Attempt 1: SSO (KPI) login ───────────────────────────────────────────
+    try:
+        driver.get(
+            "https://sso.kpi.fei.tuke.sk/login"
+            "?service=https%3A%2F%2Fmoodle.fei.tuke.sk%2Flogin%2Findex.php%3FauthCAS%3DCAS"
+        )
+        wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
+        driver.find_element(By.ID, "username").send_keys(MOODLE_USERNAME)
+        driver.find_element(By.ID, "password").send_keys(MOODLE_PASSWORD)
+        driver.find_element(By.NAME, "submit").click()
+        wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
+
+        if _is_logged_in(driver):
+            log.info("Login successful (SSO).")
+            return
+        log.warning("SSO login failed — trying direct Moodle login…")
+    except Exception as exc:
+        log.warning("SSO login error (%s) — trying direct Moodle login…", exc)
+
+    # ── Attempt 2: direct Moodle login ───────────────────────────────────────
     driver.get("https://moodle.fei.tuke.sk/login/index.php")
     wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
-    driver.find_element(By.ID, "username").send_keys(MOODLE_USERNAME)
+
+    username_field = driver.find_element(By.ID, "username")
+    username_field.clear()
+    username_field.send_keys(MOODLE_USERNAME)
     driver.find_element(By.ID, "password").send_keys(MOODLE_PASSWORD)
     driver.find_element(By.ID, "loginbtn").click()
     wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
-    log.info("Login complete.")
+
+    if _is_logged_in(driver):
+        log.info("Login successful (direct).")
+    else:
+        raise RuntimeError("Both login methods failed — check credentials or Moodle availability.")
 
 
 def open_attempts_page(driver: webdriver.Chrome, wait: WebDriverWait) -> int:
@@ -226,7 +260,7 @@ def get_student_email(driver: webdriver.Chrome, wait: WebDriverWait, idx: int) -
 def open_attempt_detail(driver: webdriver.Chrome, wait: WebDriverWait, idx: int, parent: str) -> None:
     """Click the 'Zhodnotiť odpoveď' grading link and switch focus to the new window."""
 
-    wait.until(EC.element_to_be_clickable(( # HARDCODED FOR 2 solution
+    wait.until(EC.element_to_be_clickable((  # HARDCODED FOR 2 solution
         By.XPATH,
         f"//tbody/tr[@class='gradedattempt' or @class='']"
         f"[@id='mod-quiz-report-overview-report_r{idx}']"
@@ -280,11 +314,11 @@ def run() -> None:
     log.info("Loaded %d previously processed students from students.json.", len(students))
 
     driver = create_driver()
-    wait   = WebDriverWait(driver, 20)
+    wait = WebDriverWait(driver, 20)
 
     try:
         login(driver, wait)
-        total  = open_attempts_page(driver, wait)
+        total = open_attempts_page(driver, wait)
         parent = driver.current_window_handle
 
         for idx in range(total):
