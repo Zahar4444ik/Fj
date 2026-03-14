@@ -30,7 +30,7 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
-from core.config.settings_parse import USERNAME, PASSWORD, ASSIGNMENT_LINK, QUESTION_NUMBER
+from core.config.settings_parse import USERNAME, PASSWORD, ASSIGNMENT_LINK, QUESTION_NUMBER, ASSIGNMENT_MAX_POINTS
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -250,7 +250,7 @@ def submit_grade(driver: webdriver.Chrome, wait: WebDriverWait, score: float) ->
         By.XPATH, f"{q_xpath}//div[@class='felement ftext']/input[1]"
     )))
 
-    grade_value = str(score/10)
+    grade_value = str(round((score * ASSIGNMENT_MAX_POINTS)/100, 2))
 
     grade_input.clear()
     grade_input.send_keys(grade_value)
@@ -309,6 +309,7 @@ def upload_student(
     try:
         paste_report_comment(driver, wait, report_text)
         submit_grade(driver, wait, score)
+        time.sleep(0.2)
         uploaded = True
         log.info("  ✔ Uploaded")
     except (TimeoutException, NoSuchElementException) as exc:

@@ -50,6 +50,9 @@ def _validate_evaluation_settings():
         errors.append("TITLE must be a non-empty string")
 
     # Test configuration validation
+    if ASSIGNMENT_MAX_POINTS <= 0:
+        errors.append("ASSIGNMENT_MAX_POINTS must be > 0")
+
     if TEST_WORDS_COUNT <= 0:
         errors.append("TEST_WORDS_COUNT must be > 0")
 

@@ -24,6 +24,8 @@ NUMBER_OF_QUESTIONS = int(os.getenv("NUMBER_OF_QUESTIONS", "0"))
 
 TITLE = os.getenv("REPORT_TITLE", "Unnamed Test")
 
+ASSIGNMENT_MAX_POINTS = int(os.getenv("ASSIGNMENT_MAX_POINTS", "0"))
+
 TEST_WORDS_COUNT = int(os.getenv("TEST_WORDS_COUNT", "0"))
 
 BAD_WORD_RATIO_LEVEL = float(os.getenv("BAD_WORD_RATIO_LEVEL", "0.0"))
