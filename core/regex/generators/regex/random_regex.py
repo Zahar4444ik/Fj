@@ -68,7 +68,7 @@ def contains_wrapper(node) -> bool:
     return False
 
 
-def generate_ast(depth: int = 0, max_depth: int = 3):
+def generate_ast(depth: int = 0, max_depth: int = 3, alphabet: list[str] = None):
     """
     Recursively build a random regex AST up to max_depth.
 
@@ -79,11 +79,12 @@ def generate_ast(depth: int = 0, max_depth: int = 3):
       - Union must have at least one non-atomic child (prevents a|b at depth limit)
       - Concat must not have two Union children (prevents ambiguous rendering)
     """
-    if depth >= max_depth:
-        return Symbol(random.choice(ALPHABET))
+    if alphabet is None:
+        alphabet = ALPHABET
 
-    # star/optional/union with constraints need room to generate a non-atomic
-    # child, so they are only offered when another depth level is available.
+    if depth >= max_depth:
+        return Symbol(random.choice(alphabet))
+
     can_nest = depth + 1 < max_depth
     choices = ["concat", "symbol"]
     if can_nest:
@@ -93,63 +94,103 @@ def generate_ast(depth: int = 0, max_depth: int = 3):
 
     choice = random.choice(choices)
 
+    # helper to recurse with the same alphabet
+    def recurse(d=None):
+        return generate_ast(depth + 1, max_depth, alphabet)
+
     if choice == "symbol":
-        return Symbol(random.choice(ALPHABET))
+        return Symbol(random.choice(alphabet))
 
     if choice == "star":
-        inner = generate_ast(depth + 1, max_depth)
+        inner = recurse()
         while is_atomic(inner) or contains_wrapper(inner):
-            inner = generate_ast(depth + 1, max_depth)
+            inner = recurse()
         return Star(inner)
 
     if choice == "optional":
-        inner = generate_ast(depth + 1, max_depth)
+        inner = recurse()
         while is_atomic(inner) or contains_wrapper(inner):
-            inner = generate_ast(depth + 1, max_depth)
+            inner = recurse()
         return Optional(inner)
 
     if choice == "union":
-        left = generate_ast(depth + 1, max_depth)
-        right = generate_ast(depth + 1, max_depth)
+        left, right = recurse(), recurse()
         while (is_atomic(left) and is_atomic(right)) \
                 or isinstance(left, Union) or isinstance(right, Union):
-            left = generate_ast(depth + 1, max_depth)
-            right = generate_ast(depth + 1, max_depth)
+            left, right = recurse(), recurse()
         return Union(left, right)
 
     if choice == "union_unconstrained":
-        # At max_depth all children are symbols — the non-atomic constraint
-        # cannot be satisfied, so we skip it and just prevent Union-of-Union.
-        left = generate_ast(depth + 1, max_depth)
-        right = generate_ast(depth + 1, max_depth)
-        return Union(left, right)
+        return Union(recurse(), recurse())
 
     if choice == "concat":
-        left = generate_ast(depth + 1, max_depth)
-        right = generate_ast(depth + 1, max_depth)
-        # Two Union children would require parentheses inside {} / [] wrappers.
+        left, right = recurse(), recurse()
         while isinstance(left, Union) and isinstance(right, Union):
-            left = generate_ast(depth + 1, max_depth)
-            right = generate_ast(depth + 1, max_depth)
+            left, right = recurse(), recurse()
         return Concat(left, right)
 
     raise ValueError(f"Unexpected choice: {choice!r}")
 
 
+def has_duplicate_union_children(node) -> bool:
+    """Return True if any Union has two identical children."""
+    if isinstance(node, Union):
+        if to_regex(node.left) == to_regex(node.right):
+            return True
+        return has_duplicate_union_children(node.left) or has_duplicate_union_children(node.right)
+    if isinstance(node, (Star, Optional)):
+        return has_duplicate_union_children(node.inner)
+    if isinstance(node, Concat):
+        return has_duplicate_union_children(node.left) or has_duplicate_union_children(node.right)
+    return False
+
+
+def has_redundant_wrapper_pair(node) -> bool:
+    """Return True if a Union has one Star and one Optional over the same inner expression."""
+    if isinstance(node, Union):
+        l, r = node.left, node.right
+        if isinstance(l, (Star, Optional)) and isinstance(r, (Star, Optional)):
+            if to_regex(l.inner) == to_regex(r.inner):
+                return True
+        return has_redundant_wrapper_pair(l) or has_redundant_wrapper_pair(r)
+    if isinstance(node, (Star, Optional)):
+        return has_redundant_wrapper_pair(node.inner)
+    if isinstance(node, Concat):
+        return has_redundant_wrapper_pair(node.left) or has_redundant_wrapper_pair(node.right)
+    return False
+
+
 def is_structurally_valid(node) -> bool:
-    """Reject trivially simple ASTs that would make poor assignments."""
     return (
         count_stars(node) >= 1
         and count_unions(node) >= 1
         and count_nodes(node) >= 5
+        and not has_duplicate_union_children(node)
+        and not has_redundant_wrapper_pair(node)
     )
 
 
+def get_used_symbols(node) -> set[str]:
+    if isinstance(node, Symbol):
+        return {node.value}
+    if isinstance(node, (Star, Optional)):
+        return get_used_symbols(node.inner)
+    if isinstance(node, (Union, Concat)):
+        return get_used_symbols(node.left) | get_used_symbols(node.right)
+    return set()
+
+
 def generate_valid_ast(max_depth: int = 3):
-    """Keep generating until a structurally non-trivial AST is produced."""
+    """ Pick a small random subset of the alphabet for this regex """
+    subset_size = random.choice([i for i in range(REGEX_MIN_STATES_COUNT-1, REGEX_MAX_STATES_COUNT)])
+    local_alphabet = random.sample(ALPHABET, subset_size)
+
     while True:
-        ast = generate_ast(max_depth=max_depth)
-        if is_structurally_valid(ast):
+        ast = generate_ast(max_depth=max_depth, alphabet=local_alphabet)
+        if (
+                is_structurally_valid(ast)
+                and get_used_symbols(ast) == set(local_alphabet)  # ← all symbols must appear
+        ):
             return ast
 
 
@@ -197,7 +238,12 @@ def to_regex(node, parent_prec: int = 0) -> str:
 
 
 def generate_valid_regex(max_depth: int = 3) -> str:
-    return to_regex(generate_valid_ast(max_depth=max_depth))
+    good_length = False
+    while not good_length:
+        generated_regex = to_regex(generate_valid_ast(max_depth=max_depth))
+        if REGEX_MIN_STATES_COUNT*2 <= len(generated_regex) <= REGEX_MAX_STATES_COUNT*3:
+            good_length = True
+    return generated_regex
 
 
 # ---------------------------------------------------------------------------
@@ -244,6 +290,6 @@ def generate_assignment_regexes(
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    for regex in generate_assignment_regexes(count=20, min_states=3, max_states=4):
+    for regex in generate_assignment_regexes(count=20, min_states=4, max_states=4):
         automaton = build_DKA(get_ast_from_regex(regex), regex)
         print(f"{regex:<30} ->  {len(automaton.name_map)} states")
