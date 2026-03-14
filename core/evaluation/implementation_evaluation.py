@@ -73,7 +73,6 @@ IMPLEMENTATION_CONFIG = {
         "module_name": "dka_iterative",
         "student_module_name": "automaton",
         "static_check": [check_no_recursion, check_imports],
-        "static_error_reason": "use of recursion",
         "generate": generate_iterative_dka,
         "get_check_fn": lambda mod, _: mod.DFA().check,
     },
@@ -83,7 +82,6 @@ IMPLEMENTATION_CONFIG = {
         "module_name": "dka_recursive",
         "student_module_name": "automaton",
         "static_check": [check_no_iteration, check_imports],
-        "static_error_reason": "use of iteration",
         "generate": generate_recursive_dka,
         "get_check_fn": _get_recursive_check_fn,
     },
@@ -93,7 +91,6 @@ IMPLEMENTATION_CONFIG = {
         "module_name": "nka_iterative",
         "student_module_name": "automaton",
         "static_check": [check_no_recursion, check_imports],
-        "static_error_reason": "use of recursion",
         "generate": generate_iterative_nka,
         "get_check_fn": lambda mod, _: mod.NFA().check,
     },
@@ -103,7 +100,6 @@ IMPLEMENTATION_CONFIG = {
         "module_name": "nka_recursive",
         "student_module_name": "automaton",
         "static_check": [check_no_iteration, check_imports],
-        "static_error_reason": "use of iteration",
         "generate": generate_recursive_nka,
         "get_check_fn": _get_recursive_check_fn,
     },
@@ -211,7 +207,7 @@ def _add_to_report(report: AssignmentReport, cfg: dict, variant: str, static_pas
     report.subsection(f"2.1 Static Analysis: {'PASSED' if static_passed else 'FAILED'}")
 
     if not static_passed:
-        report.add_info(f"Skipping behavioral testing due to {cfg['static_error_reason']}.")
+        report.add_info(f"Skipping behavioral testing due to:")
         for err in static_errors:
             report.add_info(err)
         return
