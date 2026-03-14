@@ -14,7 +14,6 @@ from core.config.settings_parse import DKA_IMPLEMENTATION, NKA_IMPLEMENTATION, T
     GROUP_SIZE
 from core.evaluation.report import AssignmentReport
 from core.evaluation.utils.difference_print import format_acceptance_diff
-from core.evaluation.utils.helpers import split_into_groups
 from testing.task2_behavioral_testing.checker.check_imports import check_imports
 from testing.task2_behavioral_testing.checker.utils import check_no_iteration, check_no_recursion
 from testing.task2_behavioral_testing.generator.dka.iterative import generate_iterative_dka
@@ -105,6 +104,7 @@ IMPLEMENTATION_CONFIG = {
     },
 }
 
+
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
@@ -142,30 +142,55 @@ def _get_check_functions(cfg: dict, variant: str, work_dir: str, reference_mod, 
     return reference_fn, student_fn
 
 
-def _generate_test_words(ast: dict) -> list[str]:
-    """Generate test words based on configuration."""
-    total = TEST_WORDS_COUNT
-    ratio = BAD_WORD_RATIO_LEVEL
-    rejected_count = int(total * ratio)
-    accepted_count = total - rejected_count
+def _create_groups(ast: dict) -> list[list[str]]:
+    """
+    Generate all words upfront to avoid repeats, then split into groups
+    while preserving the bad word ratio per group.
+    """
+    full_groups, remainder = divmod(TEST_WORDS_COUNT, GROUP_SIZE)
+    group_sizes = [GROUP_SIZE] * full_groups + ([remainder] if remainder else [])
 
-    words = []
-    words.extend(generate_accepted_words(ast, count=accepted_count, max_iterations=5))
-    words.extend(generate_rejected_words(ast, count=rejected_count))
-    words.sort(key=lambda w: (len(w), w))
+    # Calculate total accepted/rejected across all groups
+    total_rejected = sum(int(size * BAD_WORD_RATIO_LEVEL) for size in group_sizes)
+    total_accepted = TEST_WORDS_COUNT - total_rejected
 
-    logger.debug(f"Generated {len(words)} test words: {accepted_count} accepted, {rejected_count} rejected")
-    return words
+    # Generate full pools upfront — no repeats
+    accepted_pool = generate_accepted_words(ast, count=total_accepted, max_iterations=5)
+    accepted_pool.sort(key=lambda w: (len(w), w))
+    rejected_pool = generate_rejected_words(ast, count=total_rejected)
+    accepted_pool.sort(key=lambda w: (len(w), w))
+
+    logger.info("Word pool: %d accepted, %d rejected", len(accepted_pool), len(rejected_pool))
+
+    # Split pools into groups respecting ratio, sort each group by length
+    groups = []
+    acc_idx = rej_idx = 0
+
+    for size in group_sizes:
+        rejected = int(size * BAD_WORD_RATIO_LEVEL)
+        accepted = size - rejected
+
+        group = (
+            accepted_pool[acc_idx : acc_idx + accepted] +
+            rejected_pool[rej_idx : rej_idx + rejected]
+        )
+        group.sort(key=lambda w: (len(w), w))
+        groups.append(group)
+
+        acc_idx += accepted
+        rej_idx += rejected
+
+    return groups
 
 
-def _run_group_tests(words: list[str], reference_fn, student_fn, impl_points: int) -> tuple[list[dict], float]:
+def _run_group_tests(reference_fn, student_fn, impl_points: int, ast: dict) -> tuple[list[dict], float]:
     """
     Run behavioral testing on groups of words.
 
     Returns:
         (group_results, total_score)
     """
-    groups = split_into_groups(words, GROUP_SIZE)
+    groups = _create_groups(ast)
     points_per_group = float(impl_points / len(groups))
 
     results = []
@@ -278,8 +303,7 @@ def evaluate_implementation(
 
         reference_fn, student_fn = _get_check_functions(cfg, variant, work_dir, reference, student)
 
-        words = _generate_test_words(ast)
-        group_results, score = _run_group_tests(words, reference_fn, student_fn, impl_points)
+        group_results, score = _run_group_tests(reference_fn, student_fn, impl_points, ast)
 
         report.increase_score(score)
 
@@ -288,6 +312,3 @@ def evaluate_implementation(
 
     logger.info(f"Implementation evaluation for {automaton_type} {variant} complete: {score} points")
     return score
-
-
-

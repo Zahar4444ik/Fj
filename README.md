@@ -137,7 +137,8 @@ QUESTION_NUMBER=1
 ### Question Generation
 ```env
 QUIZ_CATEGORY="test_generated_assignments"
-QUIZ_TITLE="FSA Credit Test A"
+REPORT_TITLE="FSA Credit Test A"
+ASSIGNMENT_MAX_POINTS=7
 NUMBER_OF_QUESTIONS=30
 ```
 
@@ -348,33 +349,6 @@ echo ".env" >> .gitignore
 - Ensure output directories have appropriate permissions
 - Don't share evaluation results publicly
 - Keep student data private
-
----
-
-## 📊 Evaluation Scoring
-
-### DFA Evaluation (Total: 100 points)
-
-| Component | Points | Criteria |
-|-----------|--------|----------|
-| FSA Isomorphism | 30 | Automaton matches regex semantics correctly |
-| FSA Annotations | 10 | State labels are correct and match specification |
-| Implementation | 60 | Code passes all behavioral test cases |
-
-### NFA Evaluation (Total: 100 points)
-
-| Component | Points | Criteria |
-|-----------|--------|----------|
-| FSA Isomorphism | 30 | Automaton matches regex semantics correctly |
-| Implementation | 70 | Code passes all behavioral test cases |
-
-### Test Groups
-
-- Students' code is tested on `GROUP_SIZE` groups of words
-- Each group has acceptance/rejection word mix
-- Ratio controlled by `BAD_WORD_RATIO_LEVEL` (e.g., 0.2 = 20% rejection, 80% acceptance)
-- Points distributed equally across groups
-- Each group either passes completely or fails
 
 ---
 
