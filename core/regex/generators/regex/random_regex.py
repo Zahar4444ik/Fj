@@ -1,6 +1,7 @@
 import random
 
-from core.config.settings_parse import REGEX_MIN_STATES_COUNT, REGEX_MAX_STATES_COUNT
+from core.config.settings_parse import REGEX_MIN_STATES_COUNT, REGEX_MAX_STATES_COUNT, MAX_ALPHABET_SIZE, \
+    MIN_ALPHABET_SIZE
 from core.regex.frontend.syntax import ALPHABET
 from core.regex.frontend.helper import get_ast_from_regex
 from core.regex.automata.dka.dka_builder import build_DKA
@@ -182,7 +183,7 @@ def get_used_symbols(node) -> set[str]:
 
 def generate_valid_ast(max_depth: int = 3):
     """ Pick a small random subset of the alphabet for this regex """
-    subset_size = random.choice([i for i in range(REGEX_MIN_STATES_COUNT-1, REGEX_MAX_STATES_COUNT)])
+    subset_size = random.randint(MIN_ALPHABET_SIZE, MAX_ALPHABET_SIZE)
     local_alphabet = random.sample(ALPHABET, subset_size)
 
     while True:

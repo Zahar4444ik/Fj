@@ -38,6 +38,49 @@ def _validate_generation_settings():
     if NUMBER_OF_QUESTIONS <= 0:
         errors.append("NUMBER_OF_QUESTIONS must be > 0")
 
+    # Regex difficulty validation
+    if REGEX_MIN_STATES_COUNT < 1:
+        errors.append("REGEX_MIN_STATES_COUNT must be >= 1")
+
+    if REGEX_MAX_STATES_COUNT < 1:
+        errors.append("REGEX_MAX_STATES_COUNT must be >= 1")
+
+    if not isinstance(REGEX_MIN_STATES_COUNT, int):
+        errors.append("REGEX_MIN_STATES_COUNT must be an integer")
+
+    if not isinstance(REGEX_MAX_STATES_COUNT, int):
+        errors.append("REGEX_MAX_STATES_COUNT must be an integer")
+
+    if REGEX_MIN_STATES_COUNT > REGEX_MAX_STATES_COUNT:
+        errors.append(
+            f"REGEX_MIN_STATES_COUNT ({REGEX_MIN_STATES_COUNT}) must be <= "
+            f"REGEX_MAX_STATES_COUNT ({REGEX_MAX_STATES_COUNT})"
+        )
+
+    if not AUTOMATON_TYPE or not isinstance(AUTOMATON_TYPE, str):
+        errors.append("CATEGORY must be a non-empty string")
+
+    if AUTOMATON_TYPE not in ["dfa", "nfa", "any"]:
+        errors.append('AUTOMATON_TYPE can only be "dfa", "nfa", "any"')
+
+    if not IMPLEMENTATION_TYPE or not isinstance(IMPLEMENTATION_TYPE, str):
+        errors.append("IMPLEMENTATION_TYPE must be a non-empty string")
+
+    if IMPLEMENTATION_TYPE not in ["iterative", "recursive", "any"]:
+        errors.append('IMPLEMENTATION_TYPE can only be "iterative", "recursive", "any"')
+
+    if not isinstance(MAX_ALPHABET_SIZE, int) or MAX_ALPHABET_SIZE < 1:
+        errors.append("MAX_ALPHABET_SIZE must be a positive integer")
+
+    if not isinstance(MIN_ALPHABET_SIZE, int) or MIN_ALPHABET_SIZE < 1:
+        errors.append("MIN_ALPHABET_SIZE must be a positive integer")
+
+    if MIN_ALPHABET_SIZE > MAX_ALPHABET_SIZE:
+        errors.append(
+            f"MIN_ALPHABET_SIZE ({MIN_ALPHABET_SIZE}) must be <= "
+            f"MAX_ALPHABET_SIZE ({MAX_ALPHABET_SIZE})"
+        )
+
     return errors
 
 
@@ -70,25 +113,6 @@ def _validate_evaluation_settings():
 
     if not isinstance(GROUP_SIZE, int):
         errors.append("GROUP_SIZE must be an integer")
-
-    # Regex difficulty validation
-    if REGEX_MIN_STATES_COUNT < 1:
-        errors.append("REGEX_MIN_STATES_COUNT must be >= 1")
-
-    if REGEX_MAX_STATES_COUNT < 1:
-        errors.append("REGEX_MAX_STATES_COUNT must be >= 1")
-
-    if not isinstance(REGEX_MIN_STATES_COUNT, int):
-        errors.append("REGEX_MIN_STATES_COUNT must be an integer")
-
-    if not isinstance(REGEX_MAX_STATES_COUNT, int):
-        errors.append("REGEX_MAX_STATES_COUNT must be an integer")
-
-    if REGEX_MIN_STATES_COUNT > REGEX_MAX_STATES_COUNT:
-        errors.append(
-            f"REGEX_MIN_STATES_COUNT ({REGEX_MIN_STATES_COUNT}) must be <= "
-            f"REGEX_MAX_STATES_COUNT ({REGEX_MAX_STATES_COUNT})"
-        )
 
     # DKA scoring validation
     errors.extend(_validate_dka_scoring())

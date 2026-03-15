@@ -1,20 +1,28 @@
 import random
 
+from core.config.settings_parse import AUTOMATON_TYPE, IMPLEMENTATION_TYPE
 from core.regex.generators.regex.random_regex import generate_regex_with_state_count
 
 
 def generate_assignment_variables(seed=None):
     random.seed(seed)
 
-    automaton_type = random.choice(["nfa", "dfa"])
-    implementation = random.choice(["iterative", "recursive"])
+    if AUTOMATON_TYPE == "any":
+        automaton_type = random.choice(["nfa", "dfa"])
+    else:
+        automaton_type = AUTOMATON_TYPE
+
+    if IMPLEMENTATION_TYPE == "any":
+        implementation_type = random.choice(["iterative", "recursive"])
+    else:
+        implementation_type = IMPLEMENTATION_TYPE
 
     regex = generate_regex_with_state_count()
 
     assignment = {
         "regex": regex,
         "automaton_type": automaton_type,
-        "implementation": implementation,
+        "implementation": implementation_type,
     }
 
     return assignment

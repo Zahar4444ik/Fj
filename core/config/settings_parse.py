@@ -18,6 +18,16 @@ CATEGORY = os.getenv("QUIZ_CATEGORY", "default")
 
 NUMBER_OF_QUESTIONS = int(os.getenv("NUMBER_OF_QUESTIONS", "0"))
 
+REGEX_MIN_STATES_COUNT = int(os.getenv("REGEX_MIN_STATES_COUNT", "1"))
+REGEX_MAX_STATES_COUNT = int(os.getenv("REGEX_MAX_STATES_COUNT", "1"))
+
+AUTOMATON_TYPE = os.getenv("AUTOMATON_TYPE", "")
+
+IMPLEMENTATION_TYPE = os.getenv("IMPLEMENTATION_TYPE", "")
+
+MAX_ALPHABET_SIZE = int(os.getenv("MAX_ALPHABET_SIZE", "0"))
+MIN_ALPHABET_SIZE = int(os.getenv("MIN_ALPHABET_SIZE", "0"))
+
 # -------------------------------------------------------------------------------
 # QUESTION PROPERTIES & EVALUATION SETTINGS
 # -------------------------------------------------------------------------------
@@ -31,9 +41,6 @@ TEST_WORDS_COUNT = int(os.getenv("TEST_WORDS_COUNT", "0"))
 BAD_WORD_RATIO_LEVEL = float(os.getenv("BAD_WORD_RATIO_LEVEL", "0.0"))
 
 GROUP_SIZE = int(os.getenv("GROUP_SIZE", "0"))
-
-REGEX_MIN_STATES_COUNT = int(os.getenv("REGEX_MIN_STATES_COUNT", "1"))
-REGEX_MAX_STATES_COUNT = int(os.getenv("REGEX_MAX_STATES_COUNT", "1"))
 
 # System constant
 TOTAL_SCORE = 100
