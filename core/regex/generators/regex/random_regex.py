@@ -1,7 +1,9 @@
 import random
+import time
 
-from core.config.settings_parse import REGEX_MIN_STATES_COUNT, REGEX_MAX_STATES_COUNT, MAX_ALPHABET_SIZE, \
-    MIN_ALPHABET_SIZE
+from core.config.settings_parse import MAX_ALPHABET_SIZE, \
+    MIN_ALPHABET_SIZE, DFA_MIN_STATES_COUNT, DFA_MAX_STATES_COUNT, NFA_MIN_STATES_COUNT, NFA_MAX_STATES_COUNT
+from core.regex.automata.nka.nka_builder import build_NKA, count_nka_states
 from core.regex.frontend.syntax import ALPHABET
 from core.regex.frontend.helper import get_ast_from_regex
 from core.regex.automata.dka.dka_builder import build_DKA
@@ -11,48 +13,64 @@ from core.regex.generators.regex.ast_nodes import (
 )
 
 # ---------------------------------------------------------------------------
-# Empirical depth → DFA state count mapping (p25, p75 from profiling).
+# Empirical depth → state count mapping (p25, p75 from profiling).
+# Separate tables for DFA and NFA because they grow differently.
 #
+# DFA:
 #   depth=3  →  2–4  states
 #   depth=4  →  4–6  states
 #   depth=5  →  5–8  states
 #   depth=6  →  6–11 states
 #
-# Used to pre-select a sensible generation depth before the rejection sampler
-# does fine-grained filtering. Re-run profile_depth_states.py after any major
-# change to generation logic and update this table accordingly.
+# NFA (grows faster):
+#   depth=3  →  3–6  states
+#   depth=4  →  5–12 states
+#   depth=5  →  8–20 states
+#   depth=6  →  12–30 states
+#
+# Format: (min_states, max_states, depth)
 # ---------------------------------------------------------------------------
-_DEPTH_STATE_TABLE: list[tuple[int, int, int]] = [
+_DFA_DEPTH_TABLE: list[tuple[int, int, int]] = [
     (2,  4,  3),
     (4,  6,  4),
     (5,  8,  5),
     (6, 11,  6),
 ]
 
+_NFA_DEPTH_TABLE: list[tuple[int, int, int]] = [
+    (3,  6,  3),
+    (5, 12,  4),
+    (8, 20,  5),
+    (12, 30, 6),
+]
+
+# Maximum time to spend trying to generate a single regex (seconds)
+_GENERATION_TIMEOUT = 5.0
+
 
 # ---------------------------------------------------------------------------
 # Depth selection
 # ---------------------------------------------------------------------------
 
-def pick_depths_for_state_range(min_states: int, max_states: int) -> list[int]:
+def pick_depths_for_state_range(min_states: int, max_states: int, automaton_type: str = "dfa") -> list[int]:
     """
-    Return every depth whose empirical p25-p75 state range overlaps
-    [min_states, max_states]. Using multiple candidate depths keeps structural
-    variety high and reduces rejection-sampler retries.
+    Return every depth whose empirical state range overlaps [min_states, max_states].
+    Uses separate tables for DFA and NFA since they grow differently.
 
-    Falls back to the shallowest depth if the target is below the profiled
-    range, or the deepest if it is above.
+    Falls back to the deepest available depth if no overlap is found.
     """
+    table = _DFA_DEPTH_TABLE if automaton_type == "dfa" else _NFA_DEPTH_TABLE
+
     candidates = [
         depth
-        for lo, hi, depth in _DEPTH_STATE_TABLE
+        for lo, hi, depth in table
         if lo <= max_states and hi >= min_states
     ]
+
     if not candidates:
-        candidates = [
-            _DEPTH_STATE_TABLE[0][2] if max_states < _DEPTH_STATE_TABLE[0][0]
-            else _DEPTH_STATE_TABLE[-1][2]
-        ]
+        # Fallback: use deepest depth
+        candidates = [table[-1][2]]
+
     return candidates
 
 
@@ -238,12 +256,14 @@ def to_regex(node, parent_prec: int = 0) -> str:
     raise TypeError(f"Unknown node type: {type(node)}")
 
 
-def generate_valid_regex(max_depth: int = 3) -> str:
-    good_length = False
+def generate_valid_regex(max_depth: int = 3, automaton_type: str = "nfa") -> str:
+    good_length = True if automaton_type == "nfa" else False
+    generated_regex = to_regex(generate_valid_ast(max_depth=max_depth))
     while not good_length:
         generated_regex = to_regex(generate_valid_ast(max_depth=max_depth))
-        if REGEX_MIN_STATES_COUNT*2 <= len(generated_regex) <= REGEX_MAX_STATES_COUNT*3:
+        if DFA_MIN_STATES_COUNT*2 <= len(generated_regex) <= DFA_MAX_STATES_COUNT*3:
             good_length = True
+
     return generated_regex
 
 
@@ -251,39 +271,62 @@ def generate_valid_regex(max_depth: int = 3) -> str:
 # Public API
 # ---------------------------------------------------------------------------
 
-def generate_regex_with_state_count(
-    min_states: int = REGEX_MIN_STATES_COUNT,
-    max_states: int = REGEX_MAX_STATES_COUNT,
-) -> str:
+def generate_regex_with_state_count(automaton_type: str) -> str:
     """
-    Generate a regex whose minimal DFA has a state count in [min_states, max_states].
+    Generate a regex whose state count matches the target range for the automaton type.
 
     Strategy:
-      1. Pre-select candidate depths from the empirical table so most generated
-         regexes are already close to the target state count.
-      2. Build the DFA and accept only if the state count is in range;
-         otherwise retry (rejection sampling).
-    """
-    candidate_depths = pick_depths_for_state_range(min_states, max_states)
+      1. Pre-select candidate depths from the appropriate empirical table (DFA or NFA)
+      2. Build the automaton and accept only if the state count is in range
+      3. Timeout after _GENERATION_TIMEOUT seconds to prevent infinite loops
 
-    while True:
+    Args:
+        automaton_type: Either "dfa" or "nfa"
+
+    Returns:
+        A regex string matching the state count requirements
+
+    Raises:
+        TimeoutError: If generation takes longer than _GENERATION_TIMEOUT seconds
+    """
+
+    if automaton_type == "dfa":
+        min_states = DFA_MIN_STATES_COUNT
+        max_states = DFA_MAX_STATES_COUNT
+    elif automaton_type == "nfa":
+        min_states = NFA_MIN_STATES_COUNT
+        max_states = NFA_MAX_STATES_COUNT
+    else:
+        raise ValueError(f"Unknown automaton type: {automaton_type}")
+
+    candidate_depths = pick_depths_for_state_range(min_states, max_states, automaton_type)
+    start_time = time.time()
+
+    while time.time() - start_time < _GENERATION_TIMEOUT:
         max_depth = random.choice(candidate_depths)
-        regex = generate_valid_regex(max_depth=max_depth)
+        regex = generate_valid_regex(max_depth=max_depth, automaton_type=automaton_type)
+
         try:
-            automaton = build_DKA(get_ast_from_regex(regex), regex)
-            if min_states <= len(automaton.name_map) <= max_states:
-                return regex
+            ast = get_ast_from_regex(regex)
+
+            if automaton_type == "dfa":
+                automaton = build_DKA(ast, regex)
+                if min_states <= len(automaton.name_map) <= max_states:
+                    return regex
+
+            elif automaton_type == "nfa":
+                automaton = build_NKA(ast)
+                if min_states <= count_nka_states(automaton) <= max_states:
+                    return regex
         except Exception:
             continue
 
-
-def generate_assignment_regexes(
-    count: int,
-    min_states: int = REGEX_MIN_STATES_COUNT,
-    max_states: int = REGEX_MAX_STATES_COUNT,
-) -> list[str]:
-    """Generate `count` regexes each satisfying the given state count range."""
-    return [generate_regex_with_state_count(min_states, max_states) for _ in range(count)]
+    # Timeout reached
+    raise TimeoutError(
+        f"Failed to generate {automaton_type.upper()} regex with {min_states}-{max_states} states "
+        f"within {_GENERATION_TIMEOUT} seconds. "
+        f"Check env vars DFA/NFA_MIN/MAX_STATES_COUNT are reasonable."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -291,6 +334,12 @@ def generate_assignment_regexes(
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    for regex in generate_assignment_regexes(count=20, min_states=4, max_states=4):
-        automaton = build_DKA(get_ast_from_regex(regex), regex)
-        print(f"{regex:<30} ->  {len(automaton.name_map)} states")
+    automaton_type = "dfa"
+    for regex in [generate_regex_with_state_count(automaton_type) for _ in range(20)]:
+        if automaton_type == "dfa":
+            automaton = build_DKA(get_ast_from_regex(regex), regex)
+            count = len(automaton.name_map)
+        else:
+            automaton = build_NKA(get_ast_from_regex(regex))
+            count = count_nka_states(automaton)
+        print(f"{regex:<30} ->  {count} states")

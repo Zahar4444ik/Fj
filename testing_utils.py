@@ -6,12 +6,11 @@ Simple functions for generating FSA and automata files from regex patterns.
 
 from pathlib import Path
 
-from core.config.settings_parse import REGEX_MIN_STATES_COUNT, REGEX_MAX_STATES_COUNT
 from core.regex.frontend.helper import get_ast_from_regex
 from core.regex.automata.dka.dka_builder import build_DKA
-from core.regex.automata.nka.nka_builder import build_NKA
+from core.regex.automata.nka.nka_builder import build_NKA, count_nka_states
 from core.regex.generators.fsa.fsa_generator import fsa_from_dka, fsa_from_nka
-from core.regex.generators.regex.random_regex import generate_assignment_regexes
+from core.regex.generators.regex.random_regex import generate_regex_with_state_count
 from testing.task2_behavioral_testing.generator.dka.iterative import generate_iterative_dka
 from testing.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
 from testing.task2_behavioral_testing.generator.nka.iterative import generate_iterative_nka
@@ -97,7 +96,12 @@ if __name__ == "__main__":
     """GENERATE RANDOM REGEXES"""
 
     COUNT = 10
-
-    for regex in generate_assignment_regexes(count=COUNT, min_states=REGEX_MIN_STATES_COUNT, max_states=REGEX_MAX_STATES_COUNT):
-        automaton = build_DKA(get_ast_from_regex(regex), regex)
-        print(f"{regex:<30} ->  {len(automaton.name_map)} states")
+    automaton_type = "nfa"
+    for regex in [generate_regex_with_state_count(automaton_type) for _ in range(20)]:
+        if automaton_type == "dfa":
+            automaton = build_DKA(get_ast_from_regex(regex), regex)
+            count = len(automaton.name_map)
+        else:
+            automaton = build_NKA(get_ast_from_regex(regex))
+            count = count_nka_states(automaton)
+        print(f"{regex:<30} ->  {count} states")

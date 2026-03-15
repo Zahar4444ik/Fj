@@ -17,7 +17,7 @@ def generate_assignment_variables(seed=None):
     else:
         implementation_type = IMPLEMENTATION_TYPE
 
-    regex = generate_regex_with_state_count()
+    regex = generate_regex_with_state_count(automaton_type)
 
     assignment = {
         "regex": regex,

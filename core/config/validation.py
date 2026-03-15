@@ -39,22 +39,40 @@ def _validate_generation_settings():
         errors.append("NUMBER_OF_QUESTIONS must be > 0")
 
     # Regex difficulty validation
-    if REGEX_MIN_STATES_COUNT < 1:
-        errors.append("REGEX_MIN_STATES_COUNT must be >= 1")
+    if DFA_MIN_STATES_COUNT < 1:
+        errors.append("DFA_MIN_STATES_COUNT must be >= 1")
 
-    if REGEX_MAX_STATES_COUNT < 1:
-        errors.append("REGEX_MAX_STATES_COUNT must be >= 1")
+    if DFA_MAX_STATES_COUNT < 1:
+        errors.append("DFA_MAX_STATES_COUNT must be >= 1")
 
-    if not isinstance(REGEX_MIN_STATES_COUNT, int):
-        errors.append("REGEX_MIN_STATES_COUNT must be an integer")
+    if not isinstance(DFA_MIN_STATES_COUNT, int):
+        errors.append("DFA_MIN_STATES_COUNT must be an integer")
 
-    if not isinstance(REGEX_MAX_STATES_COUNT, int):
-        errors.append("REGEX_MAX_STATES_COUNT must be an integer")
+    if not isinstance(DFA_MAX_STATES_COUNT, int):
+        errors.append("DFA_MAX_STATES_COUNT must be an integer")
 
-    if REGEX_MIN_STATES_COUNT > REGEX_MAX_STATES_COUNT:
+    if DFA_MIN_STATES_COUNT > DFA_MAX_STATES_COUNT:
         errors.append(
-            f"REGEX_MIN_STATES_COUNT ({REGEX_MIN_STATES_COUNT}) must be <= "
-            f"REGEX_MAX_STATES_COUNT ({REGEX_MAX_STATES_COUNT})"
+            f"DFA_MIN_STATES_COUNT ({DFA_MIN_STATES_COUNT}) must be <= "
+            f"DFA_MAX_STATES_COUNT ({DFA_MAX_STATES_COUNT})"
+        )
+
+    if NFA_MIN_STATES_COUNT < 1:
+        errors.append("NFA_MIN_STATES_COUNT must be >= 1")
+
+    if NFA_MAX_STATES_COUNT < 1:
+        errors.append("NFA_MAX_STATES_COUNT must be >= 1")
+
+    if not isinstance(NFA_MIN_STATES_COUNT, int):
+        errors.append("NFA_MIN_STATES_COUNT must be an integer")
+
+    if not isinstance(NFA_MAX_STATES_COUNT, int):
+        errors.append("NFA_MAX_STATES_COUNT must be an integer")
+
+    if NFA_MIN_STATES_COUNT > NFA_MAX_STATES_COUNT:
+        errors.append(
+            f"NFA_MIN_STATES_COUNT ({NFA_MIN_STATES_COUNT}) must be <= "
+            f"NFA_MAX_STATES_COUNT ({NFA_MAX_STATES_COUNT})"
         )
 
     if not AUTOMATON_TYPE or not isinstance(AUTOMATON_TYPE, str):

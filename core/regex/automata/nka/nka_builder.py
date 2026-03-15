@@ -65,6 +65,36 @@ def optional_NKA(nka):
     return NKA(start, accepts)
 
 
+def count_nka_states(nka):
+    """
+    Count the total number of states in an NKA by traversing all reachable states.
+
+    Args:
+        nka: An NKA instance
+
+    Returns:
+        int: The number of states in the NKA
+    """
+    visited = set()
+    stack = [nka.start]
+
+    while stack:
+        state = stack.pop()
+
+        if state in visited:
+            continue
+
+        visited.add(state)
+
+        # Add all reachable states from current state's transitions
+        for next_states in state.transitions.values():
+            for next_state in next_states:
+                if next_state not in visited:
+                    stack.append(next_state)
+
+    return len(visited)
+
+
 def build_NKA(node):
     if node['type'] == 'regular':
         return build_NKA(node['children'][0])
