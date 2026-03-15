@@ -41,6 +41,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SOLUTIONS_PATH = BASE_DIR / "downloads"
 SOLUTIONS_PATH.mkdir(parents=True, exist_ok=True)
 RESULT_PATH = BASE_DIR / "output" / "results"
+OUTPUT_DIR =  BASE_DIR / "output"
 RESULT_PATH.mkdir(parents=True, exist_ok=True)
 
 AUTOMATON_BUILDERS = {
@@ -58,7 +59,7 @@ log = logging.getLogger(__name__)
 
 # ─────────────────────────── FILE PATHS ──────────────────────────────────────
 
-STUDENTS_FILE = os.path.join(SOLUTIONS_PATH, "students.json")
+STUDENTS_FILE = os.path.join(OUTPUT_DIR, "students.json")
 
 
 # ─────────────────────────── HELPERS ─────────────────────────────────────────

@@ -43,8 +43,10 @@ MOODLE_ASSIGNMENT_LINK = ASSIGNMENT_LINK
 # Local settings
 STUDENT_GROUP = "Všetci účastníci"  # or e.g. "01 Pondelok 07:30 (Novotný)"
 QUESTION = QUESTION_NUMBER  # question number to download
-DOWNLOAD_PATH = BASE_DIR / "output"
+DOWNLOAD_PATH = BASE_DIR / "downloads"
 DOWNLOAD_PATH.mkdir(parents=True, exist_ok=True)
+OUTPUT_DIR = BASE_DIR / "output"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 DOWNLOAD_TIMEOUT = 30  # seconds to wait for a .zip to appear on disk
 
@@ -58,7 +60,7 @@ log = logging.getLogger(__name__)
 
 # ─────────────────────────── STUDENTS.JSON ───────────────────────────────────
 
-STUDENTS_FILE = os.path.join(DOWNLOAD_PATH, "students.json")
+STUDENTS_FILE = os.path.join(OUTPUT_DIR, "students.json")
 
 
 def load_students() -> dict:
