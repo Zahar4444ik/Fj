@@ -43,7 +43,7 @@ MOODLE_ASSIGNMENT_LINK = ASSIGNMENT_LINK
 # Local settings
 STUDENT_GROUP = "Všetci účastníci"  # or e.g. "01 Pondelok 07:30 (Novotný)"
 QUESTION = QUESTION_NUMBER  # question number to download
-DOWNLOAD_PATH = BASE_DIR / "downloads"
+DOWNLOAD_PATH = BASE_DIR / "output"
 DOWNLOAD_PATH.mkdir(parents=True, exist_ok=True)
 
 DOWNLOAD_TIMEOUT = 30  # seconds to wait for a .zip to appear on disk

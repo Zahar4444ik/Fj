@@ -14,6 +14,7 @@ This system provides an end-to-end solution for managing FSA assignments:
 2. **Download** - Automatically retrieve student submissions from Moodle
 3. **Evaluate** - Perform isomorphism checks and behavioral testing on implementations
 4. **Upload** - Report grades and feedback back to Moodle
+5. **Overview** - Generates testing overview table, that shows every student's task details
 
 **Workflow:**
 ```
@@ -116,6 +117,9 @@ python main.py upload
 # Run full pipeline
 python main.py auto
 
+# Generate testing overview
+python main.py overview
+
 # Show help
 python main.py --help
 ```
@@ -124,46 +128,72 @@ python main.py --help
 
 ## ⚙️ Configuration
 
-Edit `.env` file to configure all settings:
+Edit `.env` file to configure all settings. All settings are auto-validated - invalid configurations will raise clear error messages.
+
+### Question Generation Settings
+```env
+# Quiz category in Moodle
+QUIZ_CATEGORY="Zapoctovka A/prakticka cast"
+
+# Number of questions to generate
+NUMBER_OF_QUESTIONS=10
+
+# Regex difficulty control (number of states)
+REGEX_MIN_STATES_COUNT=4
+REGEX_MAX_STATES_COUNT=4
+
+# Type of automaton: "dfa", "nfa", or "any"
+AUTOMATON_TYPE="any"
+
+# Type of implementation: "iterative", "recursive", or "any"
+IMPLEMENTATION_TYPE="any"
+
+# Alphabet size constraints
+MAX_ALPHABET_SIZE=3
+MIN_ALPHABET_SIZE=3
+```
+
+### Question Properties & Evaluation Settings
+```env
+# Report title/name
+REPORT_TITLE="FSA Credit Test A"
+
+# Max points for assignment
+ASSIGNMENT_MAX_POINTS=7
+
+# Test configuration
+TEST_WORDS_COUNT=30
+BAD_WORD_RATIO_LEVEL=0.4
+GROUP_SIZE=5
+```
+
+### Scoring Configuration - DFA (Deterministic Finite Automaton)
+```env
+DKA_FSA_ISOMORPHISM=30      # Points for FSA isomorphism check
+DKA_FSA_ANNOTATIONS=10      # Points for state annotations
+DKA_IMPLEMENTATION=60       # Points for code implementation
+# Total: 100 points
+```
+
+### Scoring Configuration - NFA (Nondeterministic Finite Automaton)
+```env
+NKA_FSA_ISOMORPHISM=30      # Points for FSA isomorphism check
+NKA_IMPLEMENTATION=70       # Points for code implementation
+# Total: 100 points
+```
 
 ### Moodle Settings
 ```env
-MOODLE_USERNAME="your_username"
+# Moodle credentials
+MOODLE_USERNAME="admin"
 MOODLE_PASSWORD="your_password"
+
+# Moodle assignment link
 ASSIGNMENT_LINK="https://moodle.fei.tuke.sk/mod/quiz/view.php?id=14374"
+
+# Question number to evaluate
 QUESTION_NUMBER=1
 ```
-
-### Question Generation
-```env
-QUIZ_CATEGORY="test_generated_assignments"
-REPORT_TITLE="FSA Credit Test A"
-ASSIGNMENT_MAX_POINTS=7
-NUMBER_OF_QUESTIONS=30
-```
-
-### Evaluation Settings
-```env
-TEST_WORDS_COUNT=30
-BAD_WORD_RATIO_LEVEL=0.2
-GROUP_SIZE=5
-REGEX_MIN_STATES_COUNT=3
-REGEX_MAX_STATES_COUNT=4
-```
-
-### Scoring Configuration (Must sum to 100)
-```env
-# DFA Scoring
-DKA_FSA_ISOMORPHISM=30
-DKA_FSA_ANNOTATIONS=10
-DKA_IMPLEMENTATION=60
-
-# NFA Scoring
-NKA_FSA_ISOMORPHISM=30
-NKA_IMPLEMENTATION=70
-```
-
-**Note:** All settings are auto-validated. Invalid configurations will raise clear error messages.
 
 ---
 
@@ -256,6 +286,16 @@ python main.py upload
 - Attaches detailed reports
 - Updates student grades
 
+### Generate Testing Overview
+```bash
+python main.py overview
+```
+- Generates CSV table from downloaded student metadata
+- Outputs to `output/students_overview.csv`
+- Contains columns: email, automaton_type, implementation_type, regex
+- Useful for quick review of all student assignments
+- Requires `students.json` from download step
+
 ### Full Pipeline
 ```bash
 python main.py auto
@@ -305,6 +345,7 @@ python main.py upload
 | `output/automata/nka_iterative.py` | NFA iterative implementation |
 | `output/automata/nka_recursive.py` | NFA recursive implementation |
 | `output/results/*.txt` | Evaluation reports per student |
+| `output/students_overview.csv` | Student metadata overview table |
 | `students.json` | Downloaded metadata |
 
 ### Directory Structure

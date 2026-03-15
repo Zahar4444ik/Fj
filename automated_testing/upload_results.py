@@ -44,7 +44,7 @@ MOODLE_ASSIGNMENT_LINK = ASSIGNMENT_LINK
 STUDENT_GROUP   = "Všetci účastníci"
 QUESTION        = QUESTION_NUMBER
 
-SUBMISSIONS_PATH = BASE_DIR / "downloads"
+SUBMISSIONS_PATH = BASE_DIR / "output"
 RESULTS_PATH     = BASE_DIR / "output" / "results"
 RESULTS_PATH.mkdir(parents=True, exist_ok=True)
 STUDENTS_FILE    = os.path.join(SUBMISSIONS_PATH, "students.json")

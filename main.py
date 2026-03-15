@@ -4,6 +4,7 @@ from core.assignment.quiz_generator import generate_quiz
 import automated_testing.download_solutions as downloader
 import automated_testing.evaluate_solutions as evaluator
 import automated_testing.upload_results as uploader
+import core.summary.students_overview_generator as overview
 from core.config.validation import validate_all_settings
 
 
@@ -26,6 +27,7 @@ def main():
     subparsers.add_parser("evaluate", help="Evaluate downloaded solutions")
     subparsers.add_parser("upload", help="Upload results back to Moodle")
     subparsers.add_parser("auto", help="Run full pipeline (Download -> Evaluate -> Upload)")
+    subparsers.add_parser("overview", help="Generates testing overview table in .csv from students.json")
 
     args = parser.parse_args()
 
@@ -42,6 +44,8 @@ def main():
         uploader.run()
     elif args.command == "auto":
         run_automated_pipeline()
+    elif args.command == "overview":
+        overview.generate()
     else:
         parser.print_help()
 
