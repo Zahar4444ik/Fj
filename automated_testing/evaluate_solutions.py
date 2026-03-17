@@ -91,21 +91,31 @@ def extract_zip(zip_path: str, target_dir: str) -> bool:
         return False
 
 
-def flatten_if_single_subdir(work_dir: str) -> None:
+def flatten_if_single_subdir(work_dir: str) -> bool:
     """
-    If the zip extracted into a single subdirectory (common student mistake),
-    move its contents up so required files are at the top level.
-
-    e.g. work_dir/solution/automaton.py  →  work_dir/automaton.py
+    Repeatedly flatten single-subdirectory nesting until required files
+    are at the top level or no further flattening is possible.
+    Returns False if multiple subdirectories are found (bad zip structure).
     """
-    entries = [e for e in os.listdir(work_dir) if not e.startswith(".")]
-    if len(entries) == 1:
-        subdir = os.path.join(work_dir, entries[0])
-        if os.path.isdir(subdir):
+    while True:
+        entries = [e for e in os.listdir(work_dir) if not e.startswith(".")]
+        if len(entries) == 1:
+            subdir = os.path.join(work_dir, entries[0])
+            if not os.path.isdir(subdir):
+                break
             for item in os.listdir(subdir):
                 shutil.move(os.path.join(subdir, item), work_dir)
             os.rmdir(subdir)
-            log.info("  Flattened single subdirectory: %s/", entries[0])
+            log.info("  Flattened subdirectory: %s/", entries[0])
+        elif len(entries) > 1:
+            # Multiple items — check if required files are already here
+            required = ["automaton.py", "specification.fsa"]
+            if all(os.path.exists(os.path.join(work_dir, f)) for f in required):
+                break  # files are present, structure is fine
+            return False  # multiple dirs/files but required files missing
+        else:
+            break  # empty, will be caught by check_required_files
+    return True
 
 
 def check_required_files(work_dir: str) -> list[str]:
@@ -190,7 +200,9 @@ def process_student(email: str, metadata: dict) -> None:
         fail("Bad zip file — extraction failed.")
         return
 
-    flatten_if_single_subdir(work_dir)
+    if not flatten_if_single_subdir(work_dir):
+        fail("Invalid zip structure — multiple nested directories found.")
+        return
 
     # ── Validate required files ──────────────────────────────────────────────
     missing = check_required_files(work_dir)
