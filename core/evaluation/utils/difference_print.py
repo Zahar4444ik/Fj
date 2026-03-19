@@ -33,8 +33,14 @@ def format_acceptance_diff(mismatches: list[dict]) -> str:
         - got (bool)
     """
 
-    def fmt(val: bool) -> str:
-        return "ACCEPTED" if val else "REJECTED"
+    def fmt(val) -> str:
+        if val is None:
+            return "None"
+        elif val is True:
+            return "True"
+        elif val is False:
+            return "False"
+        return str(val)
 
     lines = [
         "Acceptance mismatches detected:",
