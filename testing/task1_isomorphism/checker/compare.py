@@ -18,7 +18,10 @@ def check_isomorphism(reference, student):
 def check_annotations(reference, student):
     _, ref_ann, _ = canonical_signature(reference)
     _, stu_ann, _ = canonical_signature(student)
-    return ref_ann == stu_ann
+
+    total = len(ref_ann)
+    correct = sum(1 for cid, ann in ref_ann.items() if stu_ann.get(cid) == ann)
+    return correct, total
 
 
 def prepare_automaton_for_fsa_test(file):

@@ -28,7 +28,7 @@ class AssignmentReport:
         self.lines.append("")
         self.lines.append("-" * 60)
         if max_points is not None:
-            self.lines.append(f"{title:<40} [ {int(self._current_score)} pts / {max_points} pts ]")
+            self.lines.append(f"{title:<38} [ {self._current_score} pts / {max_points} pts ]")
         else:
             self.lines.append(title)
         self.lines.append("-" * 60)
@@ -42,7 +42,7 @@ class AssignmentReport:
         """Add informational text."""
         self.lines.append(str(text) if text is not None else "(no data)")
 
-    def add_result(self, description: str, passed: bool, points: float = 0.0):
+    def add_result(self, description: str, passed: bool, points: float = 0.0, total_points: int = 0):
         """
         Add a test result with status and points.
         Format: "description: PASSED/FAILED"
@@ -51,7 +51,7 @@ class AssignmentReport:
         status = "PASSED" if passed else "FAILED"
         self.lines.append(f"{description}: {status}")
 
-        self.lines.append(f"[ {int(points) if passed else 0} pts / {int(points)} pts ]")
+        self.lines.append(f"[ {points} pts / {int(total_points)} pts ]")
 
     def add_group_result(
             self,
@@ -84,7 +84,7 @@ class AssignmentReport:
         """Add final score footer."""
         self.lines.extend([
             "=" * 60,
-            f"FINAL SCORE:{' ' * 27} [ {int(score)} pts / {self.total_score} pts ]",
+            f"FINAL SCORE:{' ' * 25} [ {score} pts / {self.total_score} pts ]",
             "=" * 60,
         ])
 

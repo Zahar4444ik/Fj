@@ -34,12 +34,6 @@ def format_acceptance_diff(mismatches: list[dict]) -> str:
     """
 
     def fmt(val) -> str:
-        if val is None:
-            return "None"
-        elif val is True:
-            return "True"
-        elif val is False:
-            return "False"
         return str(val)
 
     lines = [

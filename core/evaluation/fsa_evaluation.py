@@ -97,15 +97,10 @@ def _run_isomorphism_check(reference: object, student: object) -> bool:
 
 
 def _run_annotations_check(reference: object, student: object) -> tuple:
-    """
-    Check state annotations.
-
-    Returns:
-        tuple: (passed, difference_string)
-    """
-    passed = check_annotations(reference, student)
+    correct, total = check_annotations(reference, student)
+    passed = correct == total
     diff = format_annotation_diff(reference, student) if not passed else None
-    return passed, diff
+    return correct, total, passed, diff
 
 
 def _get_scoring_points(automaton_type: str, check_type: str) -> int:
@@ -129,6 +124,8 @@ def _add_to_report(report: AssignmentReport,
                    iso_points: int,
                    ann_passed: bool = None,
                    ann_points: int = 0,
+                   ann_correct: int = 0,
+                   ann_total: int = 0,
                    ann_diff: str = None) -> None:
     """Add evaluation results to report."""
     total_points = iso_points + ann_points
@@ -142,14 +139,16 @@ def _add_to_report(report: AssignmentReport,
         "Isomorphism verification",
         iso_passed,
         points=iso_points,
+        total_points=iso_points
     )
 
     if ann_passed is not None:
         report.subsection("1.3 State Annotations")
         report.add_result(
-            "State annotations verification",
+            f"State annotations verification ({ann_correct}/{ann_total} correct)",
             ann_passed,
-            points=ann_points,
+            points=round(ann_points / ann_total * ann_correct, 2) if ann_total > 0 else 0,
+            total_points=ann_points
         )
 
         if not ann_passed and ann_diff:
@@ -192,10 +191,12 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
     iso_points = _get_scoring_points(automaton_type, "isomorphism")
     ann_points = _get_scoring_points(automaton_type, "annotations")
     ann_passed = None
+    ann_correct = 0
+    ann_total = 0
     ann_diff = None
 
     if type_cfg["check_annotations"]:
-        ann_passed, ann_diff = _run_annotations_check(reference, student)
+        ann_correct, ann_total, ann_passed, ann_diff = _run_annotations_check(reference, student)
 
     # Step 3: Calculate score
     score = 0.0
@@ -204,13 +205,15 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         score += iso_points
         report.increase_score(iso_points)
 
-    if ann_passed:
-        score += ann_points
-        report.increase_score(ann_points)
+    if ann_total > 0:
+        per_state = ann_points / ann_total
+        ann_score = round(per_state * ann_correct, 2)
+        score += ann_score
+        report.increase_score(ann_score)
 
     # Step 4: Add to report
     _add_to_report(report, alphabet_passed, iso_passed, iso_points,
-                   ann_passed, ann_points, ann_diff)
+                   ann_passed, ann_points, ann_correct, ann_total, ann_diff)
 
     logger.info(f"FSA evaluation for {automaton_type} complete: {score} points")
     return score
