@@ -138,7 +138,7 @@ def _add_to_report(report: AssignmentReport,
     report.add_result(
         "Isomorphism verification",
         iso_passed,
-        points=iso_points,
+        points=iso_points if iso_passed else 0,
         total_points=iso_points
     )
 
