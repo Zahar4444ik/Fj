@@ -287,7 +287,7 @@ def submit_grade(driver: webdriver.Chrome, wait: WebDriverWait, score: float) ->
         By.XPATH, f"{q_xpath}//div[@class='felement ftext']/input[1]"
     )))
 
-    grade_value = str(round((score * ASSIGNMENT_MAX_POINTS)/100, 2))
+    grade_value = str(round((score * ASSIGNMENT_MAX_POINTS)/100))
 
     grade_input.clear()
     grade_input.send_keys(grade_value)
