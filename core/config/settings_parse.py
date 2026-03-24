@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 # -------------------------------------------------------------------------------
 # QUESTION GENERATION
 # -------------------------------------------------------------------------------
@@ -56,7 +55,6 @@ DKA_IMPLEMENTATION = int(os.getenv("DKA_IMPLEMENTATION", "0"))
 NKA_FSA_ISOMORPHISM = int(os.getenv("NKA_FSA_ISOMORPHISM", "0"))
 NKA_IMPLEMENTATION = int(os.getenv("NKA_IMPLEMENTATION", "0"))
 
-
 # -------------------------------------------------------------------------------
 # MOODLE AUTHENTICATION & FILE OPERATIONS
 # -------------------------------------------------------------------------------
@@ -69,3 +67,21 @@ PASSWORD = os.getenv("MOODLE_PASSWORD", "")
 ASSIGNMENT_LINK = os.getenv("ASSIGNMENT_LINK", "")
 
 QUESTION_NUMBER = int(os.getenv("QUESTION_NUMBER", "1"))
+
+
+def parse_bool(value) -> bool:
+    if isinstance(value, bool):
+        return value
+
+    true_values = {"true", "1", "yes", "on"}
+    false_values = {"false", "0", "no", "off"}
+
+    v = value.lower()
+    if v in true_values:
+        return True
+    elif v in false_values:
+        return False
+    return value
+
+
+HEADLESS = parse_bool(os.getenv("HEADLESS", "true"))

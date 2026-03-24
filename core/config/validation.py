@@ -242,4 +242,7 @@ def _validate_moodle_settings():
     if QUESTION_NUMBER <= 0:
         errors.append("QUESTION_NUMBER must be > 0")
 
+    if not isinstance(HEADLESS, bool):
+        errors.append("HEADLESS must be a boolean value")
+
     return errors

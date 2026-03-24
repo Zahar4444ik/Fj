@@ -29,7 +29,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from core.config.settings_parse import PASSWORD, USERNAME, ASSIGNMENT_LINK, QUESTION_NUMBER
+from core.config.settings_parse import PASSWORD, USERNAME, ASSIGNMENT_LINK, QUESTION_NUMBER, HEADLESS
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 
@@ -169,6 +169,11 @@ def create_driver() -> webdriver.Chrome:
     options.add_argument("--no-sandbox")
     options.add_argument("--start-maximized")
     options.add_argument("--safebrowsing-disable-download-protection")
+
+    if HEADLESS:
+        options.add_argument("--headless=new")
+        options.add_argument("--window-size=1920,1080")
+
     options.add_experimental_option("prefs", {
         "download.default_directory": str(DOWNLOAD_PATH),
         "download.prompt_for_download": False,
@@ -340,7 +345,7 @@ def run() -> None:
             if downloaded:
                 metadata["status"] = "downloaded"
             else:
-                log.info("  No attachment found — grading 0")
+                log.info("  No attachment found")
                 metadata["status"] = "no_submission"
 
             # ── Save immediately so a crash mid-run is resumable ─────────────

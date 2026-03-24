@@ -30,7 +30,7 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
-from core.config.settings_parse import USERNAME, PASSWORD, ASSIGNMENT_LINK, QUESTION_NUMBER, ASSIGNMENT_MAX_POINTS
+from core.config.settings_parse import USERNAME, PASSWORD, ASSIGNMENT_LINK, QUESTION_NUMBER, ASSIGNMENT_MAX_POINTS, HEADLESS
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -123,6 +123,10 @@ def create_driver() -> webdriver.Chrome:
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")
     options.add_argument("--start-maximized")
+
+    if HEADLESS:
+        options.add_argument("--headless=new")
+        options.add_argument("--window-size=1920,1080")
     return webdriver.Chrome(options=options)
 
 # ─────────────────────────── CORE STEPS ──────────────────────────────────────
