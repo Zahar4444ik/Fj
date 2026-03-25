@@ -232,7 +232,18 @@ def _add_to_report(report: AssignmentReport, cfg: dict, variant: str, static_pas
     report.subsection(f"2.1 Static Analysis: {'PASSED' if static_passed else 'FAILED'}")
 
     if not static_passed:
-        report.add_info(f"Skipping behavioral testing due to:")
+        types = {
+            "import": "use of extra imports",
+            "iteration": "use of iteration",
+            "Recursion": "use of recursion"
+        }
+
+        error_type = next(
+            (label for key, label in types.items() if any(key.lower() in err.lower() for err in static_errors)),
+            "static analysis errors"
+        )
+
+        report.add_info(f"Skipping behavioral testing due to {error_type}:")
         for err in static_errors:
             report.add_info(err)
         return
@@ -283,32 +294,51 @@ def evaluate_implementation(
         "nfa": NKA_IMPLEMENTATION,
     }[automaton_type]
 
-    # Step 1: Static analysis
-    logger.debug(f"Running static analysis for {automaton_type} {variant}")
-    student_path = os.path.join(work_dir, cfg["student_filename"])
-    static_errors = []
-    for check in cfg["static_check"]:
-        static_errors = check(student_path)
-    static_passed = not static_errors
+    if not os.path.exists(os.path.join(work_dir, cfg["student_filename"])):
+        report.section("2. FSA Implementation Testing", 0)
+        report.add_info("\nERROR")
+        report.add_info("-" * 60)
+        report.add_info(f"Missing required file: automaton.py")
 
-    # Step 2: Behavioral testing (only if static passed)
-    group_results = []
-    score = 0.0
+        logger.error(f"Missing required file: automaton.py")
+        return 0.0
 
-    if static_passed:
-        logger.debug(f"Running behavioral testing for {automaton_type} {variant}")
-        _generate_reference_implementation(ast, cfg)
-        reference = _load_reference_module(cfg)
-        student = _load_student_module(work_dir, cfg)
 
-        reference_fn, student_fn = _get_check_functions(cfg, variant, work_dir, reference, student)
+    try:
+        # Step 1: Static analysis
+        logger.debug(f"Running static analysis for {automaton_type} {variant}")
+        student_path = os.path.join(work_dir, cfg["student_filename"])
+        static_errors = []
+        for check in cfg["static_check"]:
+            static_errors = check(student_path)
+        static_passed = not static_errors
 
-        group_results, score = _run_group_tests(reference_fn, student_fn, impl_points, ast)
+        # Step 2: Behavioral testing (only if static passed)
+        group_results = []
+        score = 0.0
 
-        report.increase_score(score)
+        if static_passed:
+            logger.debug(f"Running behavioral testing for {automaton_type} {variant}")
+            _generate_reference_implementation(ast, cfg)
+            reference = _load_reference_module(cfg)
+            student = _load_student_module(work_dir, cfg)
 
-    # Step 3: Add to report
-    _add_to_report(report, cfg, variant, static_passed, static_errors, group_results, impl_points)
+            reference_fn, student_fn = _get_check_functions(cfg, variant, work_dir, reference, student)
 
-    logger.info(f"Implementation evaluation for {automaton_type} {variant} complete: {score} points")
-    return score
+            group_results, score = _run_group_tests(reference_fn, student_fn, impl_points, ast)
+
+            report.increase_score(score)
+
+        # Step 3: Add to report
+        _add_to_report(report, cfg, variant, static_passed, static_errors, group_results, impl_points)
+
+        logger.info(f"Implementation evaluation for {automaton_type} {variant} complete: {score} points")
+        return score
+    except Exception as e:
+        report.section("2. FSA Implementation Testing", 0)
+        report.add_info("\nERROR")
+        report.add_info("-" * 60)
+        report.add_info(f"Evaluation failed: {e}")
+
+        logger.error(f"Evaluation failed: {e}")
+        return 0.0

@@ -227,12 +227,6 @@ def process_student(email: str, metadata: dict) -> None:
         fail("Invalid zip structure — multiple nested directories found.")
         return
 
-    # ── Validate required files ──────────────────────────────────────────────
-    missing = check_required_files(work_dir)
-    if missing:
-        fail(f"Missing required files: {missing}")
-        return
-
     # ── Build automaton ──────────────────────────────────────────────────────
     try:
         regex = metadata["regex"]
@@ -247,16 +241,8 @@ def process_student(email: str, metadata: dict) -> None:
         return
 
     # ── Evaluate ─────────────────────────────────────────────────────────────
-    try:
-        score += evaluate_fsa(automaton, automaton_type, report, work_dir)
-        # score += evaluate_implementation(ast, automaton_type, variant, report, work_dir)
-
-        if os.path.exists(os.path.join(work_dir, "automaton.py")):
-            score += evaluate_implementation(ast, automaton_type, variant, report, work_dir)
-        else:
-            fail("Missing file: automaton.py", failed=False)
-    except Exception as e:
-        fail(f"Evaluation failed: {e}", failed=False)
+    score += evaluate_fsa(automaton, automaton_type, report, work_dir)
+    score += evaluate_implementation(ast, automaton_type, variant, report, work_dir)
 
     # ── Success ──────────────────────────────────────────────────────────────
     build_report_footer(report, score)

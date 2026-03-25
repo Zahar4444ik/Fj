@@ -184,48 +184,66 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
     """
     type_cfg = FSA_CONFIG[automaton_type]
 
-    # Step 1: Generate and load automatons
-    logger.debug(f"Generating reference FSA for {automaton_type}")
-    _generate_reference_fsa(automaton, type_cfg["reference_path"])
-    reference, error = _load_reference_fsa(type_cfg["reference_path"])
-    student, syntax_errors = _load_student_fsa(work_dir, type_cfg["student_fsa_filename"])
-    syntax_passed = not syntax_errors
+    if not os.path.exists(os.path.join(work_dir, type_cfg["student_fsa_filename"])):
+        report.section("1. FSA Specification Verification", 0)
+        report.add_info("\nERROR")
+        report.add_info("-" * 60)
+        report.add_info(f"Missing required file: specification.fsa")
 
-    # Step 2: Run all checks
-    logger.debug(f"Running checks for {automaton_type} FSA")
+        logger.error(f"Missing required file: specification.fsa")
+        return 0.0
 
-    iso_passed = False
-    iso_points = _get_scoring_points(automaton_type, "isomorphism")
-    ann_points = _get_scoring_points(automaton_type, "annotations")
-    ann_passed = None
-    ann_correct = 0
-    ann_total = 0
-    ann_diff = None
+    try:
+        # Step 1: Generate and load automatons
+        logger.debug(f"Generating reference FSA for {automaton_type}")
+        _generate_reference_fsa(automaton, type_cfg["reference_path"])
+        reference, error = _load_reference_fsa(type_cfg["reference_path"])
+        student, syntax_errors = _load_student_fsa(work_dir, type_cfg["student_fsa_filename"])
+        syntax_passed = not syntax_errors
 
-    if syntax_passed:
-        iso_passed = _run_isomorphism_check(reference, student)
+        # Step 2: Run all checks
+        logger.debug(f"Running checks for {automaton_type} FSA")
 
-        if type_cfg["check_annotations"]:
-            ann_correct, ann_total, ann_passed, ann_diff = _run_annotations_check(reference, student)
+        iso_passed = False
+        iso_points = _get_scoring_points(automaton_type, "isomorphism")
+        ann_points = _get_scoring_points(automaton_type, "annotations")
+        ann_passed = None
+        ann_correct = 0
+        ann_total = 0
+        ann_diff = None
 
-    # Step 3: Calculate score
-    score = 0.0
+        if syntax_passed:
+            iso_passed = _run_isomorphism_check(reference, student)
 
-    if iso_passed:
-        score += iso_points
-        report.increase_score(iso_points)
+            if type_cfg["check_annotations"]:
+                ann_correct, ann_total, ann_passed, ann_diff = _run_annotations_check(reference, student)
 
-    if ann_total > 0:
-        per_state = ann_points / ann_total
-        ann_score = round(per_state * ann_correct, 2)
-        score += ann_score
-        report.increase_score(ann_score)
+        # Step 3: Calculate score
+        score = 0.0
 
-    # Step 4: Add to report
-    _add_to_report(report, syntax_passed=syntax_passed, syntax_errors=syntax_errors,
-                   iso_passed=iso_passed, iso_points=iso_points,
-                   ann_passed=ann_passed, ann_points=ann_points,
-                   ann_correct=ann_correct, ann_total=ann_total, ann_diff=ann_diff)
+        if iso_passed:
+            score += iso_points
+            report.increase_score(iso_points)
 
-    logger.info(f"FSA evaluation for {automaton_type} complete: {score} points")
-    return score
+        if ann_total > 0:
+            per_state = ann_points / ann_total
+            ann_score = round(per_state * ann_correct, 2)
+            score += ann_score
+            report.increase_score(ann_score)
+
+        # Step 4: Add to report
+        _add_to_report(report, syntax_passed=syntax_passed, syntax_errors=syntax_errors,
+                       iso_passed=iso_passed, iso_points=iso_points,
+                       ann_passed=ann_passed, ann_points=ann_points,
+                       ann_correct=ann_correct, ann_total=ann_total, ann_diff=ann_diff)
+
+        logger.info(f"FSA evaluation for {automaton_type} complete: {score} points")
+        return score
+    except Exception as e:
+        report.section("1. FSA Specification Verification", 0)
+        report.add_info("\nERROR")
+        report.add_info("-" * 60)
+        report.add_info(f"Evaluation failed: {e}")
+
+        logger.error(f"Evaluation failed: {e}")
+        return 0.0
