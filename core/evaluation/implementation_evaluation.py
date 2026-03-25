@@ -71,7 +71,7 @@ IMPLEMENTATION_CONFIG = {
         "reference_path": AUTOMATA_DIR / "dka_iterative.py",
         "module_name": "dka_iterative",
         "student_module_name": "automaton",
-        "static_check": [check_no_recursion, check_imports],
+        "static_check": check_no_recursion,
         "generate": generate_iterative_dka,
         "get_check_fn": lambda mod, _: mod.DFA().check,
     },
@@ -80,7 +80,7 @@ IMPLEMENTATION_CONFIG = {
         "reference_path": AUTOMATA_DIR / "dka_recursive.py",
         "module_name": "dka_recursive",
         "student_module_name": "automaton",
-        "static_check": [check_no_iteration, check_imports],
+        "static_check": check_no_iteration,
         "generate": generate_recursive_dka,
         "get_check_fn": _get_recursive_check_fn,
     },
@@ -89,7 +89,7 @@ IMPLEMENTATION_CONFIG = {
         "reference_path": AUTOMATA_DIR / "nka_iterative.py",
         "module_name": "nka_iterative",
         "student_module_name": "automaton",
-        "static_check": [check_no_recursion, check_imports],
+        "static_check": check_no_recursion,
         "generate": generate_iterative_nka,
         "get_check_fn": lambda mod, _: mod.NFA().check,
     },
@@ -98,7 +98,7 @@ IMPLEMENTATION_CONFIG = {
         "reference_path": AUTOMATA_DIR / "nka_recursive.py",
         "module_name": "nka_recursive",
         "student_module_name": "automaton",
-        "static_check": [check_no_iteration, check_imports],
+        "static_check": check_no_iteration,
         "generate": generate_recursive_nka,
         "get_check_fn": _get_recursive_check_fn,
     },
@@ -308,9 +308,8 @@ def evaluate_implementation(
         # Step 1: Static analysis
         logger.debug(f"Running static analysis for {automaton_type} {variant}")
         student_path = os.path.join(work_dir, cfg["student_filename"])
-        static_errors = []
-        for check in cfg["static_check"]:
-            static_errors = check(student_path)
+        static_errors = check_imports(student_path)
+        static_errors.extend(cfg["static_check"](student_path))
         static_passed = not static_errors
 
         # Step 2: Behavioral testing (only if static passed)
