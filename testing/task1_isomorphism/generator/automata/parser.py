@@ -1,4 +1,6 @@
 from antlr4 import *
+from antlr4.error.ErrorListener import ErrorListener
+
 from testing.task1_isomorphism.generator.generated.FSALexer import FSALexer
 from testing.task1_isomorphism.generator.generated.FSAListener import FSAListener
 from testing.task1_isomorphism.generator.generated.FSAParser import FSAParser
@@ -39,14 +41,33 @@ class FSABuilder(FSAListener):
         self.automaton.transitions[src][sym].add(dst)
 
 
+class FSASyntaxErrorListener(ErrorListener):
+    def __init__(self):
+        super().__init__()
+        self.errors = []
+
+    def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
+        self.errors.append(f"line {line}:{column} {msg}")
+
+
 def parse_fsa(path):
     stream = FileStream(path, encoding="utf-8")
     lexer = FSALexer(stream)
+
+    error_listener = FSASyntaxErrorListener()
+
+    # Remove default stderr listener, attach ours to both lexer and parser
+    lexer.removeErrorListeners()
+    lexer.addErrorListener(error_listener)
+
     tokens = CommonTokenStream(lexer)
     parser = FSAParser(tokens)
+    parser.removeErrorListeners()
+    parser.addErrorListener(error_listener)
+
     tree = parser.file_()
 
     builder = FSABuilder()
     ParseTreeWalker().walk(builder, tree)
 
-    return builder.automaton
+    return builder.automaton, error_listener.errors

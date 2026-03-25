@@ -11,8 +11,8 @@ def fsa(path):
 
 
 def check(f1, f2, expected):
-    a1 = prepare_automaton_for_fsa_test(fsa(f1))
-    a2 = prepare_automaton_for_fsa_test(fsa(f2))
+    a1, error = prepare_automaton_for_fsa_test(fsa(f1))
+    a2, error = prepare_automaton_for_fsa_test(fsa(f2))
     assert check_isomorphism(a1, a2) is expected
 
 

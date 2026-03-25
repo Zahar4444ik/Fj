@@ -25,6 +25,7 @@ def check_annotations(reference, student):
 
 
 def prepare_automaton_for_fsa_test(file):
-    a = parse_fsa(file)
-    normalize_automaton(a)
-    return a
+    a, syntax_errors = parse_fsa(file)
+    if not syntax_errors:
+        normalize_automaton(a)
+    return a, syntax_errors

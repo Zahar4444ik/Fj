@@ -80,8 +80,8 @@ def _load_reference_fsa(reference_path: Path) -> object:
     return prepare_automaton_for_fsa_test(str(reference_path))
 
 
-def _load_student_fsa(work_dir: str, student_filename: str) -> object:
-    """Load student FSA from submission."""
+def _load_student_fsa(work_dir: str, student_filename: str) -> tuple[object, list[str]]:
+    """Load student FSA from submission, returning automaton and any syntax errors."""
     student_path = os.path.join(work_dir, student_filename)
     return prepare_automaton_for_fsa_test(student_path)
 
@@ -119,7 +119,8 @@ def _get_scoring_points(automaton_type: str, check_type: str) -> int:
 
 
 def _add_to_report(report: AssignmentReport,
-                   alphabet_passed: bool,
+                   syntax_passed: bool,
+                   syntax_errors: list,
                    iso_passed: bool,
                    iso_points: int,
                    ann_passed: bool = None,
@@ -132,7 +133,13 @@ def _add_to_report(report: AssignmentReport,
 
     report.section("1. FSA Specification Verification", total_points)
 
-    report.subsection(f"1.1 Alphabet correctness: {'PASSED' if alphabet_passed else 'FAILED'}")
+    report.subsection(f"1.1 Syntactic Validation: {'PASSED' if syntax_passed else 'FAILED'}")
+
+    if not syntax_passed:
+        report.add_info("Skipping further checks due to syntax errors:")
+        for err in syntax_errors:
+            report.add_info(err)
+        return
 
     report.subsection("1.2 Isomorphism with Reference Automaton")
     report.add_result(
@@ -180,14 +187,14 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
     # Step 1: Generate and load automatons
     logger.debug(f"Generating reference FSA for {automaton_type}")
     _generate_reference_fsa(automaton, type_cfg["reference_path"])
-    reference = _load_reference_fsa(type_cfg["reference_path"])
-    student = _load_student_fsa(work_dir, type_cfg["student_fsa_filename"])
+    reference, error = _load_reference_fsa(type_cfg["reference_path"])
+    student, syntax_errors = _load_student_fsa(work_dir, type_cfg["student_fsa_filename"])
+    syntax_passed = not syntax_errors
 
     # Step 2: Run all checks
     logger.debug(f"Running checks for {automaton_type} FSA")
-    alphabet_passed = _run_alphabet_check(reference, student)
-    iso_passed = _run_isomorphism_check(reference, student)
 
+    iso_passed = False
     iso_points = _get_scoring_points(automaton_type, "isomorphism")
     ann_points = _get_scoring_points(automaton_type, "annotations")
     ann_passed = None
@@ -195,8 +202,11 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
     ann_total = 0
     ann_diff = None
 
-    if type_cfg["check_annotations"]:
-        ann_correct, ann_total, ann_passed, ann_diff = _run_annotations_check(reference, student)
+    if syntax_passed:
+        iso_passed = _run_isomorphism_check(reference, student)
+
+        if type_cfg["check_annotations"]:
+            ann_correct, ann_total, ann_passed, ann_diff = _run_annotations_check(reference, student)
 
     # Step 3: Calculate score
     score = 0.0
@@ -212,8 +222,10 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         report.increase_score(ann_score)
 
     # Step 4: Add to report
-    _add_to_report(report, alphabet_passed, iso_passed, iso_points,
-                   ann_passed, ann_points, ann_correct, ann_total, ann_diff)
+    _add_to_report(report, syntax_passed=syntax_passed, syntax_errors=syntax_errors,
+                   iso_passed=iso_passed, iso_points=iso_points,
+                   ann_passed=ann_passed, ann_points=ann_points,
+                   ann_correct=ann_correct, ann_total=ann_total, ann_diff=ann_diff)
 
     logger.info(f"FSA evaluation for {automaton_type} complete: {score} points")
     return score
