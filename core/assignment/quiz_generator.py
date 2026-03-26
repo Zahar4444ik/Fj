@@ -12,10 +12,13 @@ Workflow:
   4. Write complete quiz to XML file in output directory
 """
 
+import base64
 import copy
+import io
 import logging
 import re
 import xml.etree.ElementTree as ET
+import zipfile
 from importlib import resources
 from pathlib import Path
 
@@ -29,6 +32,16 @@ from core.config.validation import validate_all_settings
 
 OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent / "output"
 OUTPUT_FILE = OUTPUT_DIR / "quiz.xml"
+
+SKELETON_DIR = Path(__file__).resolve().parent.parent.parent / "testing" / "task2_behavioral_testing" / "skeletons"
+
+# Mapping from template key to (skeleton subdirectory name, zip filename)
+SKELETON_MAP = {
+    "dfa_iterative": ("skeleton_dfa_iter", "skeleton_dfa_iter.zip"),
+    "dfa_recursive": ("skeleton_dfa_rec", "skeleton_dfa_rec.zip"),
+    "nfa_iterative": ("skeleton_nfa_iter", "skeleton_nfa_iter.zip"),
+    "nfa_recursive": ("skeleton_nfa_rec", "skeleton_nfa_rec.zip"),
+}
 
 # Mapping from template question names to template keys
 TEMPLATE_KEY_MAP = {
@@ -48,6 +61,32 @@ logger = logging.getLogger(__name__)
 # -------------------------------------------------------------------------------
 # HELPER FUNCTIONS
 # -------------------------------------------------------------------------------
+
+def _build_skeleton_zip(skeleton_dir: Path) -> bytes:
+    """Zip all files in skeleton_dir flat (no subdirectory inside the archive)."""
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+        for file in skeleton_dir.iterdir():
+            if file.is_file():
+                zf.write(file, arcname=file.name)
+    return buffer.getvalue()
+
+
+def _update_skeleton_file(question_element: ET.Element, zip_name: str, zip_bytes: bytes) -> None:
+    """Replace (or create) the <file> element inside <questiontext> with the given zip."""
+    questiontext = question_element.find("questiontext")
+    if questiontext is None:
+        raise ValueError("Question element missing <questiontext>")
+
+    file_elem = questiontext.find("file")
+    if file_elem is None:
+        file_elem = ET.SubElement(questiontext, "file")
+
+    file_elem.set("name", zip_name)
+    file_elem.set("path", "/")
+    file_elem.set("encoding", "base64")
+    file_elem.text = base64.b64encode(zip_bytes).decode("ascii")
+
 
 def _load_templates() -> dict:
     traversable_path = resources.files("core.assignment.templates").joinpath("templates.xml")
@@ -93,7 +132,7 @@ def _apply_regex_to_question(question_element: ET.Element, regex: str) -> None:
 
     updated = re.sub(
         r"\$\$.*?\$\$",
-        f"$${escaped_regex}$$", # Finds the LaTeX placeholder ($$...$$) in the question text
+        f"$${escaped_regex}$$",  # Finds the LaTeX placeholder ($$...$$) in the question text
         questiontext.text,
         flags=re.DOTALL,
     )
@@ -189,6 +228,11 @@ def _build_quiz_xml(templates: dict, question_count: int) -> ET.Element:
 
         template_question = templates[template_key]
         new_question = copy.deepcopy(template_question)
+
+        # Embed fresh skeleton zip
+        skeleton_subdir, zip_name = SKELETON_MAP[template_key]
+        zip_bytes = _build_skeleton_zip(SKELETON_DIR / skeleton_subdir)
+        _update_skeleton_file(new_question, zip_name, zip_bytes)
 
         # Apply assignments to question
         _apply_regex_to_question(new_question, assignment_vars["regex"])
