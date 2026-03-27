@@ -5,6 +5,7 @@ Evaluates automata implementations from student submissions.
 Performs static analysis and behavioral testing on iterative/recursive implementations.
 """
 
+import importlib.util
 import logging
 import os
 from pathlib import Path
@@ -114,6 +115,13 @@ def _generate_reference_implementation(ast: dict, cfg: dict) -> None:
     """Generate reference implementation file."""
     cfg["reference_path"].parent.mkdir(parents=True, exist_ok=True)
     cfg["generate"](ast, str(cfg["reference_path"]))
+
+    # Delete the cached .pyc so Python can't reuse stale bytecode when the source
+    # is overwritten within the same second (mtime has only second precision).
+    pyc = Path(importlib.util.cache_from_source(str(cfg["reference_path"])))
+    if pyc.exists():
+        pyc.unlink()
+
     logger.debug(f"Generated reference implementation: {cfg['reference_path']}")
 
 
