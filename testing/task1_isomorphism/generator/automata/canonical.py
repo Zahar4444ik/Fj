@@ -34,7 +34,16 @@ def canonical_signature(automaton):
             targets = automaton.transitions[current][symbol]
             ids = []
 
-            for t in sorted(targets):
+            # Sort by structural properties (accepting status + outgoing symbols)
+            # rather than by arbitrary state name strings.  This makes the
+            # canonical BFS order invariant to the non-deterministic q-name
+            # assignment that get_state_name produces for NFA epsilon branches.
+            def _struct_key(state_name):
+                accepting = state_name in automaton.accepting
+                out_symbols = tuple(sorted(automaton.transitions.get(state_name, {}).keys()))
+                return (accepting, out_symbols, state_name)
+
+            for t in sorted(targets, key=_struct_key):
                 if t not in state_id:
                     state_id[t] = len(state_id)
                     id_to_state[state_id[t]] = t
