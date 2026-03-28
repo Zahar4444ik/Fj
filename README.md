@@ -1,458 +1,261 @@
 # FSA Assignments - Finite State Automaton Assignment Management System
 
-A comprehensive Python system for generating, managing, and evaluating finite state automaton (FSA) assignments for students. Automates question generation, solution download, evaluation, and result upload to Moodle.
+A Python system for generating, managing, and evaluating finite state automaton (FSA) assignments for students. Automates question generation, solution download, evaluation, and result upload to Moodle.
 
-**Status:** ✅ Production Ready | **Python:** 3.13+ 
+**Status:** Production Ready | **Python:** 3.13+
 
 ---
 
-## 🎯 Overview
+## Overview
 
-This system provides an end-to-end solution for managing FSA assignments:
+End-to-end pipeline for managing FSA assignments:
 
-1. **Generate** - Create randomized FSA assignment questions with regex patterns
-2. **Download** - Automatically retrieve student submissions from Moodle
-3. **Evaluate** - Perform isomorphism checks and behavioral testing on implementations
-4. **Upload** - Report grades and feedback back to Moodle
-5. **Overview** - Generates testing overview table, that shows every student's task details
+1. **Generate** — Create randomized FSA questions with regex patterns and embed skeleton code
+2. **Download** — Automatically retrieve student submissions from Moodle
+3. **Evaluate** — Perform isomorphism checks and behavioral testing on implementations
+4. **Upload** — Report grades and feedback back to Moodle
+5. **Overview** — Generate a CSV table with every student's assignment details
 
-**Workflow:**
 ```
 Generate Questions → Download Solutions → Evaluate Implementations → Upload Results
 ```
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 ### Question Generation
-- ✅ Auto-generate FSA questions from regex patterns
-- ✅ Randomized difficulty levels
-- ✅ Moodle XML export format
-- ✅ Configurable number of questions
-- ✅ Reference automata generation (DFA/NFA)
+- Auto-generate FSA questions from regex patterns
+- Randomized DFA/NFA with configurable alphabet and state counts
+- Moodle XML export with embedded skeleton zip attachments (students get starter code directly in the question)
+- Reference automata generation (DFA/NFA)
 
 ### Solution Download
-- ✅ Automated Moodle scraping with Selenium
-- ✅ Multi-threaded downloads
-- ✅ Student metadata extraction
-- ✅ Resume capability for interrupted downloads
-- ✅ JSON metadata storage
+- Automated Moodle scraping with Selenium
+- Student metadata extraction and JSON storage
+- Resume capability for interrupted downloads
 
 ### Solution Evaluation
-- ✅ **FSA Specification Checking**
-  - Isomorphism verification with reference automaton
-  - State annotation validation
-  - Alphabet correctness checks
-  
-- ✅ **Implementation Testing**
-  - Static analysis (recursion/iteration detection)
-  - Behavioral testing on generated word groups
-  - Support for both iterative and recursive implementations
-  - DFA and NFA variants
-  
-- ✅ **Detailed Reporting**
-  - Per-student evaluation reports
-  - Score breakdown
-  - Test case failure analysis
+- **FSA Specification Checking** — isomorphism verification, state annotation validation, alphabet correctness
+- **Implementation Testing** — static analysis (recursion/iteration detection), behavioral testing on generated word groups, DFA and NFA variants (iterative and recursive)
+- **Detailed Reporting** — per-student reports with score breakdown and failure analysis
 
 ### Result Upload
-- ✅ Upload grades to Moodle
-- ✅ Attach evaluation reports
-- ✅ Batch processing
+- Upload grades and attach evaluation reports to Moodle in batch
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
-- **Python 3.13+**
+- Python 3.13+
 - Dependencies from `requirements.txt`
 
 ### Installation
 
 ```bash
-# Clone or download the project
 cd fj_assignments
 
-# Create virtual environment (recommended)
+# Create and activate virtual environment
 python -m venv venv
+venv\Scripts\activate        # Windows
+source venv/bin/activate     # Mac/Linux
 
-# Activate virtual environment
-# On Windows:
-venv\Scripts\activate
-# On Mac/Linux:
-source venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
 ```
 
 ### Configuration
 
-```bash
-# Copy environment template
-cp .env .env
+Copy `.env.example` to `.env` (or edit `.env` directly) and fill in your settings. See the Configuration section below.
 
-# Edit .env with your settings
-# See Configuration section below
-```
-
-### Running Commands
+### Commands
 
 ```bash
-# Generate FSA questions
-python main.py generate
-
-# Download student solutions
-python main.py download
-
-# Evaluate solutions
-python main.py evaluate
-
-# Upload results to Moodle
-python main.py upload
-
-# Run full pipeline
-python main.py auto
-
-# Generate testing overview
-python main.py overview
-
-# Show help
+python main.py generate    # Generate Moodle XML quiz questions
+python main.py download    # Fetch student submissions from Moodle
+python main.py evaluate    # Grade downloaded submissions
+python main.py upload      # Send results back to Moodle
+python main.py auto        # Full pipeline: download → evaluate → upload
+python main.py overview    # Generate students_overview.csv
 python main.py --help
 ```
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
-Edit `.env` file to configure all settings. All settings are auto-validated - invalid configurations will raise clear error messages.
+All settings live in `.env`. They are loaded in `core/config/settings_parse.py` and validated in `core/config/validation.py` before any command runs — invalid configurations raise clear error messages.
 
-### Question Generation Settings
+### Question Generation
 ```env
-# Quiz category in Moodle
 QUIZ_CATEGORY="Zapoctovka A/prakticka cast"
-
-# Number of questions to generate
 NUMBER_OF_QUESTIONS=10
 
-# Regex difficulty control (number of states)
 REGEX_MIN_STATES_COUNT=4
 REGEX_MAX_STATES_COUNT=4
 
-# Type of automaton: "dfa", "nfa", or "any"
-AUTOMATON_TYPE="any"
+AUTOMATON_TYPE="any"        # "dfa", "nfa", or "any"
+IMPLEMENTATION_TYPE="any"   # "iterative", "recursive", or "any"
 
-# Type of implementation: "iterative", "recursive", or "any"
-IMPLEMENTATION_TYPE="any"
-
-# Alphabet size constraints
 MAX_ALPHABET_SIZE=3
 MIN_ALPHABET_SIZE=3
 ```
 
-### Question Properties & Evaluation Settings
+### Evaluation
 ```env
-# Report title/name
 REPORT_TITLE="FSA Credit Test A"
-
-# Max points for assignment
 ASSIGNMENT_MAX_POINTS=7
 
-# Test configuration
 TEST_WORDS_COUNT=30
-BAD_WORD_RATIO_LEVEL=0.4
+BAD_WORD_RATIO_LEVEL=0.4   # Fraction of non-accepted test words
 GROUP_SIZE=5
 ```
 
-### Scoring Configuration - DFA (Deterministic Finite Automaton)
+### Scoring
+
+Each group must sum to 100.
+
 ```env
-DKA_FSA_ISOMORPHISM=30      # Points for FSA isomorphism check
-DKA_FSA_ANNOTATIONS=10      # Points for state annotations
-DKA_IMPLEMENTATION=60       # Points for code implementation
-# Total: 100 points
+# DFA scoring
+DKA_FSA_ISOMORPHISM=30
+DKA_FSA_ANNOTATIONS=10
+DKA_IMPLEMENTATION=60
+
+# NFA scoring
+NKA_FSA_ISOMORPHISM=30
+NKA_IMPLEMENTATION=70
 ```
 
-### Scoring Configuration - NFA (Nondeterministic Finite Automaton)
+### Moodle
 ```env
-NKA_FSA_ISOMORPHISM=30      # Points for FSA isomorphism check
-NKA_IMPLEMENTATION=70       # Points for code implementation
-# Total: 100 points
-```
-
-### Moodle Settings
-```env
-# Moodle credentials
 MOODLE_USERNAME="admin"
 MOODLE_PASSWORD="your_password"
-
-# Moodle assignment link
 ASSIGNMENT_LINK="https://moodle.fei.tuke.sk/mod/quiz/view.php?id=14374"
-
-# Question number to evaluate
 QUESTION_NUMBER=1
+HEADLESS=true              # Run browser in headless mode
 ```
 
 ---
 
-## 📊 Project Structure
+## Project Structure
 
 ```
 fj_assignments/
+├── main.py                          # CLI entry point
+├── test.py                          # Manual testing script
+├── testing_utils.py                 # Helpers for generating automata by regex
+│
 ├── core/
 │   ├── assignment/
-│   │   ├── quiz_generator.py        # Generate Moodle XML questions
-│   │   ├── assignment_variables.py  # Random assignment generation
-│   │   └── utils.py
+│   │   ├── quiz_generator.py        # Generate Moodle XML + embed skeleton zips
+│   │   └── assignment_variables.py  # Random assignment variable generation
 │   ├── config/
 │   │   ├── settings_parse.py        # Load .env configuration
 │   │   └── validation.py            # Validate all settings
 │   ├── evaluation/
-│   │   ├── fsa_evaluation.py        # Evaluate FSA specifications
+│   │   ├── fsa_evaluation.py        # Evaluate FSA specifications (isomorphism, annotations)
 │   │   ├── implementation_evaluation.py  # Evaluate code implementations
-│   │   ├── report.py                # Generate evaluation reports
-│   │   └── utils/
-│   └── regex/
-│       ├── frontend/                # Regex parsing (Lexer/Parser)
-│       ├── automata/                # DFA/NFA builders
-│       └── generators/              # FSA file generation
+│   │   └── report.py                # Generate evaluation reports
+│   ├── regex/
+│   │   ├── frontend/                # ANTLR4-based regex lexer/parser
+│   │   ├── automata/                # DFA/NFA builders from parsed regex
+│   │   └── generators/              # FSA spec and Python code generators
+│   └── summary/
+│       └── students_overview_generator.py
+│
 ├── automated_testing/
-│   ├── download_solutions.py        # Download from Moodle
-│   ├── solution_evaluation.py       # Evaluate all solutions
-│   └── uploading_results.py         # Upload grades to Moodle
-├── tasks/
-│   ├── task1_isomorphism/           # Isomorphism checking
-│   └── task2_behavioral_testing/    # Behavioral testing
-├── output/
-│   ├── fsa/                         # Generated FSA files
-│   ├── automata/                    # Generated automata implementations
-│   └── results/                     # Evaluation reports
+│   ├── download_solutions.py        # Moodle scraping and zip download
+│   ├── evaluate_solutions.py        # Per-student evaluation pipeline
+│   └── upload_results.py            # Upload grades to Moodle
+│
+├── testing/
+│   ├── task1_isomorphism/           # Isomorphism checker and FSA generator
+│   │   ├── checker/compare.py       # check_isomorphism(), check_annotations()
+│   │   └── generator/automata/
+│   │       └── canonical.py         # Canonical signature (NFA-safe BFS ordering)
+│   └── task2_behavioral_testing/
+│       ├── generator/               # Reference implementation generators
+│       ├── skeletons/               # Starter code zipped into quiz questions
+│       │   ├── skeleton_dfa_iter/
+│       │   ├── skeleton_dfa_rec/
+│       │   ├── skeleton_nfa_iter/
+│       │   └── skeleton_nfa_rec/
+│       └── word_generation/         # Accepted/rejected word generators
+│
 ├── tests/
-│   ├── task1/                       # Isomorphism tests
-│   └── task2/                       # Implementation tests
-├── main.py                          # Entry point
-├── .env                             # Configuration (don't commit)
-├── requirements.txt                 # Dependencies
-└── README.md                        # This file
+│   ├── task1/
+│   │   ├── test_isomorphism.py              # FSA file-based isomorphism tests
+│   │   └── test_nfa_isomorphism_stability.py # Multi-run NFA stability tests
+│   └── task2/
+│       ├── test_dka_iterative.py
+│       ├── test_dka_recursive.py
+│       ├── test_nka_iterative.py
+│       └── test_nka_recursive.py
+│
+├── output/                          # Generated at runtime, not committed
+│   ├── quiz.xml
+│   ├── fsa/                         # Reference FSA specs
+│   ├── automata/                    # Reference Python implementations
+│   └── results/                     # Per-student evaluation reports
+│
+├── downloads/                       # Student submission zips (not committed)
+├── .env                             # Configuration (never commit)
+└── requirements.txt
 ```
 
 ---
 
-## 🔧 Commands Reference
+## Testing
 
-### Generate Questions
 ```bash
-python main.py generate
-```
-- Generates `NUMBER_OF_QUESTIONS` random FSA questions
-- Outputs to `output/quiz.xml`
-- Validates configuration before generating
-- Creates reference FSA files in `output/fsa/`
+# Run all tests
+pytest
 
-### Download Solutions
-```bash
-python main.py download
+# Run specific test files
+pytest tests/task1/test_isomorphism.py
+pytest tests/task1/test_nfa_isomorphism_stability.py
+pytest tests/task2/test_dka_iterative.py
+pytest tests/task2/test_nka_recursive.py
 ```
-- Logs into Moodle with provided credentials
-- Downloads all student submissions
-- Extracts and organizes files by student
-- Stores metadata in `students.json`
-- Can be resumed if interrupted
 
-### Evaluate Solutions
-```bash
-python main.py evaluate
-```
-- Evaluates all downloaded solutions
-- Generates per-student evaluation reports
-- Performs:
-  - FSA isomorphism checks
-  - State annotation verification
-  - Implementation behavioral testing
-- Stores results in `output/results/`
-
-**Evaluation checks:**
-- DFA/NFA specification correctness
-- Code implementation correctness
-- Test case pass/fail analysis
-
-### Upload Results
-```bash
-python main.py upload
-```
-- Uploads evaluation results to Moodle
-- Attaches detailed reports
-- Updates student grades
-
-### Generate Testing Overview
-```bash
-python main.py overview
-```
-- Generates CSV table from downloaded student metadata
-- Outputs to `output/students_overview.csv`
-- Contains columns: email, automaton_type, implementation_type, regex
-- Useful for quick review of all student assignments
-- Requires `students.json` from download step
-
-### Full Pipeline
-```bash
-python main.py auto
-```
-- Runs: Download → Evaluate → Upload
-- Complete workflow in one command
-
-### View Help
-```bash
-python main.py --help
-```
+`tests/task1/test_nfa_isomorphism_stability.py` specifically covers the NFA canonical signature stability bug — building the same NFA 10 times and verifying all runs are mutually isomorphic.
 
 ---
 
-## 📈 Workflow Example
-
-```bash
-# 1. Generate questions
-python main.py generate
-
-# 2. Download student solutions
-python main.py download
-
-# 3. Evaluate all solutions
-python main.py evaluate
-
-# 4. Check results
-ls output/results/
-
-# 5. Upload to Moodle
-python main.py upload
-```
-
----
-
-## 🔍 Output Files
-
-### Generated Files
+## Output Files
 
 | File | Purpose |
 |------|---------|
-| `output/quiz.xml` | Moodle quiz with generated questions |
-| `output/fsa/dka.fsa` | Reference DFA automaton specification |
-| `output/fsa/nka.fsa` | Reference NFA automaton specification |
-| `output/automata/dka_iterative.py` | DFA iterative implementation |
-| `output/automata/dka_recursive.py` | DFA recursive implementation |
-| `output/automata/nka_iterative.py` | NFA iterative implementation |
-| `output/automata/nka_recursive.py` | NFA recursive implementation |
+| `output/quiz.xml` | Moodle quiz with generated questions and skeleton attachments |
+| `output/fsa/dka.fsa` | Reference DFA specification |
+| `output/fsa/nka.fsa` | Reference NFA specification |
+| `output/automata/dka_iterative.py` | Reference DFA iterative implementation |
+| `output/automata/dka_recursive.py` | Reference DFA recursive implementation |
+| `output/automata/nka_iterative.py` | Reference NFA iterative implementation |
+| `output/automata/nka_recursive.py` | Reference NFA recursive implementation |
 | `output/results/*.txt` | Evaluation reports per student |
-| `output/students_overview.csv` | Student metadata overview table |
-| `students.json` | Downloaded metadata |
-
-### Directory Structure
-
-```
-output/
-├── quiz.xml                    # Generated Moodle quiz
-├── fsa/
-│   ├── dka.fsa                # DFA specification
-│   └── nka.fsa                # NFA specification
-├── automata/
-│   ├── dka_iterative.py
-│   ├── dka_recursive.py
-│   ├── nka_iterative.py
-│   └── nka_recursive.py
-└── results/
-    ├── assignment_report.txt
-    └── [student_reports]/
-```
----
-
-## 🔐 Security Notes
-
-### Environment Variables
-
-Never commit `.env` to version control:
-```bash
-# Add to .gitignore
-echo ".env" >> .gitignore
-```
-
-### Moodle Credentials
-
-- Store securely in `.env`
-- Don't share `.env` files with others
-- Use service accounts if possible
-- Rotate passwords periodically
-- Don't store credentials in code
-
-### File Access
-
-- Ensure output directories have appropriate permissions
-- Don't share evaluation results publicly
-- Keep student data private
+| `output/students_overview.csv` | Student assignment overview |
+| `downloads/` | Raw student submission zips |
 
 ---
 
-[//]: # (## 📄 License)
+## Security Notes
 
-[//]: # ()
-[//]: # (MIT License - See LICENSE file for details)
-
-[//]: # ()
-[//]: # (---)
-
-## 🚀 Getting Started Checklist
-
-- [ ] Python 3.13+ installed
-- [ ] Project downloaded/cloned
-- [ ] Virtual environment created: `python -m venv venv`
-- [ ] Virtual environment activated
-- [ ] Dependencies installed: `pip install -r requirements.txt`
-- [ ] `.env` file created and filled
-- [ ] Run `python main.py generate` to test
-- [ ] Check `output/quiz.xml` was created
-- [ ] Ready to go! 🎉
+- Never commit `.env` to version control
+- Keep student submission data private
+- Use a dedicated Moodle service account if possible
 
 ---
 
-## 📈 Version History
+## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0.0 | 2026-03-12 | Initial release - Full automation pipeline |
+| 1.0.0 | 2026-03-12 | Initial release — full automation pipeline |
+| 1.1.0 | 2026-03-20 | Skeleton zips embedded in generated quiz questions |
+| 1.2.0 | 2026-03-28 | Fix stale .pyc cache causing wrong reference automaton; fix NFA canonical signature non-determinism in isomorphism check; add NFA stability tests |
 
 ---
 
-## 🎯 Quick Links
-
-- **Main Entry Point:** `main.py`
-- **Configuration:** `.env`
-- **Question Generator:** `core/assignment/quiz_generator.py`
-- **FSA Evaluator:** `core/evaluation/fsa_evaluation.py`
-- **Implementation Evaluator:** `core/evaluation/implementation_evaluation.py`
-
----
-
-## 🤖 Workflow Summary
-
-```
-START
-  ↓
-[Generate] → Create FSA questions, generate reference automata
-  ↓
-[Download] → Scrape Moodle, extract student solutions
-  ↓
-[Evaluate] → Check FSA specs, test implementations, grade
-  ↓
-[Upload] → Send grades and reports back to Moodle
-  ↓
-COMPLETE
-```
-
----
-
-**Happy automaton grading!** 🤖
-
-For issues or questions, check the troubleshooting section or review code comments.
-
-Last updated: March 12, 2026 | Python 3.13+
+Last updated: March 28, 2026 | Python 3.13+
