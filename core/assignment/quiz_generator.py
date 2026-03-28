@@ -33,7 +33,7 @@ from core.config.validation import validate_all_settings
 OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent / "output"
 OUTPUT_FILE = OUTPUT_DIR / "quiz.xml"
 
-SKELETON_DIR = Path(__file__).resolve().parent.parent.parent / "testing" / "task2_behavioral_testing" / "skeletons"
+SKELETON_DIR = Path(__file__).resolve().parent.parent.parent / "graders" / "behavioral" / "skeletons"
 
 # Mapping from template key to (skeleton subdirectory name, zip filename)
 SKELETON_MAP = {
