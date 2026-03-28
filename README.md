@@ -161,20 +161,20 @@ fj_assignments/
 │   │   ├── frontend/                # ANTLR4-based regex lexer/parser
 │   │   ├── automata/                # DFA/NFA builders from parsed regex
 │   │   └── generators/              # FSA spec and Python code generators
-│   └── summary/
-│       └── students_overview_generator.py
+│   └── students_overview_generator.py   # Generate students_overview.csv
 │
-├── automated_testing/
+├── pipeline/
 │   ├── download_solutions.py        # Moodle scraping and zip download
 │   ├── evaluate_solutions.py        # Per-student evaluation pipeline
 │   └── upload_results.py            # Upload grades to Moodle
 │
-├── testing/
-│   ├── task1_isomorphism/           # Isomorphism checker and FSA generator
+├── graders/                         # Grading logic library (used by pipeline)
+│   ├── isomorphism/
 │   │   ├── checker/compare.py       # check_isomorphism(), check_annotations()
-│   │   └── generator/automata/
+│   │   └── fsa_parser/automata/
 │   │       └── canonical.py         # Canonical signature (NFA-safe BFS ordering)
-│   └── task2_behavioral_testing/
+│   └── behavioral/
+│       ├── checker/                 # Static analysis (imports, iteration/recursion)
 │       ├── generator/               # Reference implementation generators
 │       ├── skeletons/               # Starter code zipped into quiz questions
 │       │   ├── skeleton_dfa_iter/
@@ -184,10 +184,10 @@ fj_assignments/
 │       └── word_generation/         # Accepted/rejected word generators
 │
 ├── tests/
-│   ├── task1/
+│   ├── isomorphism/
 │   │   ├── test_isomorphism.py              # FSA file-based isomorphism tests
 │   │   └── test_nfa_isomorphism_stability.py # Multi-run NFA stability tests
-│   └── task2/
+│   └── behavioral/
 │       ├── test_dka_iterative.py
 │       ├── test_dka_recursive.py
 │       ├── test_nka_iterative.py
@@ -213,13 +213,13 @@ fj_assignments/
 pytest
 
 # Run specific test files
-pytest tests/task1/test_isomorphism.py
-pytest tests/task1/test_nfa_isomorphism_stability.py
-pytest tests/task2/test_dka_iterative.py
-pytest tests/task2/test_nka_recursive.py
+pytest tests/isomorphism/test_isomorphism.py
+pytest tests/isomorphism/test_nfa_isomorphism_stability.py
+pytest tests/behavioral/test_dka_iterative.py
+pytest tests/behavioral/test_nka_recursive.py
 ```
 
-`tests/task1/test_nfa_isomorphism_stability.py` specifically covers the NFA canonical signature stability bug — building the same NFA 10 times and verifying all runs are mutually isomorphic.
+`tests/isomorphism/test_nfa_isomorphism_stability.py` specifically covers the NFA canonical signature stability bug — building the same NFA 10 times and verifying all runs are mutually isomorphic.
 
 ---
 

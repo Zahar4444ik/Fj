@@ -1,8 +1,8 @@
-from tests.task2.data.dka_iterative import student_a, student_b, student_random
+from tests.behavioral.data.dka_iterative import student_a, student_b, student_random
 import importlib.util
 import sys
 
-from testing.task2_behavioral_testing.word_generation.testing_words_generator import generate_accepted_words, \
+from graders.behavioral.word_generation.testing_words_generator import generate_accepted_words, \
     generate_rejected_words
 
 
@@ -17,7 +17,7 @@ def load_module_from_path(module_name, path):
 def prepare_reference_automaton(pattern, module_name, path):
     from core.regex.frontend.lexer import Lexer
     from core.regex.frontend.parser import Parser
-    from testing.task2_behavioral_testing.generator.dka.iterative import generate_iterative_dka
+    from graders.behavioral.generator.dka.iterative import generate_iterative_dka
 
     lexer = Lexer(pattern)
     parser = Parser(lexer)
@@ -32,7 +32,7 @@ def test_student_a():
     reference, ast = prepare_reference_automaton(
         "{0}",
         module_name="reference_a",
-        path="tests/task2/data/dka_iterative/reference_a.py"
+        path="tests/behavioral/data/dka_iterative/reference_a.py"
     )
 
     assert reference.DFA().check("000") == student_a.DFA().check("000")
@@ -43,7 +43,7 @@ def test_student_b():
     reference, ast = prepare_reference_automaton(
         "{01}1",
         module_name="reference_b",
-        path="tests/task2/data/dka_iterative/reference_b.py"
+        path="tests/behavioral/data/dka_iterative/reference_b.py"
     )
 
     assert reference.DFA().check("011") == student_b.DFA().check("011")
@@ -54,7 +54,7 @@ def test_student_random():
     reference, tree = prepare_reference_automaton(
         "0|1{0|1}",
         module_name="reference_random",
-        path="tests/task2/data/dka_iterative/reference_random.py"
+        path="tests/behavioral/data/dka_iterative/reference_random.py"
     )
 
     words = generate_accepted_words(tree, count=5, max_iterations=5)

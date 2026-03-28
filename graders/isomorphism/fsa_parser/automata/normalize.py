@@ -1,6 +1,6 @@
 from collections import deque
 
-from testing.task1_isomorphism.generator.automata.classify import is_dfa
+from graders.isomorphism.fsa_parser.automata.classify import is_dfa
 
 
 # Ensure states from transitions are included

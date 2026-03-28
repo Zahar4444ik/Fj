@@ -15,12 +15,12 @@ from core.regex.frontend.helper import get_ast_from_regex
 from core.regex.automata.nka.nka_builder import build_NKA
 from core.regex.automata.dka.dka_builder import build_DKA
 from core.regex.generators.fsa.fsa_generator import fsa_from_nka
-from testing.task1_isomorphism.checker.compare import (
+from graders.isomorphism.checker.compare import (
     prepare_automaton_for_fsa_test,
     check_isomorphism,
     check_annotations,
 )
-from testing.task1_isomorphism.generator.automata.canonical import canonical_signature
+from graders.isomorphism.fsa_parser.automata.canonical import canonical_signature
 
 
 RUNS = 10

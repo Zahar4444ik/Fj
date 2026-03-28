@@ -1,10 +1,10 @@
 from antlr4 import *
 from antlr4.error.ErrorListener import ErrorListener
 
-from testing.task1_isomorphism.generator.generated.FSALexer import FSALexer
-from testing.task1_isomorphism.generator.generated.FSAListener import FSAListener
-from testing.task1_isomorphism.generator.generated.FSAParser import FSAParser
-from testing.task1_isomorphism.generator.automata.automaton import Automaton
+from graders.isomorphism.fsa_parser.generated.FSALexer import FSALexer
+from graders.isomorphism.fsa_parser.generated.FSAListener import FSAListener
+from graders.isomorphism.fsa_parser.generated.FSAParser import FSAParser
+from graders.isomorphism.fsa_parser.automata.automaton import Automaton
 
 
 class FSABuilder(FSAListener):

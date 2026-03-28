@@ -1,7 +1,7 @@
 import random
 
 from core.config.settings_parse import AUTOMATON_TYPE, IMPLEMENTATION_TYPE
-from core.regex.generators.regex.random_regex import generate_regex_with_state_count
+from core.regex.generators.random_regex import generate_regex_with_state_count
 
 
 def generate_assignment_variables(seed=None):

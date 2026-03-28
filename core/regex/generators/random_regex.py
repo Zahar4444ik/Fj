@@ -7,7 +7,7 @@ from core.regex.automata.nka.nka_builder import build_NKA, count_nka_states
 from core.regex.frontend.syntax import ALPHABET
 from core.regex.frontend.helper import get_ast_from_regex
 from core.regex.automata.dka.dka_builder import build_DKA
-from core.regex.generators.regex.ast_nodes import (
+from core.regex.generators.ast_nodes import (
     Symbol, Star, Union, Concat, Optional,
     is_atomic, count_stars, count_unions, count_nodes,
 )

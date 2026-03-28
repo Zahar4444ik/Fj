@@ -15,14 +15,14 @@ from core.config.settings_parse import DKA_IMPLEMENTATION, NKA_IMPLEMENTATION, T
     GROUP_SIZE
 from core.evaluation.report import AssignmentReport
 from core.evaluation.utils.difference_print import format_acceptance_diff
-from testing.task2_behavioral_testing.checker.check_imports import check_imports
-from testing.task2_behavioral_testing.checker.utils import check_no_iteration, check_no_recursion
-from testing.task2_behavioral_testing.generator.dka.iterative import generate_iterative_dka
-from testing.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
-from testing.task2_behavioral_testing.generator.nka.iterative import generate_iterative_nka
-from testing.task2_behavioral_testing.generator.nka.recursive import generate_recursive_nka
-from testing.task2_behavioral_testing.generator.utils.resursive_helper import get_start_state_for_recursive
-from testing.task2_behavioral_testing.word_generation.testing_words_generator import generate_accepted_words, \
+from graders.behavioral.checker.check_imports import check_imports
+from graders.behavioral.checker.utils import check_no_iteration, check_no_recursion
+from graders.behavioral.generator.dka.iterative import generate_iterative_dka
+from graders.behavioral.generator.dka.recursive import generate_recursive_dka
+from graders.behavioral.generator.nka.iterative import generate_iterative_nka
+from graders.behavioral.generator.nka.recursive import generate_recursive_nka
+from graders.behavioral.generator.utils.recursive_helper import get_start_state_for_recursive
+from graders.behavioral.word_generation.testing_words_generator import generate_accepted_words, \
     generate_rejected_words
 
 # ============================================================================

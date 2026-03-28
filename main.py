@@ -1,10 +1,10 @@
 import argparse
 
 from core.assignment.quiz_generator import generate_quiz
-import automated_testing.download_solutions as downloader
-import automated_testing.evaluate_solutions as evaluator
-import automated_testing.upload_results as uploader
-import core.summary.students_overview_generator as overview
+import pipeline.download_solutions as downloader
+import pipeline.evaluate_solutions as evaluator
+import pipeline.upload_results as uploader
+import core.students_overview_generator as overview
 from core.config.validation import validate_all_settings
 
 

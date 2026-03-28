@@ -10,11 +10,11 @@ from core.regex.frontend.helper import get_ast_from_regex
 from core.regex.automata.dka.dka_builder import build_DKA
 from core.regex.automata.nka.nka_builder import build_NKA, count_nka_states
 from core.regex.generators.fsa.fsa_generator import fsa_from_dka, fsa_from_nka
-from core.regex.generators.regex.random_regex import generate_regex_with_state_count
-from testing.task2_behavioral_testing.generator.dka.iterative import generate_iterative_dka
-from testing.task2_behavioral_testing.generator.dka.recursive import generate_recursive_dka
-from testing.task2_behavioral_testing.generator.nka.iterative import generate_iterative_nka
-from testing.task2_behavioral_testing.generator.nka.recursive import generate_recursive_nka
+from core.regex.generators.random_regex import generate_regex_with_state_count
+from graders.behavioral.generator.dka.iterative import generate_iterative_dka
+from graders.behavioral.generator.dka.recursive import generate_recursive_dka
+from graders.behavioral.generator.nka.iterative import generate_iterative_nka
+from graders.behavioral.generator.nka.recursive import generate_recursive_nka
 
 OUTPUT_DIR = Path(__file__).resolve().parent / "output"
 FSA_DIR = OUTPUT_DIR / "fsa"
@@ -84,24 +84,24 @@ def generate_automata(regex: str) -> dict:
 if __name__ == "__main__":
 
     """GENERATE ALL TYPES OF FSA AND IMPLEMENTATION FROM REGEX"""
-    # test_regex = "YYY|{4|Y}"
-    # print(f"Generating FSA for regex: {test_regex}")
-    # fsa_files = generate_fsa(test_regex)
-    # print(f"FSA files generated!")
-    #
-    # print(f"\nGenerating automata implementations for regex: {test_regex}")
-    # automata_files = generate_automata(test_regex)
-    # print(f"Automata implementation files generated!")
+    test_regex = "{(h|F)h(h|Fh)}k"
+    print(f"Generating FSA for regex: {test_regex}")
+    fsa_files = generate_fsa(test_regex)
+    print(f"FSA files generated!")
+
+    print(f"\nGenerating automata implementations for regex: {test_regex}")
+    automata_files = generate_automata(test_regex)
+    print(f"Automata implementation files generated!")
 
     """GENERATE RANDOM REGEXES"""
 
-    COUNT = 10
-    automaton_type = "nfa"
-    for regex in [generate_regex_with_state_count(automaton_type) for _ in range(20)]:
-        if automaton_type == "dfa":
-            automaton = build_DKA(get_ast_from_regex(regex), regex)
-            count = len(automaton.name_map)
-        else:
-            automaton = build_NKA(get_ast_from_regex(regex))
-            count = count_nka_states(automaton)
-        print(f"{regex:<30} ->  {count} states")
+    # COUNT = 10
+    # automaton_type = "nfa"
+    # for regex in [generate_regex_with_state_count(automaton_type) for _ in range(20)]:
+    #     if automaton_type == "dfa":
+    #         automaton = build_DKA(get_ast_from_regex(regex), regex)
+    #         count = len(automaton.name_map)
+    #     else:
+    #         automaton = build_NKA(get_ast_from_regex(regex))
+    #         count = count_nka_states(automaton)
+    #     print(f"{regex:<30} ->  {count} states")

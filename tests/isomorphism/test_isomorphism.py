@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from testing.task1_isomorphism.checker.compare import check_isomorphism, prepare_automaton_for_fsa_test
+from graders.isomorphism.checker.compare import check_isomorphism, prepare_automaton_for_fsa_test
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
