@@ -34,6 +34,7 @@ OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent / "output"
 OUTPUT_FILE = OUTPUT_DIR / "quiz.xml"
 
 SKELETON_DIR = Path(__file__).resolve().parent.parent.parent / "graders" / "behavioral" / "skeletons"
+SKELETON_SHARED_DIR = SKELETON_DIR / "shared"
 
 # Mapping from template key to (skeleton subdirectory name, zip filename)
 SKELETON_MAP = {
@@ -63,12 +64,18 @@ logger = logging.getLogger(__name__)
 # -------------------------------------------------------------------------------
 
 def _build_skeleton_zip(skeleton_dir: Path) -> bytes:
-    """Zip all files in skeleton_dir flat (no subdirectory inside the archive)."""
+    """Zip skeleton files plus the shared syntax checker into a flat archive.
+
+    Archive layout:
+        automaton.py, main.py, specification.fsa  ← skeleton-specific files
+        check_syntax.py                            ← shared, self-contained syntax checker
+    """
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
         for file in skeleton_dir.iterdir():
             if file.is_file():
                 zf.write(file, arcname=file.name)
+        zf.write(SKELETON_SHARED_DIR / "check_syntax.py", arcname="check_syntax.py")
     return buffer.getvalue()
 
 
