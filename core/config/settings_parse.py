@@ -85,3 +85,5 @@ def parse_bool(value) -> bool:
 
 
 HEADLESS = parse_bool(os.getenv("HEADLESS", "true"))
+
+REGEX_LATEX_FORMAT = parse_bool(os.getenv("REGEX_LATEX_FORMAT", "true"))

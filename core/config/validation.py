@@ -99,6 +99,9 @@ def _validate_generation_settings():
             f"MAX_ALPHABET_SIZE ({MAX_ALPHABET_SIZE})"
         )
 
+    if not isinstance(REGEX_LATEX_FORMAT, bool):
+        errors.append("REGEX_LATEX_FORMAT must be a boolean value (true/false)")
+
     return errors
 
 

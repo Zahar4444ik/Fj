@@ -23,8 +23,7 @@ from importlib import resources
 from pathlib import Path
 
 from core.assignment.assignment_variables import generate_assignment_variables
-from core.config.settings_parse import CATEGORY, NUMBER_OF_QUESTIONS
-from core.config.validation import validate_all_settings
+from core.config.settings_parse import CATEGORY, NUMBER_OF_QUESTIONS, REGEX_LATEX_FORMAT
 
 # -------------------------------------------------------------------------------
 # CONFIGURATION
@@ -135,14 +134,12 @@ def _apply_regex_to_question(question_element: ET.Element, regex: str) -> None:
     if questiontext is None or not questiontext.text:
         raise ValueError("Question element missing questiontext/text")
 
-    escaped_regex = _escape_regex_for_latex(regex)
+    if REGEX_LATEX_FORMAT:
+        replacement = f"$${_escape_regex_for_latex(regex)}$$"
+    else:
+        replacement = regex
 
-    updated = re.sub(
-        r"\$\$.*?\$\$",
-        f"$${escaped_regex}$$",  # Finds the LaTeX placeholder ($$...$$) in the question text
-        questiontext.text,
-        flags=re.DOTALL,
-    )
+    updated = re.sub(r"\$\$.*?\$\$", replacement, questiontext.text, flags=re.DOTALL)
 
     if updated == questiontext.text:
         raise ValueError(f"No LaTeX placeholder found in question template for regex: {regex}")
