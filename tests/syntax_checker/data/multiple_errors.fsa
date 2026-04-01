@@ -1,0 +1,6 @@
+alphabt: {a, b}
+states: {q0, q1}
+initial_state: q0
+transitions: {
+  q0 -> q1
+}

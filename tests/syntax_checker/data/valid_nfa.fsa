@@ -1,0 +1,11 @@
+alphabet: {a, b}
+states: {q0, q1, q2, q3}
+initial_state: q0
+accepting_states: {q3}
+
+transitions: {
+  q0 -eps-> q1,
+  q0 -a-> q2,
+  q1 -b-> q3,
+  q2 -epsilon-> q3
+}
