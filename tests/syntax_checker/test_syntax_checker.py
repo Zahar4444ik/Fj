@@ -1,5 +1,5 @@
 """
-Tests for the student-facing FSA syntax checker (check_syntax.py).
+Tests for the student-facing FSA syntax checker (check_fsa_syntax.py).
 
 Imports check_fsa_syntax directly from the shared skeleton script so that
 the tests always run against the exact code students receive in the zip.
@@ -16,10 +16,10 @@ import pytest
 
 _CHECKER_PATH = (
     Path(__file__).resolve().parent.parent.parent
-    / "graders" / "behavioral" / "skeletons" / "shared" / "check_syntax.py"
+    / "graders" / "behavioral" / "skeletons" / "shared" / "check_fsa_syntax.py"
 )
 
-_spec = importlib.util.spec_from_file_location("check_syntax", _CHECKER_PATH)
+_spec = importlib.util.spec_from_file_location("check_fsa_syntax", _CHECKER_PATH)
 _module = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_module)
 check_fsa_syntax = _module.check_fsa_syntax
@@ -128,6 +128,23 @@ def test_multiple_errors_reported():
     errs = errors("multiple_errors.fsa")
     assert len(errs) >= 2, (
         f"Expected at least 2 errors, got {len(errs)}:\n" + "\n".join(errs)
+    )
+
+
+# ---------------------------------------------------------------------------
+# Comma enforcement
+# ---------------------------------------------------------------------------
+
+
+def test_missing_comma_between_items():
+    """Commas are required between items in all list sections; only the trailing comma is optional.
+    The fixture has missing commas in alphabet, accepting_states, and transitions."""
+    errs = errors("missing_comma.fsa")
+    assert len(errs) >= 3, (
+        f"Expected at least 3 missing-comma errors, got {len(errs)}:\n" + "\n".join(errs)
+    )
+    assert all("',' " in e or "','" in e for e in errs), (
+        f"All errors should mention a missing comma:\n" + "\n".join(errs)
     )
 
 

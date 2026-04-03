@@ -84,7 +84,7 @@ def generate_automata(regex: str) -> dict:
 if __name__ == "__main__":
 
     """GENERATE ALL TYPES OF FSA AND IMPLEMENTATION FROM REGEX"""
-    test_regex = "{(h|F)h(h|Fh)}k"
+    test_regex = "ab|b"
     print(f"Generating FSA for regex: {test_regex}")
     fsa_files = generate_fsa(test_regex)
     print(f"FSA files generated!")

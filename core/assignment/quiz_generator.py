@@ -74,7 +74,7 @@ def _build_skeleton_zip(skeleton_dir: Path) -> bytes:
         for file in skeleton_dir.iterdir():
             if file.is_file():
                 zf.write(file, arcname=file.name)
-        zf.write(SKELETON_SHARED_DIR / "check_syntax.py", arcname="check_syntax.py")
+        zf.write(SKELETON_SHARED_DIR / "check_fsa_syntax.py", arcname="check_fsa_syntax.py")
     return buffer.getvalue()
 
 

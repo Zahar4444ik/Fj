@@ -108,8 +108,6 @@ class _Parser:
         """Advance until one of the stop tokens (for error recovery)."""
         while self._peek() and self._peek().kind not in stop_kinds:
             self._consume()
-        if self._peek() and self._peek().kind == "COMMA":
-            self._consume()
 
     # --- top-level ---
 
@@ -180,108 +178,159 @@ class _Parser:
             self._expect("RBRACE", f"expected '}}' to close '{section}' block")
 
     def _parse_id_list(self):
-        """Comma-separated IDs — used for alphabet and accepting_states."""
-        while self._peek() and self._peek().kind != "RBRACE":
-            tok = self._peek()
-            if tok.kind in ("ID", "EPSILON", "KEYWORD"):
-                self._consume()
-            else:
-                self.errors.append(
-                    f"Line {tok.line}, col {tok.col}: expected a symbol/state name, got '{tok.value}'"
-                )
-                self._consume()
-                continue
-            if self._peek() and self._peek().kind == "COMMA":
-                self._consume()
-
-    def _parse_state_list(self):
-        """States: ID (= "annotation")? — comma-separated."""
-        while self._peek() and self._peek().kind != "RBRACE":
-            tok = self._peek()
-            if tok.kind not in ("ID", "KEYWORD"):
-                self.errors.append(
-                    f"Line {tok.line}, col {tok.col}: expected a state name, got '{tok.value}'"
-                )
-                self._consume()
-                continue
+        """Comma-separated IDs: item (COMMA item)* COMMA? — alphabet, accepting_states."""
+        tok = self._peek()
+        if tok is None or tok.kind == "RBRACE":
+            return
+        # first item
+        if tok.kind in ("ID", "EPSILON", "KEYWORD"):
             self._consume()
-            if self._peek() and self._peek().kind == "EQUAL":
-                self._consume()
-                ann = self._peek()
-                if ann and ann.kind == "STRING":
-                    self._consume()
-                else:
-                    ref = ann if ann else tok
-                    self.errors.append(
-                        f"Line {ref.line}, col {ref.col}: expected a quoted string after '='"
-                    )
-            if self._peek() and self._peek().kind == "COMMA":
-                self._consume()
-
-    def _parse_transitions(self):
-        """Transitions: ID -symbol-> ID — comma-separated."""
+        else:
+            self.errors.append(
+                f"Line {tok.line}, col {tok.col}: expected a symbol/state name, got '{tok.value}'"
+            )
+            self._consume()
+            return
+        # subsequent items — each must be preceded by a comma
         while self._peek() and self._peek().kind != "RBRACE":
             tok = self._peek()
-
-            # skip stray commas
             if tok.kind == "COMMA":
                 self._consume()
-                continue
-
-            if tok.kind not in ("ID", "KEYWORD"):
+                if self._peek() and self._peek().kind == "RBRACE":
+                    break  # trailing comma OK
+                tok = self._peek()
+                if tok is None:
+                    break
+                if tok.kind in ("ID", "EPSILON", "KEYWORD"):
+                    self._consume()
+                else:
+                    self.errors.append(
+                        f"Line {tok.line}, col {tok.col}: expected a symbol/state name, got '{tok.value}'"
+                    )
+                    self._consume()
+            else:
                 self.errors.append(
-                    f"Line {tok.line}, col {tok.col}: "
-                    f"expected a state name to start a transition, got '{tok.value}'"
+                    f"Line {tok.line}, col {tok.col}: expected ',' before '{tok.value}'"
                 )
-                self._skip_to("COMMA", "RBRACE")
-                continue
+                self._consume()  # consume item anyway for error recovery
 
-            src = self._consume()
-
-            dash = self._peek()
-            if not dash or dash.kind != "DASH":
-                got = f"'{dash.value}'" if dash else "end of file"
-                self.errors.append(
-                    f"Line {src.line}: expected '-' after '{src.value}' "
-                    f"(transition format: state -symbol-> state), got {got}"
-                )
-                self._skip_to("COMMA", "RBRACE")
-                continue
-            self._consume()
-
-            sym = self._peek()
-            if not sym or sym.kind not in ("ID", "EPSILON", "KEYWORD"):
-                got = f"'{sym.value}'" if sym else "end of file"
-                self.errors.append(
-                    f"Line {src.line}: expected a transition symbol after '-', got {got}"
-                )
-                self._skip_to("COMMA", "RBRACE")
-                continue
-            self._consume()
-
-            arrow = self._peek()
-            if not arrow or arrow.kind != "ARROW":
-                got = f"'{arrow.value}'" if arrow else "end of file"
-                self.errors.append(
-                    f"Line {src.line}: expected '->' after transition symbol, got {got} "
-                    f"(transition format: state -symbol-> state)"
-                )
-                self._skip_to("COMMA", "RBRACE")
-                continue
-            self._consume()
-
-            dst = self._peek()
-            if not dst or dst.kind not in ("ID", "KEYWORD"):
-                got = f"'{dst.value}'" if dst else "end of file"
-                self.errors.append(
-                    f"Line {src.line}: expected a destination state after '->', got {got}"
-                )
-                self._skip_to("COMMA", "RBRACE")
-                continue
-            self._consume()
-
-            if self._peek() and self._peek().kind == "COMMA":
+    def _parse_state_list(self):
+        """States: stateEntry (COMMA stateEntry)* COMMA?"""
+        tok = self._peek()
+        if tok is None or tok.kind == "RBRACE":
+            return
+        self._parse_single_state_entry()
+        while self._peek() and self._peek().kind != "RBRACE":
+            tok = self._peek()
+            if tok.kind == "COMMA":
                 self._consume()
+                if self._peek() and self._peek().kind == "RBRACE":
+                    break  # trailing comma OK
+                self._parse_single_state_entry()
+            else:
+                self.errors.append(
+                    f"Line {tok.line}, col {tok.col}: expected ',' before '{tok.value}'"
+                )
+                self._parse_single_state_entry()
+
+    def _parse_single_state_entry(self):
+        tok = self._peek()
+        if tok is None or tok.kind == "RBRACE":
+            return
+        if tok.kind not in ("ID", "KEYWORD"):
+            self.errors.append(
+                f"Line {tok.line}, col {tok.col}: expected a state name, got '{tok.value}'"
+            )
+            self._consume()
+            return
+        self._consume()
+        if self._peek() and self._peek().kind == "EQUAL":
+            self._consume()
+            ann = self._peek()
+            if ann and ann.kind == "STRING":
+                self._consume()
+            else:
+                ref = ann if ann else tok
+                self.errors.append(
+                    f"Line {ref.line}, col {ref.col}: expected a quoted string after '='"
+                )
+
+    def _parse_transitions(self):
+        """Transitions: transition (COMMA transition)* COMMA?"""
+        tok = self._peek()
+        if tok is None or tok.kind == "RBRACE":
+            return
+        self._parse_single_transition()
+        while self._peek() and self._peek().kind != "RBRACE":
+            tok = self._peek()
+            if tok.kind == "COMMA":
+                self._consume()
+                if self._peek() and self._peek().kind == "RBRACE":
+                    break  # trailing comma OK
+                self._parse_single_transition()
+            else:
+                self.errors.append(
+                    f"Line {tok.line}, col {tok.col}: expected ',' before '{tok.value}'"
+                )
+                self._parse_single_transition()
+
+    def _parse_single_transition(self):
+        """Parse one transition: ID -symbol-> ID."""
+        tok = self._peek()
+        if tok is None or tok.kind == "RBRACE":
+            return
+
+        if tok.kind not in ("ID", "KEYWORD"):
+            self.errors.append(
+                f"Line {tok.line}, col {tok.col}: "
+                f"expected a state name to start a transition, got '{tok.value}'"
+            )
+            self._skip_to("COMMA", "RBRACE")
+            return
+
+        src = self._consume()
+
+        dash = self._peek()
+        if not dash or dash.kind != "DASH":
+            got = f"'{dash.value}'" if dash else "end of file"
+            self.errors.append(
+                f"Line {src.line}: expected '-' after '{src.value}' "
+                f"(transition format: state -symbol-> state), got {got}"
+            )
+            self._skip_to("COMMA", "RBRACE")
+            return
+        self._consume()
+
+        sym = self._peek()
+        if not sym or sym.kind not in ("ID", "EPSILON", "KEYWORD"):
+            got = f"'{sym.value}'" if sym else "end of file"
+            self.errors.append(
+                f"Line {src.line}: expected a transition symbol after '-', got {got}"
+            )
+            self._skip_to("COMMA", "RBRACE")
+            return
+        self._consume()
+
+        arrow = self._peek()
+        if not arrow or arrow.kind != "ARROW":
+            got = f"'{arrow.value}'" if arrow else "end of file"
+            self.errors.append(
+                f"Line {src.line}: expected '->' after transition symbol, got {got} "
+                f"(transition format: state -symbol-> state)"
+            )
+            self._skip_to("COMMA", "RBRACE")
+            return
+        self._consume()
+
+        dst = self._peek()
+        if not dst or dst.kind not in ("ID", "KEYWORD"):
+            got = f"'{dst.value}'" if dst else "end of file"
+            self.errors.append(
+                f"Line {src.line}: expected a destination state after '->', got {got}"
+            )
+            self._skip_to("COMMA", "RBRACE")
+            return
+        self._consume()
 
     def _skip_block(self):
         depth = 0
