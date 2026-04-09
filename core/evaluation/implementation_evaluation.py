@@ -257,6 +257,8 @@ def _add_to_report(report: AssignmentReport, cfg: dict, variant: str, static_pas
         return
 
     report.subsection(f"2.2 Functional Testing ({variant}):")
+    report.add_info("Test cases are evaluated in groups, and points are awarded\nfor a group only if all inputs in "
+                    "that group produce correct\nresults.")
     report.add_info("")
 
     for result in group_results:
