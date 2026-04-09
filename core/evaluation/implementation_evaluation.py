@@ -74,7 +74,7 @@ IMPLEMENTATION_CONFIG = {
         "student_module_name": "automaton",
         "static_check": check_no_recursion,
         "generate": generate_iterative_dka,
-        "get_check_fn": lambda mod, _: mod.DFA().check,
+        "get_check_fn": lambda mod, _: lambda word: mod.DFA().check(word),
     },
     ("dfa", "recursive"): {
         "student_filename": "automaton.py",
@@ -92,7 +92,7 @@ IMPLEMENTATION_CONFIG = {
         "student_module_name": "automaton",
         "static_check": check_no_recursion,
         "generate": generate_iterative_nka,
-        "get_check_fn": lambda mod, _: mod.NFA().check,
+        "get_check_fn": lambda mod, _: lambda word: mod.NFA().check(word),
     },
     ("nfa", "recursive"): {
         "student_filename": "automaton.py",
