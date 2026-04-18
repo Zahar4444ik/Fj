@@ -183,9 +183,12 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         float: Points earned for FSA evaluation
     """
     type_cfg = FSA_CONFIG[automaton_type]
+    iso_points = _get_scoring_points(automaton_type, "isomorphism")
+    ann_points = _get_scoring_points(automaton_type, "annotations")
+    total_points = iso_points + ann_points
 
     if not os.path.exists(os.path.join(work_dir, type_cfg["student_fsa_filename"])):
-        report.section("1. FSA Specification Verification", 0)
+        report.section("1. FSA Specification Verification", total_points)
         report.add_info("\nERROR")
         report.add_info("-" * 60)
         report.add_info(f"Missing required file: specification.fsa")
@@ -205,8 +208,6 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         logger.debug(f"Running checks for {automaton_type} FSA")
 
         iso_passed = False
-        iso_points = _get_scoring_points(automaton_type, "isomorphism")
-        ann_points = _get_scoring_points(automaton_type, "annotations")
         ann_passed = None
         ann_correct = 0
         ann_total = 0
@@ -240,7 +241,7 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
         logger.info(f"FSA evaluation for {automaton_type} complete: {score} points")
         return score
     except Exception as e:
-        report.section("1. FSA Specification Verification", 0)
+        report.section("1. FSA Specification Verification", total_points)
         report.add_info("\nERROR")
         report.add_info("-" * 60)
         report.add_info(f"Evaluation failed: {e}")

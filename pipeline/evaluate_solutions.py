@@ -95,7 +95,7 @@ def extract_zip(zip_path: str, target_dir: str) -> bool:
 def flatten_if_single_subdir(work_dir: str) -> bool:
     required = ["automaton.py", "specification.fsa"]
     def has_required_files(path):
-        return all(os.path.exists(os.path.join(path, f)) for f in required)
+        return any(os.path.exists(os.path.join(path, f)) for f in required)
     while True:
         entries = [e for e in os.listdir(work_dir) if not e.startswith(".")]
         if len(entries) == 0:

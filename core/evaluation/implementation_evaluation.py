@@ -305,7 +305,7 @@ def evaluate_implementation(
     }[automaton_type]
 
     if not os.path.exists(os.path.join(work_dir, cfg["student_filename"])):
-        report.section("2. FSA Implementation Testing", 0)
+        report.section("2. FSA Implementation Testing", impl_points)
         report.add_info("\nERROR")
         report.add_info("-" * 60)
         report.add_info(f"Missing required file: automaton.py")
@@ -344,7 +344,7 @@ def evaluate_implementation(
         logger.info(f"Implementation evaluation for {automaton_type} {variant} complete: {score} points")
         return score
     except Exception as e:
-        report.section("2. FSA Implementation Testing", 0)
+        report.section("2. FSA Implementation Testing", impl_points)
         report.add_info("\nERROR")
         report.add_info("-" * 60)
         report.add_info(f"Evaluation failed: {e}")
