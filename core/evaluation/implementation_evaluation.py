@@ -8,6 +8,7 @@ Performs static analysis and behavioral testing on iterative/recursive implement
 import importlib.util
 import logging
 import os
+import threading
 from pathlib import Path
 
 from core.assignment.utils import load_module_from_path
@@ -191,6 +192,30 @@ def _create_groups(ast: dict) -> list[list[str]]:
     return groups
 
 
+STUDENT_TIMEOUT = 5  # seconds per word before treating as infinite loop
+
+
+def _safe_call(fn, word: str) -> bool:
+    result = [None]
+    exc = [None]
+
+    def target():
+        try:
+            result[0] = fn(word)
+        except Exception as e:
+            exc[0] = e
+
+    t = threading.Thread(target=target, daemon=True)
+    t.start()
+    t.join(timeout=STUDENT_TIMEOUT)
+
+    if t.is_alive():
+        raise TimeoutError(f"Student function timed out on word {word!r} (possible infinite loop)")
+    if exc[0] is not None:
+        raise exc[0]
+    return result[0]
+
+
 def _run_group_tests(reference_fn, student_fn, impl_points: int, ast: dict) -> tuple[list[dict], float]:
     """
     Run behavioral testing on groups of words.
@@ -209,7 +234,7 @@ def _run_group_tests(reference_fn, student_fn, impl_points: int, ast: dict) -> t
 
         for word in group:
             ref = reference_fn(word)
-            stu = student_fn(word)
+            stu = _safe_call(student_fn, word)
             if ref != stu:
                 mismatches.append({
                     "word": word,
