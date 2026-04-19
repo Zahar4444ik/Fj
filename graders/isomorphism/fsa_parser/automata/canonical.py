@@ -34,14 +34,23 @@ def canonical_signature(automaton):
             targets = automaton.transitions[current][symbol]
             ids = []
 
-            # Sort by structural properties (accepting status + outgoing symbols)
-            # rather than by arbitrary state name strings.  This makes the
-            # canonical BFS order invariant to the non-deterministic q-name
-            # assignment that get_state_name produces for NFA epsilon branches.
+            # Sort by structural properties rather than arbitrary state names.
+            # Two levels of lookahead breaks ties between siblings whose immediate
+            # properties are identical but whose children differ (e.g. symmetric
+            # NFA branches where one child is accepting and the other is not).
             def _struct_key(state_name):
                 accepting = state_name in automaton.accepting
                 out_symbols = tuple(sorted(automaton.transitions.get(state_name, {}).keys()))
-                return (accepting, out_symbols, state_name)
+                child_sigs = []
+                for sym in out_symbols:
+                    raw = automaton.transitions[state_name][sym]
+                    children = list(raw) if isinstance(raw, (list, set, frozenset)) else [raw]
+                    for child in children:
+                        child_acc = child in automaton.accepting
+                        child_out = tuple(sorted(automaton.transitions.get(child, {}).keys()))
+                        child_sigs.append((sym, child_acc, child_out))
+                child_sigs.sort()
+                return (accepting, out_symbols, tuple(child_sigs), state_name)
 
             for t in sorted(targets, key=_struct_key):
                 if t not in state_id:
