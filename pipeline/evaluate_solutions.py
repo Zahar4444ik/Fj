@@ -42,7 +42,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SOLUTIONS_PATH = BASE_DIR / "downloads"
 SOLUTIONS_PATH.mkdir(parents=True, exist_ok=True)
 RESULT_PATH = BASE_DIR / "output" / "results"
-OUTPUT_DIR =  BASE_DIR / "output"
+OUTPUT_DIR = BASE_DIR / "output"
 RESULT_PATH.mkdir(parents=True, exist_ok=True)
 
 AUTOMATON_BUILDERS = {
@@ -91,11 +91,22 @@ def extract_zip(zip_path: str, target_dir: str) -> bool:
         log.error("  Bad zip file: %s", exc)
         return False
 
-# new flatten function flatting not just one level of subdirectories 
+
 def flatten_if_single_subdir(work_dir: str) -> bool:
+    """
+        Repeatedly flatten single-subdirectory nesting until required files
+    are at the top level or no further flattening is possible.
+
+    Returns:
+        True if required files (automaton.py, specification.fsa) are found
+        at the top level of work_dir.
+        False if work_dir is empty (no entries found).
+    """
     required = ["automaton.py", "specification.fsa"]
+
     def has_required_files(path):
         return any(os.path.exists(os.path.join(path, f)) for f in required)
+
     while True:
         entries = [e for e in os.listdir(work_dir) if not e.startswith(".")]
         if len(entries) == 0:
@@ -104,41 +115,24 @@ def flatten_if_single_subdir(work_dir: str) -> bool:
             subpath = os.path.join(work_dir, entries[0])
             if not os.path.isdir(subpath):
                 return has_required_files(work_dir)
-            tmp_dir = tempfile.mkdtemp(dir=os.path.dirname(work_dir))
+            parent_dir = os.path.dirname(work_dir)
+            tmp_dir = tempfile.mkdtemp(dir=parent_dir)
             for item in os.listdir(subpath):
                 shutil.move(
                     os.path.join(subpath, item),
                     tmp_dir
                 )
-            shutil.rmtree(work_dir)
-            os.rename(tmp_dir, work_dir)
+            backup_dir = tempfile.mkdtemp(dir=parent_dir)
+            os.rmdir(backup_dir)
+            os.rename(work_dir, backup_dir)
+            try:
+                os.rename(tmp_dir, work_dir)
+            except Exception:
+                os.rename(backup_dir, work_dir)
+                raise
+            shutil.rmtree(backup_dir)
         else:
             return has_required_files(work_dir)
-# def flatten_if_single_subdir(work_dir: str) -> bool:
-#     """
-#     Repeatedly flatten single-subdirectory nesting until required files
-#     are at the top level or no further flattening is possible.
-#     Returns False if multiple subdirectories are found (bad zip structure).
-#     """
-#     while True:
-#         entries = [e for e in os.listdir(work_dir) if not e.startswith(".")]
-#         if len(entries) == 1:
-#             subdir = os.path.join(work_dir, entries[0])
-#             if not os.path.isdir(subdir):
-#                 break
-#             for item in os.listdir(subdir):
-#                 shutil.move(os.path.join(subdir, item), work_dir)
-#             os.rmdir(subdir)
-#             log.info("  Flattened subdirectory: %s/", entries[0])
-#         elif len(entries) > 1:
-#             # Multiple items — check if required files are already here
-#             required = ["automaton.py", "specification.fsa"]
-#             if all(os.path.exists(os.path.join(work_dir, f)) for f in required):
-#                 break  # files are present, structure is fine
-#             return False  # multiple dirs/files but required files missing
-#         else:
-#             break  # empty, will be caught by check_required_files
-#     return True
 
 
 def check_required_files(work_dir: str) -> list[str]:
