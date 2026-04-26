@@ -6,6 +6,7 @@ to ensure they meet requirements for each stage of the assignment workflow.
 """
 
 from .settings_parse import *
+from core.regex.frontend.syntax import ALPHABET as _FULL_ALPHABET
 
 
 def validate_all_settings():
@@ -101,6 +102,18 @@ def _validate_generation_settings():
 
     if not isinstance(REGEX_LATEX_FORMAT, bool):
         errors.append("REGEX_LATEX_FORMAT must be a boolean value (true/false)")
+
+    invalid_symbols = RESTRICTED_SYMBOLS - set(_FULL_ALPHABET)
+    if invalid_symbols:
+        errors.append(
+            f"RESTRICTED_SYMBOLS contains invalid symbols: {sorted(invalid_symbols)}"
+        )
+    usable_count = len(_FULL_ALPHABET) - len(RESTRICTED_SYMBOLS - invalid_symbols)
+    if usable_count < MAX_ALPHABET_SIZE:
+        errors.append(
+            f"After applying RESTRICTED_SYMBOLS, only {usable_count} symbols remain "
+            f"but MAX_ALPHABET_SIZE={MAX_ALPHABET_SIZE}"
+        )
 
     return errors
 

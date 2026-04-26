@@ -4,7 +4,7 @@ import time
 from core.config.settings_parse import MAX_ALPHABET_SIZE, \
     MIN_ALPHABET_SIZE, DFA_MIN_STATES_COUNT, DFA_MAX_STATES_COUNT, NFA_MIN_STATES_COUNT, NFA_MAX_STATES_COUNT
 from core.regex.automata.nka.nka_builder import build_NKA, count_nka_states
-from core.regex.frontend.syntax import ALPHABET
+from core.regex.frontend.syntax import USABLE_ALPHABET
 from core.regex.frontend.helper import get_ast_from_regex
 from core.regex.automata.dka.dka_builder import build_DKA
 from core.regex.generators.ast_nodes import (
@@ -45,7 +45,7 @@ _NFA_DEPTH_TABLE: list[tuple[int, int, int]] = [
 ]
 
 # Maximum time to spend trying to generate a single regex (seconds)
-_GENERATION_TIMEOUT = 5.0
+_GENERATION_TIMEOUT = 10.0
 
 
 # ---------------------------------------------------------------------------
@@ -99,7 +99,7 @@ def generate_ast(depth: int = 0, max_depth: int = 3, alphabet: list[str] = None)
       - Concat must not have two Union children (prevents ambiguous rendering)
     """
     if alphabet is None:
-        alphabet = ALPHABET
+        alphabet = USABLE_ALPHABET
 
     if depth >= max_depth:
         return Symbol(random.choice(alphabet))
@@ -202,7 +202,7 @@ def get_used_symbols(node) -> set[str]:
 def generate_valid_ast(max_depth: int = 3):
     """ Pick a small random subset of the alphabet for this regex """
     subset_size = random.randint(MIN_ALPHABET_SIZE, MAX_ALPHABET_SIZE)
-    local_alphabet = random.sample(ALPHABET, subset_size)
+    local_alphabet = random.sample(USABLE_ALPHABET, subset_size)
 
     while True:
         ast = generate_ast(max_depth=max_depth, alphabet=local_alphabet)
