@@ -75,7 +75,8 @@ def _build_dka_automata(regex: str, runs: int):
     "{a|b}c",           # kleene + alternation
     "(a|b)(c|d)",       # two alternations
     "a{b|c}d",          # nested kleene
-    "4t|ti",            # symmetric branches: one direct-accept vs one intermediate — canonical ordering regression
+    "4t|ti",            # symmetric branches: one direct-accept vs one intermediate
+    "(ac|b)|(a|bc)",    # depth-3 asymmetry: 2-level lookahead is insufficient
 ])
 def test_nfa_isomorphism_stable_across_runs(regex):
     """All NFA builds from the same regex must be mutually isomorphic."""
@@ -94,6 +95,7 @@ def test_nfa_isomorphism_stable_across_runs(regex):
     "(a|b)(c|d)",
     "a{b|c}d",
     "4t|ti",
+    "(ac|b)|(a|bc)",
 ])
 def test_nfa_annotations_stable_across_runs(regex):
     """All NFA builds from the same regex must produce identical state annotations."""
