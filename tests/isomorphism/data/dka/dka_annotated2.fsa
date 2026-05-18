@@ -1,0 +1,15 @@
+alphabet: {a, b}
+
+states: {
+    s0="start",
+    s1="middle",
+    s2="accept"
+}
+
+initial_state: s0
+accepting_states: {s2}
+
+transitions: {
+    s0 -a-> s1,
+    s1 -b-> s2
+}
