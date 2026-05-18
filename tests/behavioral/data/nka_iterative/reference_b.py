@@ -33,9 +33,9 @@ class NFA:
             (State.q2, 'eps'): {State.q3},
             (State.q3, '1'): {State.q4},
             (State.q5, 'eps'): {State.q6, State.q8},
-            (State.q6, '1'): {State.q7},
+            (State.q6, '0'): {State.q7},
             (State.q7, 'eps'): {State.q1, State.q5},
-            (State.q8, '0'): {State.q9},
+            (State.q8, '1'): {State.q9},
             (State.q9, 'eps'): {State.q1, State.q5},
         }
         self.accepted_states = {

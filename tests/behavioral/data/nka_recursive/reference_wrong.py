@@ -8,27 +8,27 @@ Automat je generovaný automaticky zo syntaxového stromu regexu.
 
 
 def q0(string: str) -> bool:
-    return q1(string) or q5(string)
+    return q1(string) or q4(string)
 
 
 def q1(string: str) -> bool:
-    return (len(string) > 0 and string[0] == '0' and q2(string[1:]))
+    return q2(string) or q8(string)
 
 
 def q2(string: str) -> bool:
-    return q3(string)
+    return (len(string) > 0 and string[0] == '1' and q3(string[1:]))
 
 
 def q3(string: str) -> bool:
-    return (len(string) > 0 and string[0] == '1' and q4(string[1:]))
+    return q1(string) or q4(string)
 
 
 def q4(string: str) -> bool:
-    return len(string) == 0
+    return (len(string) > 0 and string[0] == '0' and q5(string[1:]))
 
 
 def q5(string: str) -> bool:
-    return q6(string) or q8(string)
+    return q6(string)
 
 
 def q6(string: str) -> bool:
@@ -36,7 +36,7 @@ def q6(string: str) -> bool:
 
 
 def q7(string: str) -> bool:
-    return q1(string) or q5(string)
+    return len(string) == 0
 
 
 def q8(string: str) -> bool:
@@ -44,7 +44,7 @@ def q8(string: str) -> bool:
 
 
 def q9(string: str) -> bool:
-    return q1(string) or q5(string)
+    return q1(string) or q4(string)
 
 
 if __name__ == "__main__":

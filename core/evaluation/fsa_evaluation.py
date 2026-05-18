@@ -53,6 +53,7 @@ FSA_CONFIG = {
     "nfa": {
         "generate": fsa_from_nka,
         "reference_path": FSA_DIR / "nka.fsa",
+        "thompson_reference_path": FSA_DIR / "nka_thompson.fsa",
         "student_fsa_filename": "specification.fsa",
         "check_annotations": False,
     },
@@ -169,7 +170,8 @@ def _add_to_report(report: AssignmentReport,
 # PUBLIC API
 # ============================================================================
 
-def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport, work_dir: str) -> float:
+def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentReport, work_dir: str,
+                 thompson_automaton: NKA | None = None) -> float:
     """
     Evaluate FSA specification from student submission.
 
@@ -215,6 +217,15 @@ def evaluate_fsa(automaton: NKA | DKA, automaton_type: str, report: AssignmentRe
 
         if syntax_passed:
             iso_passed = _run_isomorphism_check(reference, student)
+
+            if not iso_passed and thompson_automaton is not None:
+                thompson_path = type_cfg.get("thompson_reference_path")
+                if thompson_path:
+                    _generate_reference_fsa(thompson_automaton, thompson_path)
+                    thompson_reference, _ = _load_reference_fsa(thompson_path)
+                    iso_passed = _run_isomorphism_check(thompson_reference, student)
+                    if iso_passed:
+                        logger.info("NFA isomorphism passed via Thompson construction fallback")
 
             if type_cfg["check_annotations"]:
                 ann_correct, ann_total, ann_passed, ann_diff = _run_annotations_check(reference, student)

@@ -24,12 +24,12 @@ class NFA:
     def __init__(self):
         self.transition_table = {
             (State.q0, 'eps'): {State.q1, State.q3},
-            (State.q1, '1'): {State.q2},
-            (State.q3, '0'): {State.q4},
-            (State.q4, 'eps'): {State.q1, State.q3},
+            (State.q1, '0'): {State.q2},
+            (State.q2, 'eps'): {State.q1, State.q3},
+            (State.q3, '1'): {State.q4},
         }
         self.accepted_states = {
-            State.q2,
+            State.q4,
         }
         self.init_state = State.q0
         self.stack = None

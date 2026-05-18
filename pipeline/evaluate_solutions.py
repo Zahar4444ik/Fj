@@ -34,6 +34,7 @@ from core.evaluation.implementation_evaluation import evaluate_implementation
 from core.evaluation.report import AssignmentReport
 from core.regex.automata.dka.dka_builder import build_DKA
 from core.regex.automata.nka.nka_builder import build_NKA
+from core.regex.automata.nka.thompson_nka_builder import build_thompson_NKA
 from core.regex.frontend.helper import get_ast_from_regex
 
 # ─────────────────────────── CONFIGURATION ───────────────────────────────────
@@ -229,13 +230,14 @@ def process_student(email: str, metadata: dict) -> None:
 
         ast = get_ast_from_regex(regex)
         automaton = AUTOMATON_BUILDERS[automaton_type](ast, regex)
+        thompson_automaton = build_thompson_NKA(ast) if automaton_type == "nfa" else None
 
     except Exception as e:
         fail(f"Automaton build failed: {e}")
         return
 
     # ── Evaluate ─────────────────────────────────────────────────────────────
-    score += evaluate_fsa(automaton, automaton_type, report, work_dir)
+    score += evaluate_fsa(automaton, automaton_type, report, work_dir, thompson_automaton=thompson_automaton)
     score += evaluate_implementation(ast, automaton_type, variant, report, work_dir)
 
     # ── Success ──────────────────────────────────────────────────────────────

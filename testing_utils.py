@@ -84,7 +84,7 @@ def generate_automata(regex: str) -> dict:
 if __name__ == "__main__":
 
     """GENERATE ALL TYPES OF FSA AND IMPLEMENTATION FROM REGEX"""
-    test_regex = "ab|b"
+    test_regex = "{V|yV}|7"
     print(f"Generating FSA for regex: {test_regex}")
     fsa_files = generate_fsa(test_regex)
     print(f"FSA files generated!")
@@ -92,16 +92,16 @@ if __name__ == "__main__":
     print(f"\nGenerating automata implementations for regex: {test_regex}")
     automata_files = generate_automata(test_regex)
     print(f"Automata implementation files generated!")
-
-    """GENERATE RANDOM REGEXES"""
+    #
+    # """GENERATE RANDOM REGEXES"""
 
     # COUNT = 10
     # automaton_type = "nfa"
-    # for regex in [generate_regex_with_state_count(automaton_type) for _ in range(20)]:
+    # for regex in [generate_regex_with_state_count(automaton_type) for _ in range(COUNT)]:
     #     if automaton_type == "dfa":
     #         automaton = build_DKA(get_ast_from_regex(regex), regex)
     #         count = len(automaton.name_map)
     #     else:
     #         automaton = build_NKA(get_ast_from_regex(regex))
     #         count = count_nka_states(automaton)
-    #     print(f"{regex:<30} ->  {count} states")
+    #     print(f"{regex:<30}")
